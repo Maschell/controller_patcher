@@ -980,8 +980,8 @@ void my_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned int
 		}else if(usr->hid != 0){
             int size = (HID_MAX_DATA_LENGTH_PER_PAD > bytes_transfered)? bytes_transfered : HID_MAX_DATA_LENGTH_PER_PAD;
             memcpy(&(((HID_Data *)config_controller_data_ptr[usr->deviceSlot][0])->hid_data),&buf[0],size);
-            usleep(5000); //DS4 is way tooo fast
-            log_printf("HID %02X %02X %02X %02X %02X %02X %02X %02X \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7]);
+            usleep(5000); //DS4 is way tooo fast (need to check the other pads)
+            //log_printf("HID %02X %02X %02X %02X %02X %02X %02X %02X \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7]);
             HIDRead(handle, usr->buf, bytes_transfered, my_read_cb, usr);
 		}
 	}
