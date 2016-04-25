@@ -19,6 +19,7 @@ void init_config_controller(){
     InitOSFunctionPointers();
     InitSysHIDFunctionPointers();
     InitVPadFunctionPointers();
+
     if(!config_done){
         config_done = 1;
         memset(config_controller,CONTROLLER_PATCHER_INVALIDVALUE,sizeof(config_controller)); // Init / Invalid everything
@@ -262,7 +263,6 @@ void init_config_controller(){
     }else{
         log_print("Config already done!\n");
     }
-
     if(!gHIDSetupDone){
         HIDSetup();
         gHIDSetupDone = 1;
