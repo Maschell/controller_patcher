@@ -15,11 +15,9 @@ void setConfigValue(u8 * dest, u8 first, u8 second){
 
 void init_config_controller(){
     InitOSFunctionPointers();
-    InitSocketFunctionPointers();
     InitSysHIDFunctionPointers();
-    InitSysFunctionPointers();
     InitVPadFunctionPointers();
-    InitGX2FunctionPointers();
+
     if(!config_done){
         config_done = 1;
         memset(config_controller,CONTROLLER_PATCHER_INVALIDVALUE,sizeof(config_controller)); // Init / Invalid everything
