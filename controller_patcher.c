@@ -5,6 +5,8 @@
 #include "controller_patcher.h"
 #include "dynamic_libs/os_functions.h"
 #include "dynamic_libs/sys_functions.h"
+#include "dynamic_libs/syshid_functions.h"
+#include "dynamic_libs/socket_functions.h"
 #include "cp_retain_vars.h"
 #include "utils/logger.h"
 
@@ -14,6 +16,9 @@ void setConfigValue(u8 * dest, u8 first, u8 second){
 }
 
 void init_config_controller(){
+    InitOSFunctionPointers();
+    InitSysHIDFunctionPointers();
+    InitVPadFunctionPointers();
     if(!config_done){
         config_done = 1;
         memset(config_controller,CONTROLLER_PATCHER_INVALIDVALUE,sizeof(config_controller)); // Init / Invalid everything
@@ -256,6 +261,15 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,HID_KEYBOARD_PAD_COUNT);
     }else{
         log_print("Config already done!\n");
+    }
+
+    if(!gHIDSetupDone){
+        HIDSetup();
+        gHIDSetupDone = 1;
+    }
+
+    if(!gHIDAttached){
+        HIDAddClient(&gHIDClient, my_attach_cb);
     }
 }
 
