@@ -5,6 +5,8 @@
 #include "controller_patcher.h"
 #include "dynamic_libs/os_functions.h"
 #include "dynamic_libs/sys_functions.h"
+#include "dynamic_libs/syshid_functions.h"
+#include "dynamic_libs/socket_functions.h"
 #include "cp_retain_vars.h"
 #include "utils/logger.h"
 
@@ -242,26 +244,25 @@ void init_config_controller(){
         //! Keyboard
         //!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_A],                 0x00,HID_KEYBOARD_BUTTON_A);
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_B],                 0x00,HID_KEYBOARD_BUTTON_B);
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_X],                 0x00,HID_KEYBOARD_BUTTON_X);
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_Y],                 0x00,HID_KEYBOARD_BUTTON_Y);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_A],                 0x00,HID_KEYBOARD_BUTTON_E);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_B],                 0x00,HID_KEYBOARD_BUTTON_Q);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_X],                 0x00,HID_KEYBOARD_BUTTON_SPACE);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_Y],                 0x00,HID_KEYBOARD_BUTTON_R);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_DPAD_MODE],                     CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Normal);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_LEFT],              0x00,HID_KEYBOARD_BUTTON_LEFT);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_RIGHT],             0x00,HID_KEYBOARD_BUTTON_RIGHT);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_DOWN],              0x00,HID_KEYBOARD_BUTTON_DOWN);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_UP],                0x00,HID_KEYBOARD_BUTTON_UP);
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_PLUS],                0x00,HID_KEYBOARD_BUTTON_PLUS);
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_MINUS],               0x00,HID_KEYBOARD_BUTTON_MINUS);
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_L],                   0x00,HID_KEYBOARD_BUTTON_L);
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_R],                   0x00,HID_KEYBOARD_BUTTON_R);
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_ZL],                  0x00,HID_KEYBOARD_BUTTON_U);
-        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_ZR],                  0x00,HID_KEYBOARD_BUTTON_I);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_PLUS],              0x00,HID_KEYBOARD_BUTTON_ENTER);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_MINUS],             0x00,HID_KEYBOARD_BUTTON_MINUS);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_L],                 0x00,HID_KEYBOARD_BUTTON_V);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_R],                 0x00,HID_KEYBOARD_BUTTON_B);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_ZL],                0x00,HID_KEYBOARD_BUTTON_SHIFT);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_ZR],                0x00,HID_KEYBOARD_BUTTON_N);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,HID_KEYBOARD_PAD_COUNT);
     }else{
         log_print("Config already done!\n");
     }
-    
     if(!gHIDSetupDone){
         HIDSetup();
         gHIDSetupDone = 1;
@@ -607,7 +608,7 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
                 if(ms_data->left_click & 0x01){
                         return 1;
                 }
-            }else if(VPADButton == VPAD_BUTTON_ZL){
+            }else if(VPADButton == VPAD_BUTTON_R){
                 if(ms_data->right_click & 0x01){
                         return 1;
                 }
