@@ -133,6 +133,7 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_X],                 0x05,HID_DS4_BUTTON_TRIANGLE);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_Y],                 0x05,HID_DS4_BUTTON_SQUARE);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_DPAD_MODE],                     CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Hat);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_DPAD_MASK],                     CONTROLLER_PATCHER_VALUE_SET,0x0F);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_DPAD_N],            0x05,HID_DS4_BUTTON_DPAD_N);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_DPAD_NE],           0x05,HID_DS4_BUTTON_DPAD_NE);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_DPAD_E],            0x05,HID_DS4_BUTTON_DPAD_E);
@@ -178,8 +179,8 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_B],              0x05,HID_SP2600_BUTTON_2);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_X],              0x05,HID_SP2600_BUTTON_3);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_Y],              0x05,HID_SP2600_BUTTON_4);
-        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_DPAD_MODE],                  CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Normal);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_DPAD_MODE],                  CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Hat);
+        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_DPAD_MASK],                     CONTROLLER_PATCHER_VALUE_SET,0xF0);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_DPAD_N],         0x06,HID_SP2600_BUTTON_DPAD_N);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_DPAD_NE],        0x06,HID_SP2600_BUTTON_DPAD_NE);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_DPAD_E],         0x06,HID_SP2600_BUTTON_DPAD_E);
@@ -227,6 +228,7 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_ZR],                0x06,HID_PS2_BUTTON_R2);
 
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_DPAD_MODE],                     CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Hat);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_DPAD_MASK],                     CONTROLLER_PATCHER_VALUE_SET,0x0F);
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_DPAD_N],            0x05,HID_PS2_BUTTON_DPAD_N);
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_DPAD_NE],           0x05,HID_PS2_BUTTON_DPAD_NE);
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_DPAD_E],            0x05,HID_PS2_BUTTON_DPAD_E);
@@ -661,8 +663,12 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
     //! Special DPAD treatment.
     if(config_controller[device][CONTRPS_DPAD_MODE][0] == CONTROLLER_PATCHER_VALUE_SET){
         if(config_controller[device][CONTRPS_DPAD_MODE][1] == CONTRPDM_Hat){
+            u8 mask = 0x0F;
+            if(config_controller[device][CONTRPS_DPAD_MASK][0] == CONTROLLER_PATCHER_VALUE_SET){
+               mask = config_controller[device][CONTRPS_DPAD_MASK][1];
+            }
             if(src[config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL][0]] != config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL][1]){ // Not neutral
-                u8 dir1_0 = 0,dir1_1  = 0;
+                u8 dir1_0 = 0,dir1_1 = 0;
                 u8 dir2_0 = 0,dir2_1 = 0;
                 u8 dir3_0 = 0,dir3_1 = 0;
                 if(VPADButton == VPAD_BUTTON_LEFT){
@@ -694,9 +700,9 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
                     dir2_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NW][1];
                     dir3_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NE][1];
                 }
-                if( (src[dir1_0] == dir1_1) ||
-                        (src[dir2_0] == dir2_1) ||
-                        (src[dir3_0] == dir3_1)) return 1;
+                if( ((src[dir1_0] & mask) == dir1_1) ||
+                        ((src[dir2_0] & mask) == dir2_1) ||
+                        ((src[dir3_0] & mask) == dir3_1)) return 1;
             }
 
         }

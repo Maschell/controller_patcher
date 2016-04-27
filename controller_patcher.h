@@ -58,6 +58,7 @@ enum Controller_Patcher_Settings
     CONTRPS_VPAD_BUTTON_X,
     CONTRPS_VPAD_BUTTON_Y,
     CONTRPS_DPAD_MODE,                     //! To set mode: CONTROLLER_PATCHER_VALUE_SET, Controller_Patcher_DPAD_MODE (default is normal mode)
+    CONTRPS_DPAD_MASK,                     //! Mask needed for hat mode: CONTROLLER_PATCHER_VALUE_SET, mask
     /* Normal DPAD */
     CONTRPS_VPAD_BUTTON_LEFT,
     CONTRPS_VPAD_BUTTON_RIGHT,
