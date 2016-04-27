@@ -72,13 +72,17 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_PAD_COUNT],                      CONTROLLER_PATCHER_VALUE_SET,HID_GC_PAD_COUNT);
 
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_X],          0x03,0x80);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],   0x1D,0xE6);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],   0x1E,0xE5);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_Y],          0x04,0x80);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],   0x17,0xE5);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X],          0x05,0x83);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],   0x23,0xE0);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y],          0x06,0x80);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],   0x19,0xDD);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],   0x18,0xE4);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X],          0x05,0x84);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],   0x26,0xE1);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y],          0x06,0x7E);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],   0x1A,0xDB);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x01);
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //! DS3
@@ -151,13 +155,17 @@ void init_config_controller(){
 
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_X],         0x01,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],  0x00,0xFF);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x05);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_Y],         0x02,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_Y_INVERT],  CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x05);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],  0x00,0xFF);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_X],         0x03,0x80);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x06);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],  0x00,0xFF);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_Y],         0x04,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT],  CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x06);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],  0x00,0xFF);
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -758,8 +766,22 @@ void setTouch(HID_Data_Struct data,VPADData * buffer){
     }
 }
 
-
-extern void DoAnalogConv(void *dst, void *src);
+f32 convertAnalogValue(u8 value, u8 default_val, u8 min, u8 max, u8 invert,u8 deadzone){
+    s8 new_value = (s8)(value - default_val);
+    u8 range = 0;
+    if((value-deadzone) > default_val){
+        range = (max - default_val);
+    }else if((value+deadzone) < default_val){
+        range = (default_val - min);
+    }else{
+        return 0.0;
+    }
+    if(invert != 0x01){
+        return (new_value / (1.0*range));
+    }else{
+        return -1.0*(new_value / (1.0*range));
+    }
+}
 
 void convertAnalogSticks(HID_Data_Struct data, VPADData * buffer){
     unsigned char * src = data.src;
@@ -818,41 +840,54 @@ void convertAnalogSticks(HID_Data_Struct data, VPADData * buffer){
                      }
                 }
             }
-        }else {
-            s8 value = (s8)(src[config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X][0]] - config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X][1]);
-            u8 range = (config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX][1] - config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX][0])>>1;
-            if(config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X_INVERT][1] != 0x01){
-                 buffer->lstick.x += (value / (1.0*range));
-            }else{
-                 buffer->lstick.x -= (value / (1.0*range));
+        }else{
+            int deadzone = 0;
+            if(config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE][0] == CONTROLLER_PATCHER_VALUE_SET){
+                 deadzone = config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE][1];
             }
+            buffer->lstick.x += convertAnalogValue(src[config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X][0]],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X][1],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX][0],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX][1],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X_INVERT][1],
+                                                   deadzone);
+           deadzone = 0;
+           if(config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE][0] == CONTROLLER_PATCHER_VALUE_SET){
+                 deadzone = config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE][1];
+           }
+           buffer->lstick.y += convertAnalogValue(src[config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y][0]],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y][1],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX][0],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX][1],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y_INVERT][1],
+                                                   deadzone);
+           deadzone = 0;
+           if(config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE][0] == CONTROLLER_PATCHER_VALUE_SET){
+                 deadzone = config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE][1];
+           }
 
-            value = (s8)(src[config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y][0]] - config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y][1]);
-            range = (config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX][1] - config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX][0])>>1;
-            if(config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y_INVERT][1] != 0x01){
-                 buffer->lstick.y += (value / (1.0*range));
-            }else{
-                 buffer->lstick.y -= (value / (1.0*range));
-            }
+           buffer->rstick.x += convertAnalogValue(src[config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X][0]],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X][1],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX][0],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX][1],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X_INVERT][1],
+                                                   deadzone);
+           deadzone = 0;
+           if(config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE][0] == CONTROLLER_PATCHER_VALUE_SET){
+                 deadzone = config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE][1];
+           }
 
-            value = (s8)(src[config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X][0]] - config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X][1]);
-            range = (config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX][1] - config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX][0])>>1;
-            if(config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X_INVERT][1] != 0x01){
-                 buffer->rstick.x += (value / (1.0*range));
-            }else{
-                 buffer->rstick.x -= (value / (1.0*range));
-            }
-
-            value = (s8)(src[config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y][0]] - config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y][1]);
-            range = (config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX][1] - config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX][0])>>1;
-            if(config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT][1] != 0x01){
-                 buffer->rstick.y += (value / (1.0*range));
-            }else{
-                 buffer->rstick.y -= (value / (1.0*range));
-            }
-
+           buffer->rstick.y += convertAnalogValue(src[config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y][0]],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y][1],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX][0],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX][1],
+                                                   config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT][1],
+                                                   deadzone);
             changed = 1;
-
+            /*log_printf("LX %f(%02X) LY %f(%02X) RX %f(%02X) RY %f(%02X)\n",buffer->lstick.x,src[config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_X][0]],
+                                                                   buffer->lstick.y,src[config_controller[device][CONTRPS_VPAD_BUTTON_L_STICK_Y][0]],
+                                                                   buffer->rstick.x,src[config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_X][0]],
+                                                                   buffer->rstick.y,src[config_controller[device][CONTRPS_VPAD_BUTTON_R_STICK_Y][0]]);*/
         }
     }
     if(changed){
@@ -861,7 +896,7 @@ void convertAnalogSticks(HID_Data_Struct data, VPADData * buffer){
         if(buffer->rstick.x < -1.0) buffer->rstick.x = -1.0;
         if(buffer->rstick.y < -1.0) buffer->rstick.y = -1.0;
     }
-    //log_printf("LX %f LY %f RX %f RY %f\n",buffer->lstick.x,buffer->lstick.y,buffer->rstick.x,buffer->rstick.y);
+
 }
 
 int wasInKeyboard(unsigned char * src,int key){
@@ -941,7 +976,6 @@ void my_ms_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned 
         if(gHID_Mouse.pad_data[0].data[0].Y > 720) gHID_Mouse.pad_data[0].data[0].Y = 720;
 
         log_printf("%02X %02X %02X %02X %02X %02X %02X %02X %d = X: %d Y: %d \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7],bytes_transfered,x_value,y_value);
-
 
         HIDRead(handle, usr->buf, bytes_transfered, my_ms_read_cb, usr);
 	}
