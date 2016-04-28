@@ -410,6 +410,43 @@ void setControllerReleasePressData(HID_Data_Struct data_cur, HID_Data_Struct dat
     }
 }
 
+u32 getEmulatedSticks(VPADData * buffer){
+    u32 emulatedSticks = 0;
+    int l_x_full = (buffer->lstick.x > 0.5f || buffer->lstick.x < -0.5f)? 1:0;
+    int l_y_full = (buffer->lstick.y > 0.5f || buffer->lstick.y < -0.5f)? 1:0;
+    int r_x_full = (buffer->rstick.x > 0.5f || buffer->rstick.x < -0.5f)? 1:0;
+    int r_y_full = (buffer->rstick.y > 0.5f || buffer->rstick.y < -0.5f)? 1:0;
+
+    if((buffer->lstick.x > 0.5f) || (buffer->lstick.x > 0.1f && !l_y_full)){
+        emulatedSticks |= VPAD_STICK_L_EMULATION_RIGHT;
+    }
+    if((buffer->lstick.x < -0.5f) || (buffer->lstick.x < -0.1f && !l_y_full)){
+        emulatedSticks |= VPAD_STICK_L_EMULATION_LEFT;
+    }
+    if((buffer->lstick.y > 0.5f) || (buffer->lstick.y > 0.1f && !l_x_full)){
+        emulatedSticks |= VPAD_STICK_L_EMULATION_UP;
+    }
+    if((buffer->lstick.y < -0.5f) || (buffer->lstick.y < -0.1f && !l_x_full)){
+        emulatedSticks |= VPAD_STICK_L_EMULATION_DOWN;
+    }
+
+    if((buffer->rstick.x > 0.5f) || (buffer->rstick.x > 0.1f && !r_y_full)){
+        emulatedSticks |= VPAD_STICK_L_EMULATION_RIGHT;
+    }
+    if((buffer->rstick.x < -0.5f) || (buffer->rstick.x < -0.1f && !r_y_full)){
+        emulatedSticks |= VPAD_STICK_L_EMULATION_LEFT;
+    }
+    if((buffer->rstick.y > 0.5f) || (buffer->rstick.y > 0.1f && !r_x_full)){
+        emulatedSticks |= VPAD_STICK_L_EMULATION_UP;
+    }
+    if((buffer->rstick.y < -0.5f) || (buffer->rstick.y < -0.1f && !r_x_full)){
+        emulatedSticks |= VPAD_STICK_L_EMULATION_DOWN;
+    }
+    return emulatedSticks;
+}
+
+static u32 last_emulatedSticks = 0;
+
 void setControllerDataFromHID(VPADData * buffer,int hid){
     int size = 0;
     HID_Data_Struct * data = getHIDDataAll(hid,&size);
@@ -448,7 +485,16 @@ void setControllerDataFromHID(VPADData * buffer,int hid){
         setControllerReleasePressData(data_cur,data_last,buffer,VPAD_BUTTON_HOME);
         setControllerReleasePressData(data_cur,data_last,buffer,VPAD_BUTTON_STICK_L);
         setControllerReleasePressData(data_cur,data_last,buffer,VPAD_BUTTON_STICK_R);
+
         convertAnalogSticks(data_cur,buffer);
+
+        u32 emulatedSticks = getEmulatedSticks(buffer);
+
+        buffer->btns_h |= emulatedSticks;
+        buffer->btns_d |= (emulatedSticks & (~last_emulatedSticks));
+        buffer->btns_r |= (last_emulatedSticks & (~emulatedSticks));
+
+        last_emulatedSticks = emulatedSticks;
 
         checkMouseMode(data_cur,data_last);
 
