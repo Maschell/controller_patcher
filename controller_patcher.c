@@ -156,17 +156,17 @@ void init_config_controller(){
 
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_X],         0x01,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],  0x00,0xFF);
-        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x05);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x06);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_Y],         0x02,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_Y_INVERT],  CONTROLLER_PATCHER_VALUE_SET,0x01);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x05);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],  0x00,0xFF);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_X],         0x03,0x80);
-        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x06);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x07);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],  0x00,0xFF);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_Y],         0x04,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT],  CONTROLLER_PATCHER_VALUE_SET,0x01);
-        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x06);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x09);
         setConfigValue((u8*)&config_controller[CONTRPD_DS4][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],  0x00,0xFF);
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
