@@ -112,13 +112,17 @@ void init_config_controller(){
 
         setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_L_STICK_X],         0x06,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],  0x00,0xFF);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x06);
         setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_L_STICK_Y],         0x07,0x80);
-        setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_L_STICK_Y_INVERT],  CONTROLLER_PATCHER_VALUE_SET,0x01);
         setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],  0x00,0xFF);
-        setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_R_STICK_X],         0x08,0x83);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x06);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_L_STICK_Y_INVERT],  CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_R_STICK_X],         0x08,0x80);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x08);
         setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],  0x00,0xFF);
         setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_R_STICK_Y],         0x09,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT],  CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE],CONTROLLER_PATCHER_VALUE_SET,0x06);
         setConfigValue((u8*)&config_controller[CONTRPD_DS3][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],  0x00,0xFF);
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -800,8 +804,8 @@ void setTouch(HID_Data_Struct data,VPADData * buffer){
     if(hid & HID_LIST_MOUSE && gHID_Mouse_Mode == HID_MOUSE_MODE_TOUCH){
         if(getButtonPressed(data,VPAD_BUTTON_TOUCH)){
            HID_Mouse_Data *  ms_data = (HID_Mouse_Data *) src;
-           int x_mouse = 80 + ((int)(((ms_data->X)*1.0/1280.0)*3890.0));
-           int y_mouse = 3910 - ((int)(((ms_data->Y)*1.0/720.0)*3760.0));
+           int x_mouse = 80 + ((int)(((ms_data->X)*1.0f/1280.0)*3890.0f));
+           int y_mouse = 3910 - ((int)(((ms_data->Y)*1.0f/720.0)*3760.0f));
            buffer->tpdata.x = x_mouse;
            buffer->tpdata.y = y_mouse;
            buffer->tpdata.touched = 1;
@@ -826,12 +830,12 @@ f32 convertAnalogValue(u8 value, u8 default_val, u8 min, u8 max, u8 invert,u8 de
     }else if((value+deadzone) < default_val){
         range = (default_val - min);
     }else{
-        return 0.0;
+        return 0.0f;
     }
     if(invert != 0x01){
-        return (new_value / (1.0*range));
+        return (new_value / (1.0f*range));
     }else{
-        return -1.0*(new_value / (1.0*range));
+        return -1.0f*(new_value / (1.0f*range));
     }
 }
 
@@ -842,8 +846,8 @@ void convertAnalogSticks(HID_Data_Struct data, VPADData * buffer){
     if (hid & HID_LIST_MOUSE){
         if(gHID_Mouse_Mode == HID_MOUSE_MODE_AIM){ // TODO: tweak values
             HID_Mouse_Data *  ms_data = (HID_Mouse_Data *) src;
-            buffer->rstick.x +=  ms_data->deltaX/10.0;
-            buffer->rstick.y +=  -1*(ms_data->deltaY/10.0);
+            buffer->rstick.x +=  ms_data->deltaX/10.0f;
+            buffer->rstick.y +=  -1.0f*(ms_data->deltaY/10.0f);
             changed = 1;
         }
     }else{
@@ -860,34 +864,34 @@ void convertAnalogSticks(HID_Data_Struct data, VPADData * buffer){
 
             if(w){
                 if(!s){
-                    buffer->lstick.y = 1;
+                    buffer->lstick.y = 1.0f;
                 }
                 if(a || d){
-                    buffer->lstick.y = 0.75;
-                    if(a) buffer->lstick.x = -0.75;
-                    if(d) buffer->lstick.x = 0.75;
+                    buffer->lstick.y = 0.75f;
+                    if(a) buffer->lstick.x = -0.75f;
+                    if(d) buffer->lstick.x = 0.75f;
                 }
                 changed = 1;
             }else if(s){
                 if(!w){
-                    buffer->lstick.y = -1;
+                    buffer->lstick.y = -1.0f;
                 }
                 if(a || d){
-                    buffer->lstick.y = -0.75;
-                    if(a) buffer->lstick.x = -0.75;
-                    if(d) buffer->lstick.x = 0.75;
+                    buffer->lstick.y = -0.75f;
+                    if(a) buffer->lstick.x = -0.75f;
+                    if(d) buffer->lstick.x = 0.75f;
                 }
                 changed = 1;
             }else{
                 if(a){
                      if(!d){
-                        buffer->lstick.x = -1;
+                        buffer->lstick.x = -1.0f;
                         changed = 1;
                      }
 
                 }else if(d){
                     if(!s){
-                        buffer->lstick.x = 1;
+                        buffer->lstick.x = 1.0f;
                         changed = 1;
                      }
                 }
@@ -943,10 +947,10 @@ void convertAnalogSticks(HID_Data_Struct data, VPADData * buffer){
         }
     }
     if(changed){
-        if(buffer->rstick.x > 1.0) buffer->rstick.x = 1.0;
-        if(buffer->rstick.y > 1.0) buffer->rstick.y = 1.0;
-        if(buffer->rstick.x < -1.0) buffer->rstick.x = -1.0;
-        if(buffer->rstick.y < -1.0) buffer->rstick.y = -1.0;
+        if(buffer->rstick.x > 1.0f) buffer->rstick.x = 1.0f;
+        if(buffer->rstick.y > 1.0f) buffer->rstick.y = 1.0f;
+        if(buffer->rstick.x < -1.0f) buffer->rstick.x = -1.0f;
+        if(buffer->rstick.y < -1.0f) buffer->rstick.y = -1.0f;
     }
 
 }
@@ -1010,7 +1014,6 @@ void my_ms_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned 
             y_value = buf[xy_offset+1];
         }else if(type == MOUSE_XY_TYPE_B){
             x_value = buf[xy_offset];
-
             y_value = ((buf[xy_offset+1] & 0xF0) >>4) | ((buf[xy_offset+2] & 0x0F) <<4);
         }
 
