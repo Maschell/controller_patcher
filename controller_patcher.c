@@ -758,9 +758,9 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
                     dir3_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NE][1];
                     direction = 1;
                 }
-                if(direction && ((src[dir1_0] & mask) == dir1_1) ||
+                if(direction && (((src[dir1_0] & mask) == dir1_1) ||
                         ((src[dir2_0] & mask) == dir2_1) ||
-                        ((src[dir3_0] & mask) == dir3_1)) return 1;
+                        ((src[dir3_0] & mask) == dir3_1))) return 1;
             }
 
         }
