@@ -52,7 +52,6 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VID],                            0x05,0x7e);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_PID],                            0x03,0x37);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_A],                  0x01,HID_GC_BUTTON_A);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_A],                  0x01,HID_GC_BUTTON_A);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_B],                  0x01,HID_GC_BUTTON_B);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_X],                  0x01,HID_GC_BUTTON_X);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_Y],                  0x01,HID_GC_BUTTON_Y);
@@ -67,22 +66,24 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_PLUS],               0x02,HID_GC_BUTTON_START);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_ZL],                 0x07,HID_GC_BUTTON_L);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_ZR],                 0x08,HID_GC_BUTTON_R);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_STICK_L],            0x01,HID_GC_BUTTON_A);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_STICK_R],            0x01,HID_GC_BUTTON_B);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_DOUBLE_USE],                     CONTROLLER_PATCHER_VALUE_SET,CONTROLLER_PATCHER_GC_DOUBLE_USE);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_DOUBLE_USE_BUTTON],              0x02,HID_GC_BUTTON_Z);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_PAD_COUNT],                      CONTROLLER_PATCHER_VALUE_SET,HID_GC_PAD_COUNT);
 
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_X],          0x03,0x80);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x09);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],   0x1E,0xE5);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_Y],          0x04,0x80);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x09);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],   0x18,0xE4);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X],          0x05,0x84);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X],          0x05,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],   0x26,0xE1);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x01);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y],          0x06,0x7E);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x09);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y],          0x06,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],   0x1A,0xDB);
-        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x01);
+        setConfigValue((u8*)&config_controller[CONTRPD_GC][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,0x09);
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //! DS3
@@ -295,6 +296,7 @@ void deinit_config_controller(){
         if(gHIDAttached) HIDDelClient(&gHIDClient);
         HIDTeardown();
     }
+    usleep(3*1000);
 }
 
 
@@ -544,14 +546,17 @@ int getActivePad(int hid){
         if((gHID_Devices[CONTRPD_GC].pad_data[1].hid_data[0] & 0x10)) return 1;
         if((gHID_Devices[CONTRPD_GC].pad_data[2].hid_data[0] & 0x10)) return 2;
         if((gHID_Devices[CONTRPD_GC].pad_data[3].hid_data[0] & 0x10)) return 3;
+        return -1;
      }
      return 0;
 }
 
 void setRumble(int hid,int rumble){
     int device = getDevice(hid);
-    if(device == -1) return ;
-    ((HID_Data *)config_controller_data_ptr[device][getActivePad(hid)])->rumbleActive = rumble;
+    if(device == -1) return;
+    int pad = getActivePad(hid);
+    if(pad < 0) return;
+    ((HID_Data *)config_controller_data_ptr[device][pad])->rumbleActive = rumble;
 }
 
 HID_Data_Struct * getHIDDataAll(int hid,int * size){
@@ -565,7 +570,7 @@ HID_Data_Struct * getHIDDataAll(int hid,int * size){
     HID_Data_Struct * data = malloc(sizeof(HID_Data_Struct)*(*size));
     if(!data) return NULL;
     int i = 0;
-
+    
     //!Mouse always need extra treatment
     if(hid & HID_LIST_MOUSE){
         unsigned char * src = (unsigned char *) &(gHID_Mouse.pad_data[getActivePad(HID_LIST_MOUSE)].data[0]);
@@ -576,8 +581,13 @@ HID_Data_Struct * getHIDDataAll(int hid,int * size){
 
     for(int j = 0;j < CONTRPD_MAX_VALUE;j++){
         if(hid & config_controller_list[j]){
+            int pad = getActivePad(config_controller_list[j]);
+            if(pad < 0){
+                (*size)--;
+                continue;
+            }
             data[i].hid = config_controller_list[j];
-            data[i].src = (u8*)&(((HID_Data *)config_controller_data_ptr[j][getActivePad(data[i].hid)])->hid_data);
+            data[i].src = (u8*)&(((HID_Data *)config_controller_data_ptr[j][pad])->hid_data);
             if(!data[i].src){
                 (*size)--;
                 continue;
@@ -780,11 +790,11 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
     if(config_controller[device][CONTRPS_DOUBLE_USE][0] == CONTROLLER_PATCHER_VALUE_SET){
         if(config_controller[device][CONTRPS_DOUBLE_USE][1] == CONTROLLER_PATCHER_GC_DOUBLE_USE){
             if(src[config_controller[device][CONTRPS_DOUBLE_USE_BUTTON][0]] & config_controller[device][CONTRPS_DOUBLE_USE_BUTTON][1]){
-               if(cur_config == CONTRPS_VPAD_BUTTON_PLUS || cur_config == CONTRPS_VPAD_BUTTON_ZL || cur_config == CONTRPS_VPAD_BUTTON_ZR){
+                if(cur_config == CONTRPS_VPAD_BUTTON_PLUS || cur_config == CONTRPS_VPAD_BUTTON_ZL || cur_config == CONTRPS_VPAD_BUTTON_ZR || cur_config == CONTRPS_VPAD_BUTTON_A || cur_config == CONTRPS_VPAD_BUTTON_B){
                     return 0;
                 }
             }else{
-                if(cur_config == CONTRPS_VPAD_BUTTON_MINUS || cur_config == CONTRPS_VPAD_BUTTON_L || cur_config == CONTRPS_VPAD_BUTTON_R){
+                if(cur_config == CONTRPS_VPAD_BUTTON_MINUS || cur_config == CONTRPS_VPAD_BUTTON_L || cur_config == CONTRPS_VPAD_BUTTON_R || cur_config == CONTRPS_VPAD_BUTTON_STICK_L || cur_config == CONTRPS_VPAD_BUTTON_STICK_R){
                     return 0;
                 }
             }
@@ -1065,7 +1075,8 @@ void my_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned int
 
             HIDRead(handle, usr->buf, bytes_transfered, my_read_cb, usr);
             int pad = getActivePad(HID_LIST_GC);
-            if(((HID_Data *)config_controller_data_ptr[CONTRPD_GC][pad])->rumbleActive != usr->rumblestatus[pad])
+            
+            if((pad >= 0) && (((HID_Data *)config_controller_data_ptr[CONTRPD_GC][pad])->rumbleActive != usr->rumblestatus[pad]))
             {
                 usr->rumblestatus[pad] = ((HID_Data *)config_controller_data_ptr[CONTRPD_GC][pad])->rumbleActive;
                 HIDGCRumble(handle,usr,usr->rumblestatus[pad],pad);
@@ -1074,7 +1085,8 @@ void my_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned int
             {
                 HIDRead(handle, usr->buf, bytes_transfered, my_read_cb, usr);
             }
-		}else if(usr->hid != 0){
+            
+		}else if(usr->hid != 0){ //
             int size = (HID_MAX_DATA_LENGTH_PER_PAD > bytes_transfered)? bytes_transfered : HID_MAX_DATA_LENGTH_PER_PAD;
             memcpy(&(((HID_Data *)config_controller_data_ptr[usr->deviceSlot][0])->hid_data),&buf[0],size);
             usleep(5000); //DS4 is way tooo fast (need to check the other pads)
