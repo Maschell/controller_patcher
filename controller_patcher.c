@@ -177,12 +177,12 @@ void init_config_controller(){
         //! Saitek P2600
         //!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VID],                        0xa3,0x06);
-        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_PID],                        0x0d,0x5f);
-        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_A],              0x05,HID_SP2600_BUTTON_1);
+        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VID],                        0x06,0xA3);
+        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_PID],                        0x5F,0x0D);
+        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_A],              0x05,HID_SP2600_BUTTON_3);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_B],              0x05,HID_SP2600_BUTTON_2);
-        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_X],              0x05,HID_SP2600_BUTTON_3);
-        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_Y],              0x05,HID_SP2600_BUTTON_4);
+        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_X],              0x05,HID_SP2600_BUTTON_4);
+        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_Y],              0x05,HID_SP2600_BUTTON_1);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_DPAD_MODE],                  CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Hat);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_DPAD_MASK],                     CONTROLLER_PATCHER_VALUE_SET,0xF0);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_DPAD_N],         0x06,HID_SP2600_BUTTON_DPAD_N);
@@ -196,9 +196,9 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL],   0x06,HID_SP2600_BUTTON_DPAD_NEUTRAL);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_PLUS],           0x06,HID_SP2600_BUTTON_FPS);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_MINUS],          0x06,HID_SP2600_BUTTON_Analog);
-        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_L],              0x05,HID_SP2600_BUTTON_7);
+        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_L],              0x05,HID_SP2600_BUTTON_5);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_R],              0x05,HID_SP2600_BUTTON_6);
-        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_ZL],             0x05,HID_SP2600_BUTTON_5);
+        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_ZL],             0x05,HID_SP2600_BUTTON_7);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_ZR],             0x05,HID_SP2600_BUTTON_8);
 
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_PAD_COUNT],                  CONTROLLER_PATCHER_VALUE_SET,HID_SP2600_PAD_COUNT);
@@ -207,7 +207,7 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],  0x00,0xFF);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_L_STICK_Y],         0x02,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],  0x00,0xFF);
-        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_R_STICK_X],         0x03,0x83);
+        setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_R_STICK_X],         0x03,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],  0x00,0xFF);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_R_STICK_Y],         0x04,0x80);
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],  0x00,0xFF);
@@ -273,6 +273,9 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_R],                 0x00,HID_KEYBOARD_BUTTON_B);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_ZL],                0x00,HID_KEYBOARD_BUTTON_SHIFT);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_ZR],                0x00,HID_KEYBOARD_BUTTON_N);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_STICK_L],           0x00,HID_KEYBOARD_BUTTON_F);
+        setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_STICK_R],           0x00,HID_KEYBOARD_BUTTON_TAB);
+        
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,HID_KEYBOARD_PAD_COUNT);
     }else{
         log_print("Config already done!\n");
@@ -721,6 +724,7 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
                 u8 dir1_0 = 0,dir1_1 = 0;
                 u8 dir2_0 = 0,dir2_1 = 0;
                 u8 dir3_0 = 0,dir3_1 = 0;
+                u8 direction = 0;
                 if(VPADButton == VPAD_BUTTON_LEFT){
                     dir1_0 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_W][0];
                     dir2_0 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NW][0];
@@ -728,6 +732,7 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
                     dir1_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_W][1];
                     dir2_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NW][1];
                     dir3_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_SW][1];
+                    direction = 1;
                 }else if(VPADButton == VPAD_BUTTON_RIGHT){
                     dir1_0 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_E][0];
                     dir2_0 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_SE][0];
@@ -735,6 +740,7 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
                     dir1_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_E][1];
                     dir2_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_SE][1];
                     dir3_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NE][1];
+                    direction = 1;
                 }else if(VPADButton == VPAD_BUTTON_DOWN){
                     dir1_0 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_S][0];
                     dir2_0 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_SE][0];
@@ -742,6 +748,7 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
                     dir1_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_S][1];
                     dir2_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_SE][1];
                     dir3_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_SW][1];
+                    direction = 1;
                 }else if(VPADButton == VPAD_BUTTON_UP){
                     dir1_0 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_N][0];
                     dir2_0 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NW][0];
@@ -749,8 +756,9 @@ int getButtonPressed(HID_Data_Struct data, int VPADButton){
                     dir1_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_N][1];
                     dir2_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NW][1];
                     dir3_1 = config_controller[device][CONTRPS_VPAD_BUTTON_DPAD_NE][1];
+                    direction = 1;
                 }
-                if( ((src[dir1_0] & mask) == dir1_1) ||
+                if(direction && ((src[dir1_0] & mask) == dir1_1) ||
                         ((src[dir2_0] & mask) == dir2_1) ||
                         ((src[dir3_0] & mask) == dir3_1)) return 1;
             }

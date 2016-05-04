@@ -290,8 +290,8 @@ void my_gc_write_cb(unsigned int handle, int error, unsigned char *buf, unsigned
 #define HID_SP2600_BUTTON_6              0x20 // 5   //R upper
 #define HID_SP2600_BUTTON_7              0x40 // 5   //L lower
 #define HID_SP2600_BUTTON_8              0x80 // 5   //R lower
-#define HID_SP2600_BUTTON_WHITE          0x01 // 6
-#define HID_SP2600_BUTTON_BLACK          0x02 // 6
+#define HID_SP2600_BUTTON_BLACK          0x01 // 6
+#define HID_SP2600_BUTTON_WHITE          0x02 // 6
 #define HID_SP2600_BUTTON_FPS            0x04 // 6
 #define HID_SP2600_BUTTON_Analog         0x08 // 6
 
@@ -347,6 +347,7 @@ void my_gc_write_cb(unsigned int handle, int error, unsigned char *buf, unsigned
 #define HID_KEYBOARD_BUTTON_PLUS              0x57
 #define HID_KEYBOARD_BUTTON_SPACE             0x2C
 #define HID_KEYBOARD_BUTTON_SHIFT             0x02
+#define HID_KEYBOARD_BUTTON_TAB               0x2B
 
 #define HID_KEYBOARD_PAD_COUNT             1
 #define HID_KEYBOARD_DATA_LENGTH           8
