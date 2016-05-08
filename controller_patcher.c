@@ -32,6 +32,7 @@ void init_config_controller(){
         config_controller_list[CONTRPD_SP2600] =                                                    HID_LIST_SP2600;
         config_controller_list[CONTRPD_KEYBOARD] =                                                  HID_LIST_KEYBOARD;
         config_controller_list[CONTRPD_PS2] =                                                       HID_LIST_PS2;
+        config_controller_list[CONTRPD_POKKEN] =                                                    HID_LIST_POKKEN;
         //config_controller_list[CONTRPD_YOUR_DEVICE] =                                             HID_LIST_YOUR_DEVICE;
 
         //Set data for each pad. Currenty 4 Pads for each device support. May need other extra treatment
@@ -44,6 +45,7 @@ void init_config_controller(){
         config_controller_data_ptr[CONTRPD_SP2600][0] =                                             (u32)&(gHID_Devices[CONTRPD_SP2600]).pad_data[0];
         config_controller_data_ptr[CONTRPD_KEYBOARD][0] =                                           (u32)&(gHID_Devices[CONTRPD_KEYBOARD]).pad_data[0];
         config_controller_data_ptr[CONTRPD_PS2][0] =                                                (u32)&(gHID_Devices[CONTRPD_PS2]).pad_data[0];
+        config_controller_data_ptr[CONTRPD_POKKEN][0] =                                             (u32)&(gHID_Devices[CONTRPD_POKKEN]).pad_data[0];
 
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -256,6 +258,40 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],  0x00,0xFF);
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //! Pokken
+        //!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VID],                           0x0e,0x8f);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_PID],                           0x00,0x03);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_A],                 0x05,HID_POKKEN_BUTTON_1);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_B],                 0x05,HID_POKKEN_BUTTON_2);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_X],                 0x05,HID_POKKEN_BUTTON_3);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_Y],                 0x05,HID_POKKEN_BUTTON_4);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_PLUS],              0x06,HID_POKKEN_BUTTON_5);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_MINUS],             0x06,HID_POKKEN_BUTTON_6);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_L],                 0x06,HID_POKKEN_BUTTON_7);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_R],                 0x06,HID_POKKEN_BUTTON_8);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_ZL],                0x06,HID_POKKEN_BUTTON_9);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_ZR],                0x06,HID_POKKEN_BUTTON_10);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_DPAD_MODE],                     CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Hat);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_DPAD_MASK],                     CONTROLLER_PATCHER_VALUE_SET,0x0F);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_N],            0x05,HID_POKKEN_BUTTON_DPAD_N);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_NE],           0x05,HID_POKKEN_BUTTON_DPAD_NE);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_E],            0x05,HID_POKKEN_BUTTON_DPAD_E);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_SE],           0x05,HID_POKKEN_BUTTON_DPAD_SE);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_S],            0x05,HID_POKKEN_BUTTON_DPAD_S);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_SW],           0x05,HID_POKKEN_BUTTON_DPAD_SW);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_W],            0x05,HID_POKKEN_BUTTON_DPAD_W);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_NW],           0x05,HID_POKKEN_BUTTON_DPAD_NW);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL],      0x05,HID_POKKEN_BUTTON_DPAD_NEUTRAL);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,HID_POKKEN_PAD_COUNT);
+
+
+        //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //! Keyboard
         //!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -276,7 +312,7 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_ZR],                0x00,HID_KEYBOARD_BUTTON_N);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_STICK_L],           0x00,HID_KEYBOARD_BUTTON_F);
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_VPAD_BUTTON_STICK_R],           0x00,HID_KEYBOARD_BUTTON_TAB);
-        
+
         setConfigValue((u8*)&config_controller[CONTRPD_KEYBOARD][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,HID_KEYBOARD_PAD_COUNT);
     }else{
         log_print("Config already done!\n");
@@ -294,9 +330,12 @@ void init_config_controller(){
 void deinit_config_controller(){
     if(gHIDSetupDone){
         if(gHIDAttached) HIDDelClient(&gHIDClient);
-        HIDTeardown();
+        gHIDAttached = 0;
+        gHIDSetupDone = 0;
+        gHIDCurrentDevice = 0;
+        //HIDTeardown(); // seems to result in a creash sometimes
+        log_printf("Exit\n");
     }
-    usleep(3*1000);
 }
 
 
@@ -305,15 +344,13 @@ void deinit_config_controller(){
 int my_attach_cb(HIDClient *p_client, HIDDevice *p_device, unsigned int attach)
 {
     if(attach){
-    log_printf("    handle                  %08x\n", p_device->handle);
-    log_printf("    physical device inst    %08x\n", p_device->physical_device_inst);
-    log_printf("    vid                     %04x\n", SWAP16(p_device->vid));
-    log_printf("    pid                     %04x\n", SWAP16(p_device->pid));
-    log_printf("    interface index         %02x\n", p_device->interface_index);
-    log_printf("    sub class               %02x\n", p_device->sub_class);
-    log_printf("    protocol                %02x\n", p_device->protocol);
-    log_printf("    max packet in           %02x\n", p_device->max_packet_size_rx);
-    log_printf("    max packet out          %02x\n", p_device->max_packet_size_tx);
+        log_printf("vid              %04x\n", SWAP16(p_device->vid));
+        log_printf("pid              %04x\n", SWAP16(p_device->pid));
+        log_printf("interface index  %02x\n", p_device->interface_index);
+        log_printf("sub class        %02x\n", p_device->sub_class);
+        log_printf("protocol         %02x\n", p_device->protocol);
+        log_printf("max packet in    %02x\n", p_device->max_packet_size_rx);
+        log_printf("max packet out   %02x\n", p_device->max_packet_size_tx);
     }
 
     int device = 0;
@@ -472,8 +509,8 @@ void setControllerDataFromHID(VPADData * buffer,int hid){
         HID_Data_Struct * data_last_ptr = getLastData(data_cur);
         if(!data_last_ptr) return;
         data_last = data_last_ptr[0];
-        setControllerReleasePressData(data_cur,data_last,buffer,VPAD_BUTTON_A);
 
+        setControllerReleasePressData(data_cur,data_last,buffer,VPAD_BUTTON_A);
         setControllerReleasePressData(data_cur,data_last,buffer,VPAD_BUTTON_B);
         setControllerReleasePressData(data_cur,data_last,buffer,VPAD_BUTTON_X);
         setControllerReleasePressData(data_cur,data_last,buffer,VPAD_BUTTON_Y);
@@ -499,6 +536,7 @@ void setControllerDataFromHID(VPADData * buffer,int hid){
 
         u32 emulatedSticks = getEmulatedSticks(buffer);
 
+        //Setting the emulated sticks
         buffer->btns_h |= emulatedSticks;
         buffer->btns_d |= (emulatedSticks & (~last_emulatedSticks));
         buffer->btns_r |= (last_emulatedSticks & (~emulatedSticks));
@@ -542,10 +580,10 @@ int getDevice(int hid){
 
 int getActivePad(int hid){
      if(hid & HID_LIST_GC){
-        if((gHID_Devices[CONTRPD_GC].pad_data[0].hid_data[0] & 0x10)) return 0;
-        if((gHID_Devices[CONTRPD_GC].pad_data[1].hid_data[0] & 0x10)) return 1;
-        if((gHID_Devices[CONTRPD_GC].pad_data[2].hid_data[0] & 0x10)) return 2;
-        if((gHID_Devices[CONTRPD_GC].pad_data[3].hid_data[0] & 0x10)) return 3;
+        if (!(((gHID_Devices[CONTRPD_GC].pad_data[0].hid_data[0] & 0x10) == 0) && ((gHID_Devices[CONTRPD_GC].pad_data[0].hid_data[0] & 0x22) != 0x22))) return 0;
+        if (!(((gHID_Devices[CONTRPD_GC].pad_data[1].hid_data[0] & 0x10) == 0) && ((gHID_Devices[CONTRPD_GC].pad_data[1].hid_data[0] & 0x22) != 0x22))) return 1;
+        if (!(((gHID_Devices[CONTRPD_GC].pad_data[2].hid_data[0] & 0x10) == 0) && ((gHID_Devices[CONTRPD_GC].pad_data[2].hid_data[0] & 0x22) != 0x22))) return 2;
+        if (!(((gHID_Devices[CONTRPD_GC].pad_data[3].hid_data[0] & 0x10) == 0) && ((gHID_Devices[CONTRPD_GC].pad_data[3].hid_data[0] & 0x22) != 0x22))) return 3;
         return -1;
      }
      return 0;
@@ -562,7 +600,7 @@ void setRumble(int hid,int rumble){
 HID_Data_Struct * getHIDDataAll(int hid,int * size){
     *size = 0;
     int bit = 1;
-    for (int i = 0;i < 16; i++){
+    for (int i = 0;i < CONTRPD_MAX_VALUE; i++){
        *size += (hid & bit)>>i;
        bit <<= 1;
     }
@@ -570,7 +608,7 @@ HID_Data_Struct * getHIDDataAll(int hid,int * size){
     HID_Data_Struct * data = malloc(sizeof(HID_Data_Struct)*(*size));
     if(!data) return NULL;
     int i = 0;
-    
+
     //!Mouse always need extra treatment
     if(hid & HID_LIST_MOUSE){
         unsigned char * src = (unsigned char *) &(gHID_Mouse.pad_data[getActivePad(HID_LIST_MOUSE)].data[0]);
@@ -582,7 +620,7 @@ HID_Data_Struct * getHIDDataAll(int hid,int * size){
     for(int j = 0;j < CONTRPD_MAX_VALUE;j++){
         if(hid & config_controller_list[j]){
             int pad = getActivePad(config_controller_list[j]);
-            if(pad < 0){
+            if(pad < 0){ //Not pad connected to adapter
                 (*size)--;
                 continue;
             }
@@ -996,7 +1034,7 @@ void my_ms_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned 
 {
 	if(error == 0)
 	{
-
+        //log_printf("%02X %02X %02X %02X %02X %02X %02X %02X  bytes_transfered: %d\n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7],bytes_transfered);
         int type = MOUSE_XY_TYPE_A;
         int click_offset = 0;
         int xy_offset = 1;
@@ -1048,7 +1086,7 @@ void my_ms_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned 
         if(gHID_Mouse.pad_data[0].data[0].Y < 0) gHID_Mouse.pad_data[0].data[0].Y = 0;
         if(gHID_Mouse.pad_data[0].data[0].Y > 720) gHID_Mouse.pad_data[0].data[0].Y = 720;
 
-        log_printf("%02X %02X %02X %02X %02X %02X %02X %02X %d = X: %d Y: %d \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7],bytes_transfered,x_value,y_value);
+        //log_printf("%02X %02X %02X %02X %02X %02X %02X %02X %d = X: %d Y: %d \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7],bytes_transfered,x_value,y_value);
 
         HIDRead(handle, usr->buf, bytes_transfered, my_ms_read_cb, usr);
 	}
@@ -1061,21 +1099,29 @@ void my_ms_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned 
 
 void my_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned int bytes_transfered, void *p_user)
 {
-	if(error == 0 && p_user != NULL)
+	if(error == 0 && p_user != NULL && gHIDAttached)
 	{
 		my_cb_user *usr = (my_cb_user*)p_user;
 
 		if(usr->hid == HID_LIST_GC){
-            //log_printf("GC: %02X %02X %02X %02X %02X %02X %02X %02X \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7]);
-
             memcpy(&(((HID_Data *)config_controller_data_ptr[CONTRPD_GC][0])->hid_data),&buf[1],9);
             memcpy(&(((HID_Data *)config_controller_data_ptr[CONTRPD_GC][1])->hid_data),&buf[10],9);
             memcpy(&(((HID_Data *)config_controller_data_ptr[CONTRPD_GC][2])->hid_data),&buf[19],9);
-            memcpy(&(((HID_Data *)config_controller_data_ptr[CONTRPD_GC][3])->hid_data),&buf[29],9);
+            memcpy(&(((HID_Data *)config_controller_data_ptr[CONTRPD_GC][3])->hid_data),&buf[28],9);
+
+
+            /*
+            int i = 0;
+            log_printf("GC1: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8],buf[i*9+9]);i++;
+            log_printf("GC2: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8],buf[i*9+9]);i++;
+            log_printf("GC3: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8],buf[i*9+9]);i++;
+            log_printf("GC4: %02X %02X %02X %02X %02X %02X %02X %02X %02X \n",buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8],buf[i*9+9]);*/
 
             HIDRead(handle, usr->buf, bytes_transfered, my_read_cb, usr);
             int pad = getActivePad(HID_LIST_GC);
-            
+
+            //log_printf("Pad attached: %02X \n",getActivePad(HID_LIST_GC));
+
             if((pad >= 0) && (((HID_Data *)config_controller_data_ptr[CONTRPD_GC][pad])->rumbleActive != usr->rumblestatus[pad]))
             {
                 usr->rumblestatus[pad] = ((HID_Data *)config_controller_data_ptr[CONTRPD_GC][pad])->rumbleActive;
@@ -1085,12 +1131,14 @@ void my_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned int
             {
                 HIDRead(handle, usr->buf, bytes_transfered, my_read_cb, usr);
             }
-            
+
 		}else if(usr->hid != 0){ //
             int size = (HID_MAX_DATA_LENGTH_PER_PAD > bytes_transfered)? bytes_transfered : HID_MAX_DATA_LENGTH_PER_PAD;
             memcpy(&(((HID_Data *)config_controller_data_ptr[usr->deviceSlot][0])->hid_data),&buf[0],size);
             usleep(5000); //DS4 is way tooo fast (need to check the other pads)
-            //log_printf("HID %02X %02X %02X %02X %02X %02X %02X %02X \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7]);
+            if(usr->hid == HID_LIST_POKKEN){
+                 log_printf("HID %02X %02X %02X %02X %02X %02X %02X %02X \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7]); //<-- only debug the pokken controller
+            }
             HIDRead(handle, usr->buf, bytes_transfered, my_read_cb, usr);
 		}
 	}

@@ -24,6 +24,7 @@ enum Controller_Patcher_Devices
     CONTRPD_SP2600,
     CONTRPD_KEYBOARD,
     CONTRPD_PS2,
+    CONTRPD_POKKEN,
     CONTRPD_MAX_VALUE
 };
 
@@ -34,6 +35,7 @@ enum Controller_Patcher_Devices
 #define HID_LIST_DS4                    0x10
 #define HID_LIST_SP2600                 0x20
 #define HID_LIST_PS2                    0x40
+#define HID_LIST_POKKEN                 0x80
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! End
@@ -296,6 +298,34 @@ void my_gc_write_cb(unsigned int handle, int error, unsigned char *buf, unsigned
 #define HID_SP2600_BUTTON_Analog         0x08 // 6
 
 #define HID_SP2600_PAD_COUNT             1
+
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! POKKEN
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#define HID_POKKEN_BUTTON_1              0x01
+#define HID_POKKEN_BUTTON_2              0x02
+#define HID_POKKEN_BUTTON_3              0x04
+#define HID_POKKEN_BUTTON_4              0x08
+#define HID_POKKEN_BUTTON_5              0x10
+#define HID_POKKEN_BUTTON_6              0x20
+#define HID_POKKEN_BUTTON_7              0x40
+#define HID_POKKEN_BUTTON_8              0x80
+#define HID_POKKEN_BUTTON_9              0x80
+#define HID_POKKEN_BUTTON_10             0x80
+
+#define HID_POKKEN_BUTTON_DPAD_N         0x00
+#define HID_POKKEN_BUTTON_DPAD_NE        0x10
+#define HID_POKKEN_BUTTON_DPAD_E         0x20
+#define HID_POKKEN_BUTTON_DPAD_SE        0x30
+#define HID_POKKEN_BUTTON_DPAD_S         0x40
+#define HID_POKKEN_BUTTON_DPAD_SW        0x50
+#define HID_POKKEN_BUTTON_DPAD_W         0x60
+#define HID_POKKEN_BUTTON_DPAD_NW        0x70
+#define HID_POKKEN_BUTTON_DPAD_NEUTRAL   0xF0
+
+#define HID_POKKEN_PAD_COUNT             1
+
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Keyboard
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
