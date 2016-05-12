@@ -23,19 +23,21 @@ enum Controller_Patcher_Devices
     CONTRPD_DS4,
     CONTRPD_SP2600,
     CONTRPD_KEYBOARD,
-    CONTRPD_PS2,
+    CONTRPD_PS2_ADAPTER,
     CONTRPD_POKKEN,
+    CONTRPD_PS2,
     CONTRPD_MAX_VALUE
 };
 
-#define HID_LIST_GC                     0x01
-#define HID_LIST_KEYBOARD               0x02
-#define HID_LIST_MOUSE                  0x04
-#define HID_LIST_DS3                    0x08
-#define HID_LIST_DS4                    0x10
-#define HID_LIST_SP2600                 0x20
-#define HID_LIST_PS2                    0x40
-#define HID_LIST_POKKEN                 0x80
+#define HID_LIST_GC                     0x001
+#define HID_LIST_KEYBOARD               0x002
+#define HID_LIST_MOUSE                  0x004
+#define HID_LIST_DS3                    0x008
+#define HID_LIST_DS4                    0x010
+#define HID_LIST_SP2600                 0x020
+#define HID_LIST_PS2_ADAPTER            0x040
+#define HID_LIST_POKKEN                 0x080
+#define HID_LIST_PS2                    0x100
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! End
@@ -215,8 +217,8 @@ void my_gc_write_cb(unsigned int handle, int error, unsigned char *buf, unsigned
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #define HID_DS4_BUTTON_CROSS            0x20 // 5
-#define HID_DS4_BUTTON_CIRCLE           0x40 // 5
 #define HID_DS4_BUTTON_SQUARE           0x10 // 5
+#define HID_DS4_BUTTON_CIRCLE           0x40 // 5
 #define HID_DS4_BUTTON_TRIANGLE         0x80 // 5
 #define HID_DS4_BUTTON_L1               0x01 // 6
 #define HID_DS4_BUTTON_L2               0x04 // 6
@@ -240,15 +242,43 @@ void my_gc_write_cb(unsigned int handle, int error, unsigned char *buf, unsigned
 
 #define HID_DS4_PAD_COUNT               1
 
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! PS2 Adapter
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#define HID_PS2_ADAPTER_BUTTON_CROSS            0x40 // 5
+#define HID_PS2_ADAPTER_BUTTON_CIRCLE           0x20 // 5
+#define HID_PS2_ADAPTER_BUTTON_SQUARE           0x80 // 5
+#define HID_PS2_ADAPTER_BUTTON_TRIANGLE         0x10 // 5
+
+#define HID_PS2_ADAPTER_BUTTON_DPAD_N           0x00 // 5
+#define HID_PS2_ADAPTER_BUTTON_DPAD_NE          0x01 // 5
+#define HID_PS2_ADAPTER_BUTTON_DPAD_E           0x02 // 5
+#define HID_PS2_ADAPTER_BUTTON_DPAD_SE          0x03 // 5
+#define HID_PS2_ADAPTER_BUTTON_DPAD_S           0x04 // 5
+#define HID_PS2_ADAPTER_BUTTON_DPAD_SW          0x05 // 5
+#define HID_PS2_ADAPTER_BUTTON_DPAD_W           0x06 // 5
+#define HID_PS2_ADAPTER_BUTTON_DPAD_NW          0x07 // 5
+#define HID_PS2_ADAPTER_BUTTON_DPAD_NEUTRAL     0x0F // 5
+
+#define HID_PS2_ADAPTER_BUTTON_L1               0x04 // 6
+#define HID_PS2_ADAPTER_BUTTON_L2               0x01 // 6
+#define HID_PS2_ADAPTER_BUTTON_R1               0x08 // 6
+#define HID_PS2_ADAPTER_BUTTON_R2               0x02 // 6
+#define HID_PS2_ADAPTER_BUTTON_START            0x20 // 6
+#define HID_PS2_ADAPTER_BUTTON_SELECT           0x10 // 6
+
+#define HID_PS2_ADAPTER_PAD_COUNT                1
+
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! PS2
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#define HID_PS2_BUTTON_CROSS            0x40 // 5
-#define HID_PS2_BUTTON_CIRCLE           0x20 // 5
-#define HID_PS2_BUTTON_SQUARE           0x80 // 5
-#define HID_PS2_BUTTON_TRIANGLE         0x10 // 5
+#define HID_PS2_BUTTON_CROSS            0x20 // 5
+#define HID_PS2_BUTTON_SQUARE           0x40 // 5
+#define HID_PS2_BUTTON_CIRCLE           0x10 // 5
+#define HID_PS2_BUTTON_TRIANGLE         0x80 // 5
 
 #define HID_PS2_BUTTON_DPAD_N           0x00 // 5
 #define HID_PS2_BUTTON_DPAD_NE          0x01 // 5

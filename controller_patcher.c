@@ -7,6 +7,7 @@
 #include "dynamic_libs/sys_functions.h"
 #include "dynamic_libs/syshid_functions.h"
 #include "dynamic_libs/socket_functions.h"
+#include "dynamic_libs/padscore_functions.h"
 #include "cp_retain_vars.h"
 #include "utils/logger.h"
 
@@ -19,6 +20,7 @@ void init_config_controller(){
     InitOSFunctionPointers();
     InitSysHIDFunctionPointers();
     InitVPadFunctionPointers();
+    InitPadScoreFunctionPointers();
 
     if(!config_done){
         config_done = 1;
@@ -31,8 +33,9 @@ void init_config_controller(){
         config_controller_list[CONTRPD_DS4] =                                                       HID_LIST_DS4;
         config_controller_list[CONTRPD_SP2600] =                                                    HID_LIST_SP2600;
         config_controller_list[CONTRPD_KEYBOARD] =                                                  HID_LIST_KEYBOARD;
-        config_controller_list[CONTRPD_PS2] =                                                       HID_LIST_PS2;
+        config_controller_list[CONTRPD_PS2_ADAPTER] =                                               HID_LIST_PS2_ADAPTER;
         config_controller_list[CONTRPD_POKKEN] =                                                    HID_LIST_POKKEN;
+        config_controller_list[CONTRPD_PS2] =                                                       HID_LIST_PS2;
         //config_controller_list[CONTRPD_YOUR_DEVICE] =                                             HID_LIST_YOUR_DEVICE;
 
         //Set data for each pad. Currenty 4 Pads for each device support. May need other extra treatment
@@ -44,8 +47,9 @@ void init_config_controller(){
         config_controller_data_ptr[CONTRPD_DS4][0] =                                                (u32)&(gHID_Devices[CONTRPD_DS4]).pad_data[0];
         config_controller_data_ptr[CONTRPD_SP2600][0] =                                             (u32)&(gHID_Devices[CONTRPD_SP2600]).pad_data[0];
         config_controller_data_ptr[CONTRPD_KEYBOARD][0] =                                           (u32)&(gHID_Devices[CONTRPD_KEYBOARD]).pad_data[0];
-        config_controller_data_ptr[CONTRPD_PS2][0] =                                                (u32)&(gHID_Devices[CONTRPD_PS2]).pad_data[0];
+        config_controller_data_ptr[CONTRPD_PS2_ADAPTER][0] =                                        (u32)&(gHID_Devices[CONTRPD_PS2_ADAPTER]).pad_data[0];
         config_controller_data_ptr[CONTRPD_POKKEN][0] =                                             (u32)&(gHID_Devices[CONTRPD_POKKEN]).pad_data[0];
+        config_controller_data_ptr[CONTRPD_PS2][0] =                                                (u32)&(gHID_Devices[CONTRPD_PS2]).pad_data[0];
 
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -216,11 +220,86 @@ void init_config_controller(){
         setConfigValue((u8*)&config_controller[CONTRPD_SP2600][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],  0x00,0xFF);
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //! PS2_ADAPTER
+        //!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VID],                           0x0e,0x8f);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_PID],                           0x00,0x03);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_A],                 0x05,HID_PS2_ADAPTER_BUTTON_CIRCLE);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_B],                 0x05,HID_PS2_ADAPTER_BUTTON_CROSS);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_X],                 0x05,HID_PS2_ADAPTER_BUTTON_TRIANGLE);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_Y],                 0x05,HID_PS2_ADAPTER_BUTTON_SQUARE);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_PLUS],              0x06,HID_PS2_ADAPTER_BUTTON_START);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_MINUS],             0x06,HID_PS2_ADAPTER_BUTTON_SELECT);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_L],                 0x06,HID_PS2_ADAPTER_BUTTON_L1);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_R],                 0x06,HID_PS2_ADAPTER_BUTTON_R1);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_ZL],                0x06,HID_PS2_ADAPTER_BUTTON_L2);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_ZR],                0x06,HID_PS2_ADAPTER_BUTTON_R2);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_DPAD_MODE],                     CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Hat);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_DPAD_MASK],                     CONTROLLER_PATCHER_VALUE_SET,0x0F);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_DPAD_N],            0x05,HID_PS2_ADAPTER_BUTTON_DPAD_N);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_DPAD_NE],           0x05,HID_PS2_ADAPTER_BUTTON_DPAD_NE);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_DPAD_E],            0x05,HID_PS2_ADAPTER_BUTTON_DPAD_E);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_DPAD_SE],           0x05,HID_PS2_ADAPTER_BUTTON_DPAD_SE);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_DPAD_S],            0x05,HID_PS2_ADAPTER_BUTTON_DPAD_S);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_DPAD_SW],           0x05,HID_PS2_ADAPTER_BUTTON_DPAD_SW);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_DPAD_W],            0x05,HID_PS2_ADAPTER_BUTTON_DPAD_W);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_DPAD_NW],           0x05,HID_PS2_ADAPTER_BUTTON_DPAD_NW);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL],      0x05,HID_PS2_ADAPTER_BUTTON_DPAD_NEUTRAL);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,HID_PS2_ADAPTER_PAD_COUNT);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_L_STICK_X],         0x02,0x7B);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],  0x00,0xFF);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_L_STICK_Y],         0x03,0x84);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],  0x00,0xFF);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_R_STICK_X],         0x00,0x7B);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],  0x00,0xFF);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_R_STICK_Y],         0x01,0x84);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2_ADAPTER][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],  0x00,0xFF);
+
+        //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //! Pokken
+        //!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VID],                           0x0f,0x0d);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_PID],                           0x00,0x92);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_A],                 0x05,HID_POKKEN_BUTTON_1);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_B],                 0x05,HID_POKKEN_BUTTON_2);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_X],                 0x05,HID_POKKEN_BUTTON_3);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_Y],                 0x05,HID_POKKEN_BUTTON_4);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_PLUS],              0x06,HID_POKKEN_BUTTON_5);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_MINUS],             0x06,HID_POKKEN_BUTTON_6);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_L],                 0x06,HID_POKKEN_BUTTON_7);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_R],                 0x06,HID_POKKEN_BUTTON_8);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_ZL],                0x06,HID_POKKEN_BUTTON_9);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_ZR],                0x06,HID_POKKEN_BUTTON_10);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_DPAD_MODE],                     CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Hat);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_DPAD_MASK],                     CONTROLLER_PATCHER_VALUE_SET,0x0F);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_N],            0x05,HID_POKKEN_BUTTON_DPAD_N);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_NE],           0x05,HID_POKKEN_BUTTON_DPAD_NE);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_E],            0x05,HID_POKKEN_BUTTON_DPAD_E);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_SE],           0x05,HID_POKKEN_BUTTON_DPAD_SE);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_S],            0x05,HID_POKKEN_BUTTON_DPAD_S);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_SW],           0x05,HID_POKKEN_BUTTON_DPAD_SW);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_W],            0x05,HID_POKKEN_BUTTON_DPAD_W);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_NW],           0x05,HID_POKKEN_BUTTON_DPAD_NW);
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL],      0x05,HID_POKKEN_BUTTON_DPAD_NEUTRAL);
+
+        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,HID_POKKEN_PAD_COUNT);
+
+        //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //! PS2
         //!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VID],                           0x0e,0x8f);
-        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_PID],                           0x00,0x03);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VID],                           0x08,0x10);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_PID],                           0x00,0x01);
 
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_A],                 0x05,HID_PS2_BUTTON_CIRCLE);
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_B],                 0x05,HID_PS2_BUTTON_CROSS);
@@ -248,47 +327,14 @@ void init_config_controller(){
 
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,HID_PS2_PAD_COUNT);
 
-        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_L_STICK_X],         0x02,0x7B);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_L_STICK_X],         0x03,0x7B);
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],  0x00,0xFF);
-        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_L_STICK_Y],         0x03,0x84);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_L_STICK_Y],         0x04,0x84);
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],  0x00,0xFF);
-        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_R_STICK_X],         0x00,0x7B);
+        setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_R_STICK_X],         0x02,0x7B);
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],  0x00,0xFF);
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_R_STICK_Y],         0x01,0x84);
         setConfigValue((u8*)&config_controller[CONTRPD_PS2][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],  0x00,0xFF);
-
-        //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        //! Pokken
-        //!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VID],                           0x0e,0x8f);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_PID],                           0x00,0x03);
-
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_A],                 0x05,HID_POKKEN_BUTTON_1);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_B],                 0x05,HID_POKKEN_BUTTON_2);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_X],                 0x05,HID_POKKEN_BUTTON_3);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_Y],                 0x05,HID_POKKEN_BUTTON_4);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_PLUS],              0x06,HID_POKKEN_BUTTON_5);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_MINUS],             0x06,HID_POKKEN_BUTTON_6);
-
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_L],                 0x06,HID_POKKEN_BUTTON_7);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_R],                 0x06,HID_POKKEN_BUTTON_8);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_ZL],                0x06,HID_POKKEN_BUTTON_9);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_ZR],                0x06,HID_POKKEN_BUTTON_10);
-
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_DPAD_MODE],                     CONTROLLER_PATCHER_VALUE_SET,CONTRPDM_Hat);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_DPAD_MASK],                     CONTROLLER_PATCHER_VALUE_SET,0x0F);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_N],            0x05,HID_POKKEN_BUTTON_DPAD_N);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_NE],           0x05,HID_POKKEN_BUTTON_DPAD_NE);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_E],            0x05,HID_POKKEN_BUTTON_DPAD_E);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_SE],           0x05,HID_POKKEN_BUTTON_DPAD_SE);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_S],            0x05,HID_POKKEN_BUTTON_DPAD_S);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_SW],           0x05,HID_POKKEN_BUTTON_DPAD_SW);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_W],            0x05,HID_POKKEN_BUTTON_DPAD_W);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_NW],           0x05,HID_POKKEN_BUTTON_DPAD_NW);
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL],      0x05,HID_POKKEN_BUTTON_DPAD_NEUTRAL);
-
-        setConfigValue((u8*)&config_controller[CONTRPD_POKKEN][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,HID_POKKEN_PAD_COUNT);
 
 
         //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
