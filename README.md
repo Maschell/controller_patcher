@@ -1,6 +1,12 @@
 # What is in this controller_patcher repository
 These files are the magic behind tools like HID to VPAD and can used to use your USB HID Device on your WiiU console.
 
+# How to create config files
+Detailed information about creating config files and adding support for more controller can be found in the [wiki](https://github.com/Maschell/controller_patcher/wiki)
+
+# Where can I find config files
+Configfiles for all controllers are collection in [this repository](https://github.com/Maschell/controller_patch_configs)
+
 #Dependencies for including it in other applications
 This controller_patcher is build to be used in serveral projects. It don't uses some ultra fancy external libraries. </br>
 To be able to use in other projects, you will need some external data though.</br>
