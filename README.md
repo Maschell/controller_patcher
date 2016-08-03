@@ -53,6 +53,14 @@ setControllerDataFromHID(&buffer,HID_ALL_CONNECTED_DEVICES);
 ```
 This example will add the input from ALL connected HID devices into the created VPADData.
 
+The postion of the mouse cursor can be read from here:
+```
+#include "controller_patcher/cp_retain_vars.h"
+
+X Value                gHID_Mouse.pad_data[0].data[0].X (0-1280)
+Y Value                gHID_Mouse.pad_data[0].data[0].Y (0-720)
+```
+
 #Credits:
 - Maschell
 - FIX94 - huge thanks to him and his initally created gc-to-vpad. Was a motivation and base to start all this
