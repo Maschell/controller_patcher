@@ -1,3 +1,20 @@
+/****************************************************************************
+ * Copyright (C) 2016 Maschell
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ****************************************************************************/
+
 #ifndef _CONTROLLER_PATCHER_H_
 #define _CONTROLLER_PATCHER_H_
 
@@ -11,33 +28,30 @@ extern "C" {
 #include "dynamic_libs/syshid_functions.h"
 #include "dynamic_libs/vpad_functions.h"
 
+#define HID_DEBUG 0
+
+typedef int HID_DEVICE_LIST;
+#define HID_ALL_CONNECTED_DEVICES 0x10
+
+#define HID_INIT_DONE   1
+#define HID_SDCARD_READ 2
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Don't forget to change this data!
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-enum Controller_Patcher_Devices
+enum Controller_Stick_Defines
 {
-    CONTRPD_GC,
-    CONTRPD_DS3,
-    CONTRPD_DS4,
-    CONTRPD_SP2600,
-    CONTRPD_KEYBOARD,
-    CONTRPD_PS2_ADAPTER,
-    CONTRPD_POKKEN,
-    CONTRPD_PS2,
-    CONTRPD_MAX_VALUE
+    STICK_CONF_MAGIC_VERSION,
+    STICK_CONF_BYTE,
+    STICK_CONF_DEFAULT,
+    STICK_CONF_DEADZONE,
+    STICK_CONF_INVERT,
+    STICK_CONF_MIN,
+    STICK_CONF_MAX,
+    STICK_CONF_ENUM_MAXVALUE
 };
 
-#define HID_LIST_GC                     0x001
-#define HID_LIST_KEYBOARD               0x002
-#define HID_LIST_MOUSE                  0x004
-#define HID_LIST_DS3                    0x008
-#define HID_LIST_DS4                    0x010
-#define HID_LIST_SP2600                 0x020
-#define HID_LIST_PS2_ADAPTER            0x040
-#define HID_LIST_POKKEN                 0x080
-#define HID_LIST_PS2                    0x100
+#define STICK_CONF_MAGIC_VALUE 0xF0 // When you change the enum above, Dont forget to change the magic version!!!!
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! End
@@ -56,7 +70,7 @@ enum Controller_Patcher_Settings
 {
     CONTRPS_VID,                          //! pid: 0x451d would be 0x45,0x1d
     CONTRPS_PID,                          //! vid: 0x488d would be 0x48,0x8d
-    CONTRPS_BUF_SIZE,                     //! To invert: CONTROLLER_PATCHER_VALUE_SET, BUF_SIZE (default is 64)
+    CONTRPS_BUF_SIZE,                     //! To set: CONTROLLER_PATCHER_VALUE_SET, BUF_SIZE (default is 64)
     CONTRPS_VPAD_BUTTON_A,
     CONTRPS_VPAD_BUTTON_B,
     CONTRPS_VPAD_BUTTON_X,
@@ -78,6 +92,11 @@ enum Controller_Patcher_Settings
     CONTRPS_VPAD_BUTTON_DPAD_W,
     CONTRPS_VPAD_BUTTON_DPAD_NW,
     CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL,
+    /* DPAD Absolute mode */
+    CONTRPS_VPAD_BUTTON_DPAD_ABS_UP,
+    CONTRPS_VPAD_BUTTON_DPAD_ABS_DOWN,
+    CONTRPS_VPAD_BUTTON_DPAD_ABS_LEFT,
+    CONTRPS_VPAD_BUTTON_DPAD_ABS_RIGHT,
     /* */
     CONTRPS_VPAD_BUTTON_ZL,
     CONTRPS_VPAD_BUTTON_ZR,
@@ -89,6 +108,20 @@ enum Controller_Patcher_Settings
     CONTRPS_VPAD_BUTTON_SYNC,
     CONTRPS_VPAD_BUTTON_STICK_R,
     CONTRPS_VPAD_BUTTON_STICK_L,
+
+    /*
+    Currently not needed
+
+    CONTRPS_VPAD_STICK_R_EMULATION_LEFT,
+    CONTRPS_VPAD_STICK_R_EMULATION_RIGHT,
+    CONTRPS_VPAD_STICK_R_EMULATION_UP,
+    CONTRPS_VPAD_STICK_R_EMULATION_DOWN,
+    CONTRPS_VPAD_STICK_L_EMULATION_LEFT,
+    CONTRPS_VPAD_STICK_L_EMULATION_RIGHT,
+    CONTRPS_VPAD_STICK_L_EMULATION_UP,
+    CONTRPS_VPAD_STICK_L_EMULATION_DOWN,
+
+    */
     CONTRPS_VPAD_BUTTON_L_STICK_X,          //! byte, default value
     CONTRPS_VPAD_BUTTON_L_STICK_X_INVERT,   //! To invert: CONTROLLER_PATCHER_VALUE_SET, 0x01
     CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE, //! Deadzone
@@ -107,15 +140,33 @@ enum Controller_Patcher_Settings
     CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX,   //! min,max
     CONTRPS_VPAD_BUTTON_TV,
     CONTRPS_DOUBLE_USE,                     //!When used: e.g. CONTROLLER_PATCHER_VALUE_SET, CONTROLLER_PATCHER_GC_DOUBLE_USE
-    CONTRPS_DOUBLE_USE_BUTTON,
+    CONTRPS_DOUBLE_USE_BUTTON_ACTIVATOR,
+    CONTRPS_DOUBLE_USE_BUTTON_1_PRESSED,
+    CONTRPS_DOUBLE_USE_BUTTON_2_PRESSED,
+    CONTRPS_DOUBLE_USE_BUTTON_3_PRESSED,
+    CONTRPS_DOUBLE_USE_BUTTON_4_PRESSED,
+    CONTRPS_DOUBLE_USE_BUTTON_5_PRESSED,
+    CONTRPS_DOUBLE_USE_BUTTON_1_RELEASED,
+    CONTRPS_DOUBLE_USE_BUTTON_2_RELEASED,
+    CONTRPS_DOUBLE_USE_BUTTON_3_RELEASED,
+    CONTRPS_DOUBLE_USE_BUTTON_4_RELEASED,
+    CONTRPS_DOUBLE_USE_BUTTON_5_RELEASED,
     CONTRPS_PAD_COUNT,                      //!
+    CONTRPS_INPUT_FILTER,                   //!
+    CONTRPS_MOUSE_STICK,
     CONTRPS_MAX_VALUE
 };
 
 enum Controller_Patcher_DPAD_MODE
 {
     CONTRPDM_Normal,
-    CONTRPDM_Hat
+    CONTRPDM_Hat,
+    CONTRPDM_Absolute_2Values,
+};
+enum Controller_Patcher_DPAD_Settings
+{
+    CONTRDPAD_MODE,
+    CONTRDPAD_MASK,
 };
 
 #define CONTROLLER_PATCHER_VALUE_SET            0x01
@@ -145,33 +196,42 @@ typedef struct _HID_Data_Struct{
 
 void setConfigValue(u8 * dest , u8 first, u8 second);
 void init_config_controller();
+void init_button_remapping();
 void deinit_config_controller();
+u32 getNextDeviceSlot();
+void printButtons(VPADData * buffer);
+void buttonRemapping(VPADData * buffer);
+void setButtonRemappingData(VPADData * buffer, VPADData * new_data,u32 VPADButton, int CONTRPS_Value);
+void setHoldButtonData(VPADData * buffer, VPADData * new_data,u32 oldVPADButton,u32 newVPADButton);
 
 void setControllerReleasePressData(HID_Data_Struct data_cur, HID_Data_Struct data_last,VPADData * buffer,int VPADButton);
-void setControllerDataFromHID(VPADData * buffer,int hid);
+void setControllerDataFromHID(VPADData * buffer,HID_DEVICE_LIST hid_devices);
+int checkDoubleUseGC();
 void checkMouseMode(HID_Data_Struct data, HID_Data_Struct data_last);
 
 void my_read_cb(unsigned int handle, int error, unsigned char *buf, unsigned int bytes_transfered, void *p_user);
 
 int wasInKeyboard(unsigned char * src,int key);
 
+const char *byte_to_binary(int x);
+
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! GC-Adapter
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-//A config would be cleaner, but no motivation atm :P
-#define HID_GC_BUTTON_A                 0x01
-#define HID_GC_BUTTON_B                 0x02
-#define HID_GC_BUTTON_X                 0x04
-#define HID_GC_BUTTON_Y                 0x08
-#define HID_GC_BUTTON_LEFT              0x10
-#define HID_GC_BUTTON_RIGHT             0x20
-#define HID_GC_BUTTON_DOWN              0x40
-#define HID_GC_BUTTON_UP                0x80
-#define HID_GC_BUTTON_START             0x01
-#define HID_GC_BUTTON_L                 0x80
-#define HID_GC_BUTTON_R                 0x80
-#define HID_GC_BUTTON_Z                 0x02
+#define HID_GC_BUTTON_A_VALUE                 0x01
+#define HID_GC_BUTTON_B_VALUE                 0x02
+#define HID_GC_BUTTON_X_VALUE                 0x04
+#define HID_GC_BUTTON_Y_VALUE                 0x08
+#define HID_GC_BUTTON_LEFT_VALUE              0x10
+#define HID_GC_BUTTON_RIGHT_VALUE             0x20
+#define HID_GC_BUTTON_DOWN_VALUE              0x40
+#define HID_GC_BUTTON_UP_VALUE                0x80
+
+#define HID_GC_BUTTON_START_VALUE             0x01
+#define HID_GC_BUTTON_L_VALUE                 0x80
+#define HID_GC_BUTTON_R_VALUE                 0x80
+#define HID_GC_BUTTON_Z_VALUE                 0x02
 
 #define HID_GC_PAD_COUNT             4
 
@@ -191,24 +251,25 @@ void my_gc_write_cb(unsigned int handle, int error, unsigned char *buf, unsigned
 #define PS3_01_REPORT_ID                0x01
 #define PS3_F5_REPORT_ID                0xF5
 
-#define HID_DS3_BUTTON_CROSS            0x40 // 3
-#define HID_DS3_BUTTON_CIRCLE           0x20 // 3
-#define HID_DS3_BUTTON_SQUARE           0x80 // 3
-#define HID_DS3_BUTTON_TRIANGLE         0x10 // 3
-#define HID_DS3_BUTTON_L1               0x04 // 3
-#define HID_DS3_BUTTON_L2               0x01 // 3
-#define HID_DS3_BUTTON_R1               0x08 // 3
-#define HID_DS3_BUTTON_R2               0x02 // 3
+#define HID_DS3_BUTTON_CROSS_VALUE            0x40 // 3
+#define HID_DS3_BUTTON_CIRCLE_VALUE           0x20 // 3
+#define HID_DS3_BUTTON_SQUARE_VALUE           0x80 // 3
+#define HID_DS3_BUTTON_TRIANGLE_VALUE         0x10 // 3
+#define HID_DS3_BUTTON_L1_VALUE               0x04 // 3
+#define HID_DS3_BUTTON_L2_VALUE               0x01 // 3
+#define HID_DS3_BUTTON_R1_VALUE               0x08 // 3
+#define HID_DS3_BUTTON_R2_VALUE               0x02 // 3
 
-#define HID_DS3_BUTTON_L3               0x02 // 2
-#define HID_DS3_BUTTON_R3               0x04 // 2
-#define HID_DS3_BUTTON_SELECT           0x01 // 2
-#define HID_DS3_BUTTON_START            0x08 // 2
-#define HID_DS3_BUTTON_LEFT             0x80 // 2
-#define HID_DS3_BUTTON_RIGHT            0x20 // 2
-#define HID_DS3_BUTTON_UP               0x10 // 2
-#define HID_DS3_BUTTON_DOWN             0x40 // 2
-#define HID_DS3_BUTTON_GUIDE            0x01 // 4
+#define HID_DS3_BUTTON_L3_VALUE               0x02 // 2
+#define HID_DS3_BUTTON_R3_VALUE               0x04 // 2
+#define HID_DS3_BUTTON_SELECT_VALUE           0x01 // 2
+#define HID_DS3_BUTTON_START_VALUE            0x08 // 2
+#define HID_DS3_BUTTON_LEFT_VALUE             0x80 // 2
+#define HID_DS3_BUTTON_RIGHT_VALUE            0x20 // 2
+#define HID_DS3_BUTTON_UP_VALUE               0x10 // 2
+#define HID_DS3_BUTTON_DOWN_VALUE             0x40 // 2
+#define HID_DS3_BUTTON_GUIDE_VALUE            0x01 // 4
+
 
 #define HID_DS3_PAD_COUNT             1
 
@@ -216,149 +277,41 @@ void my_gc_write_cb(unsigned int handle, int error, unsigned char *buf, unsigned
 //! DS4
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#define HID_DS4_BUTTON_CROSS            0x20 // 5
-#define HID_DS4_BUTTON_SQUARE           0x10 // 5
-#define HID_DS4_BUTTON_CIRCLE           0x40 // 5
-#define HID_DS4_BUTTON_TRIANGLE         0x80 // 5
-#define HID_DS4_BUTTON_L1               0x01 // 6
-#define HID_DS4_BUTTON_L2               0x04 // 6
-#define HID_DS4_BUTTON_L3               0x40 // 6
-#define HID_DS4_BUTTON_R1               0x02 // 6
-#define HID_DS4_BUTTON_R2               0x08 // 6
-#define HID_DS4_BUTTON_R3               0x80 // 6
-#define HID_DS4_BUTTON_SHARE            0x10 // 6
-#define HID_DS4_BUTTON_OPTIONS          0x20 // 6
-#define HID_DS4_BUTTON_DPAD_N           0x00 // 5
-#define HID_DS4_BUTTON_DPAD_NE          0x01 // 5
-#define HID_DS4_BUTTON_DPAD_E           0x02 // 5
-#define HID_DS4_BUTTON_DPAD_SE          0x03 // 5
-#define HID_DS4_BUTTON_DPAD_S           0x04 // 5
-#define HID_DS4_BUTTON_DPAD_SW          0x05 // 5
-#define HID_DS4_BUTTON_DPAD_W           0x06 // 5
-#define HID_DS4_BUTTON_DPAD_NW          0x07 // 5
-#define HID_DS4_BUTTON_DPAD_NEUTRAL     0x08 // 5
-#define HID_DS4_BUTTON_GUIDE            0x01 // 7
-#define HID_DS4_BUTTON_T_PAD_CLICK      0x02 // 7
+#define HID_DS4_BUTTON_CROSS_VALUE            0x20 // 5
+#define HID_DS4_BUTTON_SQUARE_VALUE           0x10 // 5
+#define HID_DS4_BUTTON_CIRCLE_VALUE           0x40 // 5
+#define HID_DS4_BUTTON_TRIANGLE_VALUE         0x80 // 5
+#define HID_DS4_BUTTON_L1_VALUE               0x01 // 6
+#define HID_DS4_BUTTON_L2_VALUE               0x04 // 6
+#define HID_DS4_BUTTON_L3_VALUE               0x40 // 6
+#define HID_DS4_BUTTON_R1_VALUE               0x02 // 6
+#define HID_DS4_BUTTON_R2_VALUE               0x08 // 6
+#define HID_DS4_BUTTON_R3_VALUE               0x80 // 6
+#define HID_DS4_BUTTON_SHARE_VALUE            0x10 // 6
+#define HID_DS4_BUTTON_OPTIONS_VALUE          0x20 // 6
+
+#define HID_DS4_BUTTON_DPAD_MASK_VALUE        0x0F
+
+#define HID_DS4_BUTTON_DPAD_N_VALUE           0x00 // 5
+#define HID_DS4_BUTTON_DPAD_NE_VALUE          0x01 // 5
+#define HID_DS4_BUTTON_DPAD_E_VALUE           0x02 // 5
+#define HID_DS4_BUTTON_DPAD_SE_VALUE          0x03 // 5
+#define HID_DS4_BUTTON_DPAD_S_VALUE           0x04 // 5
+#define HID_DS4_BUTTON_DPAD_SW_VALUE          0x05 // 5
+#define HID_DS4_BUTTON_DPAD_W_VALUE           0x06 // 5
+#define HID_DS4_BUTTON_DPAD_NW_VALUE          0x07 // 5
+#define HID_DS4_BUTTON_DPAD_NEUTRAL_VALUE     0x08 // 5
+
+#define HID_DS4_BUTTON_GUIDE_VALUE            0x01 // 7
+#define HID_DS4_BUTTON_T_PAD_CLICK_VALUE      0x02 // 7
 
 #define HID_DS4_PAD_COUNT               1
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//! PS2 Adapter
+//! Keyboard (Full list is on: http://www.freebsddiary.org/APC/usb_hid_usages.php)
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#define HID_PS2_ADAPTER_BUTTON_CROSS            0x40 // 5
-#define HID_PS2_ADAPTER_BUTTON_CIRCLE           0x20 // 5
-#define HID_PS2_ADAPTER_BUTTON_SQUARE           0x80 // 5
-#define HID_PS2_ADAPTER_BUTTON_TRIANGLE         0x10 // 5
-
-#define HID_PS2_ADAPTER_BUTTON_DPAD_N           0x00 // 5
-#define HID_PS2_ADAPTER_BUTTON_DPAD_NE          0x01 // 5
-#define HID_PS2_ADAPTER_BUTTON_DPAD_E           0x02 // 5
-#define HID_PS2_ADAPTER_BUTTON_DPAD_SE          0x03 // 5
-#define HID_PS2_ADAPTER_BUTTON_DPAD_S           0x04 // 5
-#define HID_PS2_ADAPTER_BUTTON_DPAD_SW          0x05 // 5
-#define HID_PS2_ADAPTER_BUTTON_DPAD_W           0x06 // 5
-#define HID_PS2_ADAPTER_BUTTON_DPAD_NW          0x07 // 5
-#define HID_PS2_ADAPTER_BUTTON_DPAD_NEUTRAL     0x0F // 5
-
-#define HID_PS2_ADAPTER_BUTTON_L1               0x04 // 6
-#define HID_PS2_ADAPTER_BUTTON_L2               0x01 // 6
-#define HID_PS2_ADAPTER_BUTTON_R1               0x08 // 6
-#define HID_PS2_ADAPTER_BUTTON_R2               0x02 // 6
-#define HID_PS2_ADAPTER_BUTTON_START            0x20 // 6
-#define HID_PS2_ADAPTER_BUTTON_SELECT           0x10 // 6
-
-#define HID_PS2_ADAPTER_PAD_COUNT                1
-
-
-//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//! PS2
-//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#define HID_PS2_BUTTON_CROSS            0x20 // 5
-#define HID_PS2_BUTTON_SQUARE           0x40 // 5
-#define HID_PS2_BUTTON_CIRCLE           0x10 // 5
-#define HID_PS2_BUTTON_TRIANGLE         0x80 // 5
-
-#define HID_PS2_BUTTON_DPAD_N           0x00 // 5
-#define HID_PS2_BUTTON_DPAD_NE          0x01 // 5
-#define HID_PS2_BUTTON_DPAD_E           0x02 // 5
-#define HID_PS2_BUTTON_DPAD_SE          0x03 // 5
-#define HID_PS2_BUTTON_DPAD_S           0x04 // 5
-#define HID_PS2_BUTTON_DPAD_SW          0x05 // 5
-#define HID_PS2_BUTTON_DPAD_W           0x06 // 5
-#define HID_PS2_BUTTON_DPAD_NW          0x07 // 5
-#define HID_PS2_BUTTON_DPAD_NEUTRAL     0x0F // 5
-
-#define HID_PS2_BUTTON_L1               0x04 // 6
-#define HID_PS2_BUTTON_L2               0x01 // 6
-#define HID_PS2_BUTTON_R1               0x08 // 6
-#define HID_PS2_BUTTON_R2               0x02 // 6
-#define HID_PS2_BUTTON_START            0x20 // 6
-#define HID_PS2_BUTTON_SELECT           0x10 // 6
-
-#define HID_PS2_PAD_COUNT                1
-
-//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//! Saitek P2600
-//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#define HID_SP2600_BUTTON_1              0x01 // 5
-#define HID_SP2600_BUTTON_2              0x02 // 5
-#define HID_SP2600_BUTTON_3              0x04 // 5
-#define HID_SP2600_BUTTON_4              0x08 // 5
-
-#define HID_SP2600_BUTTON_DPAD_N         0x00 // 5
-#define HID_SP2600_BUTTON_DPAD_NE        0x10 // 5
-#define HID_SP2600_BUTTON_DPAD_E         0x20 // 5
-#define HID_SP2600_BUTTON_DPAD_SE        0x30 // 5
-#define HID_SP2600_BUTTON_DPAD_S         0x40 // 5
-#define HID_SP2600_BUTTON_DPAD_SW        0x50 // 5
-#define HID_SP2600_BUTTON_DPAD_W         0x60 // 5
-#define HID_SP2600_BUTTON_DPAD_NW        0x70 // 5
-#define HID_SP2600_BUTTON_DPAD_NEUTRAL   0xF0 // 5
-
-#define HID_SP2600_BUTTON_5              0x10 // 5   //L upper
-#define HID_SP2600_BUTTON_6              0x20 // 5   //R upper
-#define HID_SP2600_BUTTON_7              0x40 // 5   //L lower
-#define HID_SP2600_BUTTON_8              0x80 // 5   //R lower
-#define HID_SP2600_BUTTON_BLACK          0x01 // 6
-#define HID_SP2600_BUTTON_WHITE          0x02 // 6
-#define HID_SP2600_BUTTON_FPS            0x04 // 6
-#define HID_SP2600_BUTTON_Analog         0x08 // 6
-
-#define HID_SP2600_PAD_COUNT             1
-
-//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//! POKKEN
-//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#define HID_POKKEN_BUTTON_1              0x01
-#define HID_POKKEN_BUTTON_2              0x02
-#define HID_POKKEN_BUTTON_3              0x04
-#define HID_POKKEN_BUTTON_4              0x08
-#define HID_POKKEN_BUTTON_5              0x10
-#define HID_POKKEN_BUTTON_6              0x20
-#define HID_POKKEN_BUTTON_7              0x40
-#define HID_POKKEN_BUTTON_8              0x80
-#define HID_POKKEN_BUTTON_9              0x80
-#define HID_POKKEN_BUTTON_10             0x80
-
-#define HID_POKKEN_BUTTON_DPAD_N         0x00
-#define HID_POKKEN_BUTTON_DPAD_NE        0x10
-#define HID_POKKEN_BUTTON_DPAD_E         0x20
-#define HID_POKKEN_BUTTON_DPAD_SE        0x30
-#define HID_POKKEN_BUTTON_DPAD_S         0x40
-#define HID_POKKEN_BUTTON_DPAD_SW        0x50
-#define HID_POKKEN_BUTTON_DPAD_W         0x60
-#define HID_POKKEN_BUTTON_DPAD_NW        0x70
-#define HID_POKKEN_BUTTON_DPAD_NEUTRAL   0xF0
-
-#define HID_POKKEN_PAD_COUNT             1
-
-//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//! Keyboard
-//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#define HID_KEYBOARD_BUTTON_SHIFT             0x02
 
 #define HID_KEYBOARD_BUTTON_A                 0x04
 #define HID_KEYBOARD_BUTTON_B                 0x05
@@ -398,16 +351,56 @@ void my_gc_write_cb(unsigned int handle, int error, unsigned char *buf, unsigned
 #define HID_KEYBOARD_BUTTON_F10               0x43
 #define HID_KEYBOARD_BUTTON_F11               0x44
 #define HID_KEYBOARD_BUTTON_F12               0x45
+#define HID_KEYBOARD_BUTTON_1                 0x1E
+#define HID_KEYBOARD_BUTTON_2                 0x1F
+#define HID_KEYBOARD_BUTTON_3                 0x20
+#define HID_KEYBOARD_BUTTON_4                 0x21
+#define HID_KEYBOARD_BUTTON_5                 0x22
+#define HID_KEYBOARD_BUTTON_6                 0x23
+#define HID_KEYBOARD_BUTTON_7                 0x24
+#define HID_KEYBOARD_BUTTON_8                 0x25
+#define HID_KEYBOARD_BUTTON_9                 0x26
+#define HID_KEYBOARD_BUTTON_0                 0x27
+
+#define HID_KEYBOARD_BUTTON_RETURN            0x28
+#define HID_KEYBOARD_BUTTON_ESCAPE            0x29
+#define HID_KEYBOARD_BUTTON_DELETE            0x2A
+#define HID_KEYBOARD_BUTTON_TAB               0x2B
+#define HID_KEYBOARD_BUTTON_SPACEBAR          0x2C
+#define HID_KEYBOARD_BUTTON_CAPSLOCK          0x39
+#define HID_KEYBOARD_BUTTON_PRINTSCREEN       0x46
+#define HID_KEYBOARD_BUTTON_SCROLLLOCK        0x47
+#define HID_KEYBOARD_BUTTON_PAUSE             0x48
+#define HID_KEYBOARD_BUTTON_INSERT            0x49
+#define HID_KEYBOARD_BUTTON_HOME              0x4A
+#define HID_KEYBOARD_BUTTON_PAGEUP            0x4B
+#define HID_KEYBOARD_BUTTON_PAGEDOWN          0x4E
+#define HID_KEYBOARD_BUTTON_DELETEFORWARD     0x4C
+#define HID_KEYBOARD_BUTTON_END               0x4D
+#define HID_KEYBOARD_BUTTON_LEFT_CONTROL      0xE0
+#define HID_KEYBOARD_BUTTON_LEFT_ALT          0xE2
+#define HID_KEYBOARD_BUTTON_RIGHT_CONTROL     0xE4
+#define HID_KEYBOARD_BUTTON_RIGHT_SHIFT       0xE5
+#define HID_KEYBOARD_BUTTON_RIGHT_ALT         0xE6
+
 #define HID_KEYBOARD_BUTTON_LEFT              0x50
 #define HID_KEYBOARD_BUTTON_RIGHT             0x4f
 #define HID_KEYBOARD_BUTTON_DOWN              0x51
 #define HID_KEYBOARD_BUTTON_UP                0x52
-#define HID_KEYBOARD_BUTTON_ENTER             0x28
-#define HID_KEYBOARD_BUTTON_MINUS             0x56
-#define HID_KEYBOARD_BUTTON_PLUS              0x57
-#define HID_KEYBOARD_BUTTON_SPACE             0x2C
-#define HID_KEYBOARD_BUTTON_SHIFT             0x02
-#define HID_KEYBOARD_BUTTON_TAB               0x2B
+
+#define HID_KEYBOARD_KEYPAD_BUTTON_1          0x59
+#define HID_KEYBOARD_KEYPAD_BUTTON_2          0x5A
+#define HID_KEYBOARD_KEYPAD_BUTTON_3          0x5B
+#define HID_KEYBOARD_KEYPAD_BUTTON_4          0x5C
+#define HID_KEYBOARD_KEYPAD_BUTTON_5          0x5D
+#define HID_KEYBOARD_KEYPAD_BUTTON_6          0x5E
+#define HID_KEYBOARD_KEYPAD_BUTTON_7          0x5F
+#define HID_KEYBOARD_KEYPAD_BUTTON_8          0x60
+#define HID_KEYBOARD_KEYPAD_BUTTON_9          0x61
+#define HID_KEYBOARD_KEYPAD_BUTTON_0          0x62
+#define HID_KEYBOARD_KEYPAD_BUTTON_NUMLOCK    0x53
+#define HID_KEYBOARD_KEYPAD_BUTTON_MINUS      0x56
+#define HID_KEYBOARD_KEYPAD_BUTTON_PLUS       0x57
 
 #define HID_KEYBOARD_PAD_COUNT             1
 #define HID_KEYBOARD_DATA_LENGTH           8
@@ -432,6 +425,7 @@ struct _HID_Mouse_Data {
     s16 Y;
     s16 deltaX;
     s16 deltaY;
+    u8 valuedChanged;
 } __attribute__ ((packed));
 
 typedef struct _HID_Mouse_Data HID_Mouse_Data;
