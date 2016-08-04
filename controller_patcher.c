@@ -1204,10 +1204,17 @@ void setTouch(HID_Data_Struct data,VPADData * buffer){
 f32 convertAnalogValue(u8 value, u8 default_val, u8 min, u8 max, u8 invert,u8 deadzone){
     s8 new_value = (s8)(value - default_val);
     u8 range = 0;
+    if(value >= max){
+        return 1.0f;
+    }else if(value <= min){
+        return -1.0f;
+    }
     if((value-deadzone) > default_val){
-        range = (max - default_val);
+        new_value -= deadzone;
+        range = (max - (default_val + deadzone));
     }else if((value+deadzone) < default_val){
-        range = (default_val - min);
+        new_value += deadzone;
+        range = ((default_val - deadzone) - min);
     }else{
         return 0.0f;
     }

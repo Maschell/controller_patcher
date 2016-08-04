@@ -61,15 +61,15 @@ const u8 HID_GC_STICK_L_X[STICK_CONF_ENUM_MAXVALUE] =  {    STICK_CONF_MAGIC_VAL
                                                             0x80, //STICK_CONF_DEFAULT,
                                                             0x09, //STICK_CONF_DEADZONE,
                                                             0x00, //STICK_CONF_INVERT,
-                                                            0x1E, //STICK_CONF_MIN,
-                                                            0xE5};//STICK_CONF_MAX,
+                                                            0x1A, //STICK_CONF_MIN,
+                                                            0xE4};//STICK_CONF_MAX,
 
 const u8 HID_GC_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE] =  {    STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
                                                             0x04, //STICK_CONF_BYTE,
                                                             0x80, //STICK_CONF_DEFAULT,
                                                             0x09, //STICK_CONF_DEADZONE,
                                                             0x00, //STICK_CONF_INVERT,
-                                                            0x18, //STICK_CONF_MIN,
+                                                            0x11, //STICK_CONF_MIN,
                                                             0xE1};//STICK_CONF_MAX,
 
 const u8 HID_GC_STICK_R_X[STICK_CONF_ENUM_MAXVALUE] =  {    STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
@@ -77,15 +77,15 @@ const u8 HID_GC_STICK_R_X[STICK_CONF_ENUM_MAXVALUE] =  {    STICK_CONF_MAGIC_VAL
                                                             0x80, //STICK_CONF_DEFAULT,
                                                             0x09, //STICK_CONF_DEADZONE,
                                                             0x00, //STICK_CONF_INVERT,
-                                                            0x26, //STICK_CONF_MIN,
-                                                            0xE1};//STICK_CONF_MAX,
+                                                            0x2B, //STICK_CONF_MIN,
+                                                            0xE2};//STICK_CONF_MAX,
 
 const u8 HID_GC_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {    STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
                                                             0x06, //STICK_CONF_BYTE,
                                                             0x80, //STICK_CONF_DEFAULT,
                                                             0x09, //STICK_CONF_DEADZONE,
                                                             0x00, //STICK_CONF_INVERT,
-                                                            0x1A, //STICK_CONF_MIN,
+                                                            0x1D, //STICK_CONF_MIN,
                                                             0xDB};//STICK_CONF_MAX,
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
