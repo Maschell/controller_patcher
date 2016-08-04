@@ -48,10 +48,23 @@ Take a look at the [HID to VPAD](https://github.com/Maschell/hid_to_vpad) source
 
 Once you set up everything correctly, you can use the "setControllerDataFromHID" method to fill a VPADData pointer. Example:
 ```
+#include "controller_patcher/controller_patcher.h"
+
 VPADData buffer;
 setControllerDataFromHID(&buffer,HID_ALL_CONNECTED_DEVICES);
 ```
 This example will add the input from ALL connected HID devices into the created VPADData.
+
+To remap the gamepad buttons. Use something like this:
+```
+#include "controller_patcher/cp_retain_vars.h"
+#include "controller_patcher/controller_patcher.h"
+
+    if(gButtonRemappingConfigDone && gConfig_done){
+        buttonRemapping(buffer);
+    }
+```
+
 
 The postion of the mouse cursor can be read from here:
 ```
