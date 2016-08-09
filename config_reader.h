@@ -31,7 +31,7 @@
 #include "../dynamic_libs/fs_functions.h"
 #include "cp_retain_vars.h"
 
-
+#define CONTROLLER_PATCHER_PATH "/vol/external01/wiiu/controller";
 
 class ConfigReader
 {

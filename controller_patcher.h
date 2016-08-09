@@ -22,8 +22,7 @@
 extern "C" {
 #endif
 
-#include "common/types.h"
-#include "common/common.h"
+#include <gctypes.h>
 #include "dynamic_libs/os_functions.h"
 #include "dynamic_libs/syshid_functions.h"
 #include "dynamic_libs/vpad_functions.h"

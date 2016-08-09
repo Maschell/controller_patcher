@@ -126,7 +126,7 @@ ConfigReader::~ConfigReader()
 }
 std::vector<std::string> ConfigReader::ScanFolder()
 {
-    std::string path = std::string(CAFE_OS_SD_PATH) + std::string(WIIU_PATH) + "/controller";
+    std::string path = CONTROLLER_PATCHER_PATH;
     int dirhandle = 0;
     if(HID_DEBUG) log_printf("Opening %s\n",path.c_str());
     std::vector<std::string> config_files;
