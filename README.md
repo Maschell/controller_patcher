@@ -14,7 +14,7 @@ To be able to use in other projects, you will need some external data though.</b
 - To able to log something, you need the right [logger functions](https://github.com/Maschell/hid_to_vpad/tree/master/src/utils).
 
 # Example implementation
-###How to "install" it
+### How to "install" it
 In order to add hid support to your application, you need add these lines add each start up.
 ```
   #include "controller_patcher/controller_patcher.h"
@@ -44,7 +44,7 @@ deinit_config_controller();
 Take a look at the [HID to VPAD](https://github.com/Maschell/hid_to_vpad) sources for an actual example.
 
 
-###How to use it:
+### How to use it:
 
 Once you set up everything correctly, you can use the "setControllerDataFromHID" method to fill a VPADData pointer. Example:
 ```
@@ -74,6 +74,6 @@ X Value                gHID_Mouse.pad_data[0].data[0].X (0-1280)
 Y Value                gHID_Mouse.pad_data[0].data[0].Y (0-720)
 ```
 
-#Credits:
+# Credits:
 - Maschell
 - FIX94 - huge thanks to him and his initally created gc-to-vpad. Was a motivation and base to start all this
