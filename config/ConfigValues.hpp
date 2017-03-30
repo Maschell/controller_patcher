@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2016,2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,22 @@
 #include <map>
 #include <gctypes.h>
 
-#include "controller_patcher.h"
-#include "pad_const.h"
+#include "../utils/PadConst.hpp"
+#include "../ControllerPatcher.hpp"
+
+#include "../utils/CPStringTools.hpp"
+#include "utils/logger.h"
 
 class ConfigValues
 {
-public:
+friend class ConfigParser;
+friend class ControllerPatcher;
+private:
     static ConfigValues *getInstance() {
-        if(!instance)
+        if(instance == NULL){
+            log_printf("ConfigValues: We need a new instance!!!\n");
             instance = new ConfigValues();
+        }
         return instance;
     }
 
@@ -42,7 +49,7 @@ public:
     }
 
     /**
-        Returns NULL if no a preset!
+        Returns NULL if not a preset!
     **/
     static const u8 * getValuesStickPreset(std::string possibleValue)
     {
@@ -120,7 +127,22 @@ public:
         return cur_instance->setIfValueIsAControllerPresetEx(value,slot,keyslot);
     }
 
-private:
+    static void addDeviceName(u16 vid,u16 pid,std::string value){
+        ConfigValues * cur_instance = getInstance();
+        if(cur_instance != NULL){
+            cur_instance->addDeviceNameEx(vid,pid,value);
+        }
+    }
+
+    /**
+        Returns empty String if not found
+    **/
+    static std::string getStringByVIDPID(u16 vid,u16 pid){
+        ConfigValues * cur_instance = getInstance();
+        if(cur_instance ==  NULL) return "";
+        return cur_instance->getStringByVIDPIDEx(vid,pid);
+    }
+
     //!Constructor
     ConfigValues();
     //!Destructor
@@ -135,9 +157,12 @@ private:
     std::map<std::string,int> gGamePadValuesToCONTRPSString;
     std::map<std::string,int> presetKeyboardValues;
 
+    std::map<std::string,std::string> deviceNames;
+
     std::map<std::string,const u8*> presetGCValues;
     std::map<std::string,const u8*> presetDS3Values;
     std::map<std::string,const u8*> presetDS4Values;
+    std::map<std::string,const u8*> presetXInputValues;
     std::map<std::string,const u8*> presetSticks;
 
     int getValueFromMap(std::map<std::string,int> values,std::string nameOfString);
@@ -147,7 +172,7 @@ private:
     int getPresetValueEx(std::string possibleString);
 
 	void InitValues(){
-        CONTPRStringToValue["VPAD_BUTTON_A"] =                    CONTRPS_VPAD_BUTTON_A;
+        CONTPRStringToValue["VPAD_BUTTON_A"] =                          CONTRPS_VPAD_BUTTON_A;
         CONTPRStringToValue["VPAD_BUTTON_B"] =                          CONTRPS_VPAD_BUTTON_B;
         CONTPRStringToValue["VPAD_BUTTON_X"] =                          CONTRPS_VPAD_BUTTON_X;
         CONTPRStringToValue["VPAD_BUTTON_Y"] =                          CONTRPS_VPAD_BUTTON_Y;
@@ -183,7 +208,6 @@ private:
         CONTPRStringToValue["VPAD_BUTTON_STICK_R"] =                    CONTRPS_VPAD_BUTTON_STICK_R;
         CONTPRStringToValue["VPAD_BUTTON_STICK_L"] =                    CONTRPS_VPAD_BUTTON_STICK_L;
 
-        /*
         CONTPRStringToValue["VPAD_STICK_R_EMULATION_LEFT"] =            CONTRPS_VPAD_STICK_R_EMULATION_LEFT;
         CONTPRStringToValue["VPAD_STICK_R_EMULATION_RIGHT"] =           CONTRPS_VPAD_STICK_R_EMULATION_RIGHT;
         CONTPRStringToValue["VPAD_STICK_R_EMULATION_UP"] =              CONTRPS_VPAD_STICK_R_EMULATION_UP;
@@ -191,17 +215,17 @@ private:
         CONTPRStringToValue["VPAD_STICK_L_EMULATION_LEFT"] =            CONTRPS_VPAD_STICK_L_EMULATION_LEFT;
         CONTPRStringToValue["VPAD_STICK_L_EMULATION_RIGHT"] =           CONTRPS_VPAD_STICK_L_EMULATION_RIGHT;
         CONTPRStringToValue["VPAD_STICK_L_EMULATION_UP"] =              CONTRPS_VPAD_STICK_L_EMULATION_UP;
-        CONTPRStringToValue["VPAD_STICK_L_EMULATION_DOWN"] =            CONTRPS_VPAD_STICK_L_EMULATION_DOWN;*/
+        CONTPRStringToValue["VPAD_STICK_L_EMULATION_DOWN"] =            CONTRPS_VPAD_STICK_L_EMULATION_DOWN;
 
-        CONTPRStringToValue["VPAD_L_STICK_UP"] =                        DEF_L_STICK_UP;
-        CONTPRStringToValue["VPAD_L_STICK_DOWN"] =                      DEF_L_STICK_DOWN;
-        CONTPRStringToValue["VPAD_L_STICK_LEFT"] =                      DEF_L_STICK_LEFT;
-        CONTPRStringToValue["VPAD_L_STICK_RIGHT"] =                     DEF_L_STICK_RIGHT;
+        CONTPRStringToValue["VPAD_L_STICK_UP"] =                        CONTRPS_VPAD_BUTTON_L_STICK_UP;
+        CONTPRStringToValue["VPAD_L_STICK_DOWN"] =                      CONTRPS_VPAD_BUTTON_L_STICK_DOWN;
+        CONTPRStringToValue["VPAD_L_STICK_LEFT"] =                      CONTRPS_VPAD_BUTTON_L_STICK_LEFT;
+        CONTPRStringToValue["VPAD_L_STICK_RIGHT"] =                     CONTRPS_VPAD_BUTTON_L_STICK_RIGHT;
 
-        CONTPRStringToValue["VPAD_R_STICK_UP"] =                        DEF_R_STICK_UP;
-        CONTPRStringToValue["VPAD_R_STICK_DOWN"] =                      DEF_R_STICK_DOWN;
-        CONTPRStringToValue["VPAD_R_STICK_LEFT"] =                      DEF_R_STICK_LEFT;
-        CONTPRStringToValue["VPAD_R_STICK_RIGHT"] =                     DEF_R_STICK_RIGHT;
+        CONTPRStringToValue["VPAD_R_STICK_UP"] =                        CONTRPS_VPAD_BUTTON_R_STICK_UP;
+        CONTPRStringToValue["VPAD_R_STICK_DOWN"] =                      CONTRPS_VPAD_BUTTON_R_STICK_DOWN;
+        CONTPRStringToValue["VPAD_R_STICK_LEFT"] =                      CONTRPS_VPAD_BUTTON_R_STICK_LEFT;
+        CONTPRStringToValue["VPAD_R_STICK_RIGHT"] =                     CONTRPS_VPAD_BUTTON_R_STICK_RIGHT;
 
         CONTPRStringToValue["VPAD_L_STICK_X"] =                         CONTRPS_VPAD_BUTTON_L_STICK_X;
         CONTPRStringToValue["VPAD_L_STICK_X_MINMAX"] =                  CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX;
@@ -215,6 +239,11 @@ private:
 
         CONTPRStringToValue["DOUBLE_USE_BUTTON_ACTIVATOR"] =            CONTRPS_DOUBLE_USE_BUTTON_ACTIVATOR,
         CONTPRStringToValue["INPUT_FILTER"] =                           CONTRPS_INPUT_FILTER;
+        CONTPRStringToValue["PAD1_FILTER"] =                            CONTRPS_PAD1_FILTER;
+        CONTPRStringToValue["PAD2_FILTER"] =                            CONTRPS_PAD2_FILTER;
+        CONTPRStringToValue["PAD3_FILTER"] =                            CONTRPS_PAD3_FILTER;
+        CONTPRStringToValue["PAD4_FILTER"] =                            CONTRPS_PAD4_FILTER;
+        CONTPRStringToValue["PAD5_FILTER"] =                            CONTRPS_PAD5_FILTER;
 
         CONTPRStringToValueSingle["DOUBLE_USE_BUTTON_1_PRESSED"] =      CONTRPS_DOUBLE_USE_BUTTON_1_PRESSED;
         CONTPRStringToValueSingle["DOUBLE_USE_BUTTON_2_PRESSED"] =      CONTRPS_DOUBLE_USE_BUTTON_2_PRESSED;
@@ -238,6 +267,7 @@ private:
         CONTPRStringToValueSingle["VPAD_L_STICK_Y_INVERT"] =            CONTRPS_VPAD_BUTTON_L_STICK_Y_INVERT;
         CONTPRStringToValueSingle["VPAD_R_STICK_X_INVERT"] =            CONTRPS_VPAD_BUTTON_R_STICK_X_INVERT;
         CONTPRStringToValueSingle["VPAD_R_STICK_Y_INVERT"] =            CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT;
+
         CONTPRStringToValueSingle["DOUBLE_USE"] =                       CONTRPS_DOUBLE_USE;
         CONTPRStringToValueSingle["PAD_COUNT"] =                        CONTRPS_PAD_COUNT;
 
@@ -308,6 +338,29 @@ private:
 
         presetDS4Values["DS4_BUTTON_GUIDE"] =                           HID_DS4_BUTTON_GUIDE;
         presetDS4Values["DS4_BUTTON_T_PAD_CLICK"] =                     HID_DS4_BUTTON_T_PAD_CLICK;
+
+        presetXInputValues["XINPUT_BUTTON_A"] =                         HID_XINPUT_BUTTON_A;
+        presetXInputValues["XINPUT_BUTTON_B"] =                         HID_XINPUT_BUTTON_B;
+        presetXInputValues["XINPUT_BUTTON_X"] =                         HID_XINPUT_BUTTON_X;
+        presetXInputValues["XINPUT_BUTTON_Y"] =                         HID_XINPUT_BUTTON_Y;
+
+        presetXInputValues["XINPUT_BUTTON_LB"] =                        HID_XINPUT_BUTTON_LB;
+        presetXInputValues["XINPUT_BUTTON_LT"] =                        HID_XINPUT_BUTTON_LT;
+        presetXInputValues["XINPUT_BUTTON_L3"] =                        HID_XINPUT_BUTTON_L3;
+        presetXInputValues["XINPUT_BUTTON_RB"] =                        HID_XINPUT_BUTTON_RB;
+        presetXInputValues["XINPUT_BUTTON_RT"] =                        HID_XINPUT_BUTTON_RT;
+        presetXInputValues["XINPUT_BUTTON_R3"] =                        HID_XINPUT_BUTTON_R3;
+
+        presetXInputValues["XINPUT_BUTTON_START"] =                     HID_XINPUT_BUTTON_START;
+        presetXInputValues["XINPUT_BUTTON_BACK"] =                      HID_XINPUT_BUTTON_BACK;
+        presetXInputValues["XINPUT_BUTTON_DPAD_TYPE"] =                 HID_XINPUT_BUTTON_DPAD_TYPE;
+
+        presetXInputValues["XINPUT_BUTTON_DPAD_UP"] =                   HID_XINPUT_BUTTON_UP;
+        presetXInputValues["XINPUT_BUTTON_DPAD_DOWN"] =                 HID_XINPUT_BUTTON_DOWN;
+        presetXInputValues["XINPUT_BUTTON_DPAD_LEFT"] =                 HID_XINPUT_BUTTON_LEFT;
+        presetXInputValues["XINPUT_BUTTON_DPAD_RIGHT"] =                HID_XINPUT_BUTTON_RIGHT;
+
+        presetXInputValues["XINPUT_BUTTON_GUIDE"] =                     HID_XINPUT_BUTTON_GUIDE;
 
         presetKeyboardValues["KEYBOARD_SHIFT"] =                        HID_KEYBOARD_BUTTON_SHIFT;
         presetKeyboardValues["KEYBOARD_A"] =                            HID_KEYBOARD_BUTTON_A;
@@ -427,9 +480,15 @@ private:
         presetSticks["DS4_STICK_R_X"] =                                 HID_DS4_STICK_R_X;
         presetSticks["DS4_STICK_R_Y"] =                                 HID_DS4_STICK_R_Y;
 
+        presetSticks["XINPUT_STICK_L_X"] =                              HID_XINPUT_STICK_L_X;
+        presetSticks["XINPUT_STICK_L_Y"] =                              HID_XINPUT_STICK_L_Y;
+        presetSticks["XINPUT_STICK_R_X"] =                              HID_XINPUT_STICK_L_X;
+        presetSticks["XINPUT_STICK_R_Y"] =                              HID_XINPUT_STICK_R_Y;
+
         presetSticks["GC_DPAD_MODE"] =                                  HID_GC_BUTTON_DPAD_TYPE;
         presetSticks["DS3_DPAD_MODE"] =                                 HID_DS3_BUTTON_DPAD_TYPE;
-        presetSticks["DS4_DPAD_MODE"] =                                 HID_DS4_BUTTON_DPAD_TYPE;
+        presetSticks["DS4_DPAD_MODE"] =                                 HID_XINPUT_BUTTON_DPAD_TYPE;
+        presetSticks["XINPUT_DPAD_MODE"] =                              HID_XINPUT_BUTTON_DPAD_TYPE;
 
         gGamePadValuesToCONTRPSString["VPAD_BUTTON_A"] =  				CONTRPS_VPAD_BUTTON_A;
         gGamePadValuesToCONTRPSString["VPAD_BUTTON_B"] =                CONTRPS_VPAD_BUTTON_B;
@@ -451,8 +510,6 @@ private:
         gGamePadValuesToCONTRPSString["VPAD_BUTTON_STICK_L"] =          CONTRPS_VPAD_BUTTON_STICK_L;
         gGamePadValuesToCONTRPSString["VPAD_BUTTON_TV"] =               CONTRPS_VPAD_BUTTON_TV;
 
-        /*
-        //Todo: think about removing it
         gGamePadValuesToCONTRPSString["VPAD_STICK_R_EMULATION_LEFT"] =  CONTRPS_VPAD_STICK_R_EMULATION_LEFT;
         gGamePadValuesToCONTRPSString["VPAD_STICK_R_EMULATION_RIGHT"] = CONTRPS_VPAD_STICK_R_EMULATION_RIGHT;
         gGamePadValuesToCONTRPSString["VPAD_STICK_R_EMULATION_UP"] =    CONTRPS_VPAD_STICK_R_EMULATION_UP;
@@ -461,7 +518,17 @@ private:
         gGamePadValuesToCONTRPSString["VPAD_STICK_L_EMULATION_RIGHT"] = CONTRPS_VPAD_STICK_L_EMULATION_RIGHT;
         gGamePadValuesToCONTRPSString["VPAD_STICK_L_EMULATION_UP"] =    CONTRPS_VPAD_STICK_L_EMULATION_UP;
         gGamePadValuesToCONTRPSString["VPAD_STICK_L_EMULATION_DOWN"] =  CONTRPS_VPAD_STICK_L_EMULATION_DOWN;
-        */
+
+        log_printf("Value device names \n");
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_GC_VID,       HID_GC_PID).c_str()]                = HID_GC_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_KEYBOARD_VID, HID_KEYBOARD_PID).c_str()]          = HID_KEYBOARD_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_MOUSE_VID,    HID_MOUSE_PID).c_str()]             = HID_MOUSE_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_DS3_VID,      HID_DS3_PID).c_str()]               = HID_DS3_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_NEW_DS4_VID,  HID_NEW_DS4_PID).c_str()]           = HID_NEW_DS4_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_DS4_VID,      HID_DS4_PID).c_str()]               = HID_DS4_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_XINPUT_VID,   HID_XINPUT_PID).c_str()]            = HID_XINPUT_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_SWITCH_PRO_VID,   HID_SWITCH_PRO_PID).c_str()]    = HID_SWITCH_PRO_STRING;
+        log_printf("Value init done\n");
     }
 
     const u8 * getValuesForPreset(std::map<std::string,const u8*> values,std::string possibleValue);
@@ -469,5 +536,7 @@ private:
     bool setIfValueIsPreset(std::map<std::string,const u8*> values,std::string possibleValue,int slot,int keyslot);
     bool setIfValueIsAControllerPresetEx(std::string value,int slot,int keyslot);
 
+    void addDeviceNameEx(u16 vid,u16 pid,std::string value);
+    std::string getStringByVIDPIDEx(u16 vid,u16 pid);
 };
 #endif

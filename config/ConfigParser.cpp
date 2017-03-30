@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2016,2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,22 +19,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "config_parser.h"
-#include "config_reader.h"
-#include "config_values.h"
-#include "string_tools.hpp"
+#include "../ConfigReader.hpp"
+#include "../utils/CPStringTools.hpp"
+#include "./ConfigParser.hpp"
+#include "./ConfigValues.hpp"
 
-ConfigParser::ConfigParser(std::string configData)
-{
+ConfigParser::ConfigParser(std::string configData){
     this->content = configData;
-    this->contentLines = MyStringSplit(content, "\n");
+    this->contentLines = CPStringTools::StringSplit(content, "\n");
 
     if(contentLines.empty())
 		return;
 
     //remove the comments and make everything uppercase
     for(u32 i = 0; i < contentLines.size(); i++){
-        std::vector<std::string> comments = MyStringSplit(contentLines[i], "//");
+        std::vector<std::string> comments = CPStringTools::StringSplit(contentLines[i], "//");
         if(!comments.empty()){
             contentLines[i] = comments[0];
         }
@@ -53,8 +52,7 @@ ConfigParser::ConfigParser(std::string configData)
     Init();
 }
 
-ConfigParser::~ConfigParser()
-{
+ConfigParser::~ConfigParser(){
 
 }
 
@@ -75,30 +73,39 @@ void ConfigParser::setSlot(u16 newSlot){
 }
 
 bool ConfigParser::Init(){
+    if(contentLines.size() == 0){
+        log_printf("ConfigParser::Init(): Files seems to be empty. Make sure to have a proper header\n");
+        return false;
+    }
     const char * line = contentLines[0].c_str();
     int len = strlen(line);
     std::string identify;
     if(line[0] == '[' && line[len-1] == ']'){
         identify = contentLines[0].substr(1,len-2);
     }else{
-        log_printf("Not a proper config file!\n");
+        log_printf("ConfigParser::Init(): Not a proper config file!\n");
         return false;
     }
 
     if(identify.compare("GAMEPAD") == 0){
-        log_printf("Its a gamepad config file!\n");
+        if(HID_DEBUG) log_printf("Its a gamepad config file!\n");
         setSlot(gGamePadSlot);
         setType(PARSE_GAMEPAD);
     }else if(identify.compare("MOUSE") == 0){
-        log_printf("Its a mouse config file!\n");
+        if(HID_DEBUG) log_printf("Its a mouse config file!\n");
         setSlot(gMouseSlot);
         setType(PARSE_MOUSE);
+        this->vid = HID_MOUSE_VID;
+        this->pid = HID_MOUSE_PID;
     }else if(identify.compare("KEYBOARD") == 0){
-        log_printf("Its a keyboard config file!\n");
+        if(HID_DEBUG) log_printf("Its a keyboard config file!\n");
         setSlot(gHID_SLOT_KEYBOARD);
         setType(PARSE_KEYBOARD);
+        this->vid = HID_KEYBOARD_VID;
+        this->pid = HID_KEYBOARD_PID;
     }else{
-        log_printf("Its a controller config file!\n");
+        if(HID_DEBUG) log_printf("Its a controller config file!\n");
+
         setSlot(getSlotController(identify));
         setType(PARSE_CONTROLLER);
     }
@@ -113,12 +120,11 @@ bool ConfigParser::Init(){
 }
 
 void ConfigParser::parseSingleLine(std::string line){
-    std::vector<std::string> cur_values = MyStringSplit(line,"=");
+    std::vector<std::string> cur_values = CPStringTools::StringSplit(line,"=");
     if(cur_values.size() != 2){
         if(HID_DEBUG || cur_values.size() > 2) log_printf("Not a valid key=pair line %s\n",line.c_str());
         return;
     }else{
-
         u16 hid_slot = getSlot();
 
         if(HID_DEBUG) log_printf("leftpart = \"%s\" \n",cur_values[0].c_str());
@@ -126,7 +132,7 @@ void ConfigParser::parseSingleLine(std::string line){
         int keyslot =  -1;
 
         if(HID_DEBUG) log_printf("Checking single value\n");
-        if(getType() == PARSE_GAMEPAD || getType() == PARSE_KEYBOARD){
+        if(getType() == PARSE_GAMEPAD /*|| getType() == PARSE_KEYBOARD*/){
             keyslot = ConfigValues::getKeySlotGamePad(cur_values[0]);
         }else if(getType() == PARSE_MOUSE){
             keyslot = ConfigValues::getKeySlotMouse(cur_values[0]);
@@ -161,31 +167,6 @@ void ConfigParser::parseSingleLine(std::string line){
                         char * ptr;
                         rightValue = strtol(cur_values[1].c_str(),&ptr,16);
                     }
-
-                    if(keyslot >= DEF_L_STICK_UP && keyslot <= DEF_R_STICK_RIGHT){
-                        if(keyslot == DEF_L_STICK_UP){
-                             config_controller[hid_slot][CONTRPS_VPAD_BUTTON_L_STICK_Y][0] = rightValue;
-                        }else if(keyslot == DEF_L_STICK_DOWN){
-                             config_controller[hid_slot][CONTRPS_VPAD_BUTTON_L_STICK_Y][1] = rightValue;
-                        }else if(keyslot == DEF_L_STICK_LEFT){
-                             config_controller[hid_slot][CONTRPS_VPAD_BUTTON_L_STICK_X][0] = rightValue;
-                        }else if(keyslot == DEF_L_STICK_RIGHT){
-                             config_controller[hid_slot][CONTRPS_VPAD_BUTTON_L_STICK_X][1] = rightValue;
-                        }else if(keyslot == DEF_R_STICK_UP){
-                             config_controller[hid_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y][0] = rightValue;
-                        }else if(keyslot == DEF_R_STICK_DOWN){
-                             config_controller[hid_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y][1] = rightValue;
-                        }else if(keyslot == DEF_R_STICK_LEFT){
-                             config_controller[hid_slot][CONTRPS_VPAD_BUTTON_R_STICK_X][0] = rightValue;
-                        }else if(keyslot == DEF_R_STICK_RIGHT){
-                             config_controller[hid_slot][CONTRPS_VPAD_BUTTON_R_STICK_X][1] = rightValue;
-                        }else{
-                            log_printf("Random error in Keyboard sticks\n");
-                        }
-                        if(HID_DEBUG) log_printf("Set stick for Keyboard (%d)\n",keyslot);
-                        return;
-                    }
-
                 }else{
                     rightValue = ConfigValues::getPresetValue(cur_values[1]);
 
@@ -215,10 +196,10 @@ void ConfigParser::parseSingleLine(std::string line){
 
                 if(!ConfigValues::getInstance()->setIfValueIsAControllerPreset(cur_values[1],getSlot(),keyslot)){
                     if(HID_DEBUG) log_printf("And its no preset\n");
-                    std::vector<std::string> rightvalues = MyStringSplit(cur_values[1],",");
+                    std::vector<std::string> rightvalues = CPStringTools::StringSplit(cur_values[1],",");
 
                     if(rightvalues.size() != 2){
-                        log_printf("%d instead of 2 key=values pairs in line\n",rightvalues.size());
+                        log_printf("ConfigParser::parseSingleLine: %d instead of 2 key=values pairs in line\n",rightvalues.size());
                         return;
                     }
 
@@ -233,7 +214,7 @@ void ConfigParser::parseSingleLine(std::string line){
                     if(HID_DEBUG) log_printf("Found preset value!!\n");
                 }
             }else{
-                log_printf("The setting \"%s\" is unknown!\n",cur_values[0].c_str());
+                log_printf("ConfigParser::parseSingleLine: The setting \"%s\" is unknown!\n",cur_values[0].c_str());
             }
         }
     }
@@ -249,27 +230,13 @@ bool ConfigParser::resetConfig(){
     return true;
 }
 
-int ConfigParser::checkExistingController(int vid, int pid){
-    for(int i = 0;i< gHIDMaxDevices;i++){
-        u16 used_vid = config_controller[i][CONTRPS_VID][0] * 0x100 + config_controller[i][CONTRPS_VID][1];
-        u16 used_pid = config_controller[i][CONTRPS_PID][0] * 0x100 + config_controller[i][CONTRPS_PID][1];
-        if((used_vid == 0x00) && (used_vid == 0x00)){
-            return -1;
-        }
-        if(vid == used_vid && pid == used_pid){
-            return i;
-        }
-    }
-    return -1;
-}
-
 int  ConfigParser::getSlotController(std::string identify){
     if(HID_DEBUG) log_printf("Getting Controller Slot\n");
 
-    std::vector<std::string> values = MyStringSplit(identify,",");
+    std::vector<std::string> values = CPStringTools::StringSplit(identify,",");
 
     if(values.size() != 2){
-        log_printf("You need to provide a VID and PID. e.g. \"[vid=0x451,pid=0x152]\". (%s)\n",identify.c_str());
+        log_printf("ConfigParser::getSlotController: You need to provide a VID and PID. e.g. \"[vid=0x451,pid=0x152]\". (%s)\n",identify.c_str());
         return HID_INVALID_SLOT;
     }
 
@@ -281,19 +248,29 @@ int  ConfigParser::getSlotController(std::string identify){
     if(pid < 0){
         return HID_INVALID_SLOT;
     }
-    log_printf("VID: %04x PID: %04x\n",vid,pid);
+     if(HID_DEBUG) log_printf("VID: %04x PID: %04x\n",vid,pid);
 
-    int slot = checkExistingController(vid,pid);
+    this->vid = vid;
+    this->pid = pid;
+    DeviceInfo deviceinfo;
+    memset(&deviceinfo,0,sizeof(deviceinfo));
+    int result = ControllerPatcherUtils::getDeviceInfoFromVidPid(&deviceinfo);
+    int slot = deviceinfo.slotdata.deviceslot;
     int hid = 0;
-    if(slot < 0){
-        log_printf("Its a new controller, lets save it\n");
-        slot = gHIDRegisteredDevices;
-        hid = getNextDeviceSlot();
+    if(result < 0){
+         if(HID_DEBUG) log_printf("Its a new controller, lets save it\n");
+
+        HIDSlotData slotdata;
+        ControllerPatcherUtils::getNextSlotData(&slotdata);
+
+        slot = slotdata.deviceslot;
+        hid = slotdata.hidmask;
+
         if(slot >= gHIDMaxDevices){
-            log_printf("We don't a space for a new controller, please delete .inis\n");
+            log_printf("ConfigParser::getSlotController: We don't a space for a new controller, please delete .inis\n");
             return HID_INVALID_SLOT;
         }
-        if(HID_DEBUG) log_printf("Got new slot! slot: %d hid %s .. Lets registrate it!\n",slot,byte_to_binary(hid));
+        if(HID_DEBUG) log_printf("Got new slot! slot: %d hid %s .. Lets registrate it!\n",slot,CPStringTools::byte_to_binary(hid));
         config_controller[slot][CONTRPS_VID][0] = (vid & 0xFF00) >> 8;
         config_controller[slot][CONTRPS_VID][1] = (vid & 0x00FF);
         config_controller[slot][CONTRPS_PID][0] = (pid & 0xFF00) >> 8;
@@ -304,35 +281,27 @@ int  ConfigParser::getSlotController(std::string identify){
 
         if(HID_DEBUG) log_printf("Saved vid: %04X pid: %04X\n",used_vid,used_pid);
 
-        config_controller_list[slot] =  hid;
-
-        if(HID_DEBUG) log_printf("Saves the hid\n");
-        config_controller_data_ptr[slot][0] = (u32)&(gHID_Devices[slot]).pad_data[0];
-        config_controller_data_ptr[slot][1] = (u32)&(gHID_Devices[slot]).pad_data[1];
-        config_controller_data_ptr[slot][2] = (u32)&(gHID_Devices[slot]).pad_data[2];
-        config_controller_data_ptr[slot][3] = (u32)&(gHID_Devices[slot]).pad_data[3];
-
-        if(HID_DEBUG) log_printf("set data ptr\n");
+        config_controller_hidmask[slot] =  hid;
+        if(HID_DEBUG) log_printf("Saved the hid\n");
 
     }else{
         if(slot < gHIDMaxDevices){
-            hid =config_controller_list[slot];
-            if(HID_DEBUG) log_printf(">>>>>> found slot %d (hid:%s). Modifing existing data <<<<<<<<\n",slot,byte_to_binary(hid));
-            log_printf("We already have data of this controller, lets modify it\n");
+            hid = config_controller_hidmask[slot];
+            if(HID_DEBUG) log_printf(">>>>>> found slot %d (hid:%s). Modifing existing data <<<<<<<<\n",slot,CPStringTools::byte_to_binary(hid));
+            if(HID_DEBUG) log_printf("We already have data of this controller, lets modify it\n");
         }else{
-            log_printf("Something really odd happend to the slots. %d is bigger then max (%d)\n",slot,gHIDMaxDevices);
+            log_printf("ConfigParser::getSlotController: Something really odd happend to the slots. %d is bigger then max (%d)\n",slot,gHIDMaxDevices);
             return HID_INVALID_SLOT;
         }
     }
 
-    if(HID_DEBUG) log_printf("using slot: %d hid %s\n",slot,byte_to_binary(hid));
+    if(HID_DEBUG) log_printf("using slot: %d hid %s\n",slot,CPStringTools::byte_to_binary(hid));
     return slot;
 }
 
 bool ConfigParser::parseIni(){
     if(getSlot() == HID_INVALID_SLOT){
-        log_printf("Couldn't parse file. Not a valid slot. Probably broken config. Or you tried to have more than %d devices\n",getType(),gHIDMaxDevices);
-
+        log_printf("ConfigParser::parseIni: Couldn't parse file. Not a valid slot. Probably broken config. Or you tried to have more than %d devices\n",getType(),gHIDMaxDevices);
     }
 
     if(HID_DEBUG) log_printf("Parsing content, type %d\n",getType());
@@ -340,7 +309,7 @@ bool ConfigParser::parseIni(){
     int start = 1;
     if(contentLines[1].compare("[IGNOREDEFAULT]") == 0){
         resetConfig();
-        log_printf("Overwriting existing settings of this device\n");
+        if(HID_DEBUG) log_printf("Overwriting existing settings of this device\n");
         start++;
     }
 
@@ -349,18 +318,18 @@ bool ConfigParser::parseIni(){
         parseSingleLine(contentLines[i]);
     }
 
-    log_printf("Parsing of the file is done.\n");
+    if(HID_DEBUG) log_printf("Parsing of the file is done.\n");
     return true;
 }
 
 int ConfigParser::getValueFromKeyValue(std::string value_pair,std::string expectedKey,std::string delimiter){
-    std::vector<std::string> string_value = MyStringSplit(value_pair,delimiter);
+    std::vector<std::string> string_value = CPStringTools::StringSplit(value_pair,delimiter);
     if(string_value.size() != 2){
         if(HID_DEBUG || string_value.size() > 2) log_printf("Not a valid key=pair line %s\n",value_pair.c_str());
         return -1;
     }
     if(string_value[0].compare(expectedKey) != 0){
-        log_printf("Key part not %s, its %s",expectedKey.c_str(),string_value[0].c_str());
+        log_printf("ConfigParser::getValueFromKeyValue: Key part not %s, its %s",expectedKey.c_str(),string_value[0].c_str());
         return -1;
     }
     char * ptr;

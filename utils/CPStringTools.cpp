@@ -1,18 +1,19 @@
 #include <string>
 #include <vector>
-
 #include <stdio.h>
 #include <string.h>
 #include <gctypes.h>
-#include "string_tools.hpp"
+#include "CPStringTools.hpp"
+#include "PadConst.hpp"
+#include <stdarg.h>
+#include <stdlib.h>
 
-bool EndsWith(const std::string& a, const std::string& b) {
+bool CPStringTools::EndsWith(const std::string& a, const std::string& b) {
     if (b.size() > a.size()) return false;
     return std::equal(a.begin() + a.size() - b.size(), a.end(), b.begin());
 }
 
-std::vector<std::string> MyStringSplit(const std::string & inValue, const std::string & splitter)
-{
+std::vector<std::string> CPStringTools::StringSplit(const std::string & inValue, const std::string & splitter){
     std::string value = inValue;
     std::vector<std::string> result;
     while (true) {
@@ -35,9 +36,7 @@ std::vector<std::string> MyStringSplit(const std::string & inValue, const std::s
     return result;
 }
 
-
-extern "C" const char *byte_to_binary(int x)
-{
+const char * CPStringTools::byte_to_binary(int x){
     static char b[9];
     b[0] = '\0';
 
@@ -49,3 +48,36 @@ extern "C" const char *byte_to_binary(int x)
 
     return b;
 }
+
+std::string CPStringTools::removeCharFromString(std::string& input,char toBeRemoved){
+    std::string output = input;
+    size_t position;
+    while(1){
+        position = output.find(toBeRemoved);
+        if(position == std::string::npos)
+            break;
+        output.erase(position, 1);
+    }
+    return output;
+}
+
+std::string CPStringTools::strfmt(const char * format, ...){
+	std::string str;
+	char * tmp = NULL;
+
+	va_list va;
+	va_start(va, format);
+	if((vasprintf(&tmp, format, va) >= 0) && tmp)
+	{
+		str = tmp;
+	}
+	va_end(va);
+
+	if(tmp){
+		free(tmp);
+		tmp = NULL;
+    }
+
+	return str;
+}
+//CPStringTools

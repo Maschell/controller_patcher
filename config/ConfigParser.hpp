@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2016,2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,11 +24,12 @@
 #include <stdio.h>
 #include <gctypes.h>
 
-#include "controller_patcher.h"
-#include "pad_const.h"
+#include "../ControllerPatcher.hpp"
+#include "../ConfigReader.hpp"
+#include "../utils/PadConst.hpp"
 
 #include "utils/logger.h"
-#include "cp_retain_vars.h"
+#include "../utils/CPRetainVars.hpp"
 
 enum PARSE_TYPE{
     PARSE_CONTROLLER,
@@ -37,9 +38,10 @@ enum PARSE_TYPE{
     PARSE_KEYBOARD
 };
 
-class ConfigParser
-{
-public:
+class ConfigParser{
+    friend class ConfigReader;
+    friend class ControllerPatcher;
+private:
     //!Constructor
     ConfigParser(std::string configData);
     //!Destructor
@@ -53,7 +55,6 @@ public:
 
     bool parseIni();
 
-private:
     bool Init();
 
     bool parseConfigString(std::string content);
@@ -69,6 +70,10 @@ private:
     void parseSingleLine(std::string line);
     u16 slot_b;
     PARSE_TYPE type_b;
+
+    u16 vid;
+    u16 pid;
+
     std::string content;
     std::vector<std::string> contentLines;
 };

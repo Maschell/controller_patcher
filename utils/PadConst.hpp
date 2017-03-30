@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2016,2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,22 +18,9 @@
 #ifndef _PAD_CONST_H_
 #define _PAD_CONST_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <gctypes.h>
-#include "controller_patcher.h"
-
-extern const u8 DEF_L_STICK_UP;
-extern const u8 DEF_L_STICK_DOWN;
-extern const u8 DEF_L_STICK_LEFT;
-extern const u8 DEF_L_STICK_RIGHT;
-
-extern const u8 DEF_R_STICK_UP;
-extern const u8 DEF_R_STICK_DOWN;
-extern const u8 DEF_R_STICK_LEFT;
-extern const u8 DEF_R_STICK_RIGHT;
+#include <string>
+#include "../patcher/ControllerPatcherDefs.h"
 
 extern const u8 DEF_R_STICK;
 extern const u8 DEF_L_STICK;
@@ -41,6 +28,18 @@ extern const u8 DEF_L_STICK;
 extern const u8 DEF_STICK_OFFSET_INVERT;
 extern const u8 DEF_STICK_OFFSET_DEADZONE;
 extern const u8 DEF_STICK_OFFSET_MINMAX;
+
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! Device names
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+extern const char *HID_GC_STRING;
+extern const char *HID_KEYBOARD_STRING;
+extern const char *HID_MOUSE_STRING;
+extern const char *HID_DS3_STRING;
+extern const char *HID_DS4_STRING;
+extern const char *HID_NEW_DS4_STRING;
+extern const char *HID_XINPUT_STRING;
+extern const char *HID_SWITCH_PRO_STRING;
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! GC_Adapter
@@ -139,8 +138,37 @@ extern const u8 HID_DS4_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE];
 extern const u8 HID_DS4_STICK_R_X[STICK_CONF_ENUM_MAXVALUE];
 extern const u8 HID_DS4_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE];
 
-#ifdef __cplusplus
-}
-#endif
+
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! XInput
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+extern const u8 HID_XINPUT_BUTTON_A[];
+extern const u8 HID_XINPUT_BUTTON_B[];
+extern const u8 HID_XINPUT_BUTTON_X[];
+extern const u8 HID_XINPUT_BUTTON_Y[];
+
+extern const u8 HID_XINPUT_BUTTON_LB[];
+extern const u8 HID_XINPUT_BUTTON_LT[];
+extern const u8 HID_XINPUT_BUTTON_L3[];
+
+extern const u8 HID_XINPUT_BUTTON_RB[];
+extern const u8 HID_XINPUT_BUTTON_RT[];
+extern const u8 HID_XINPUT_BUTTON_R3[];
+
+extern const u8 HID_XINPUT_BUTTON_START[];
+extern const u8 HID_XINPUT_BUTTON_BACK[];
+extern const u8 HID_XINPUT_BUTTON_GUIDE[];
+
+extern const u8 HID_XINPUT_BUTTON_DPAD_TYPE[];
+extern const u8 HID_XINPUT_BUTTON_LEFT[];
+extern const u8 HID_XINPUT_BUTTON_RIGHT[];
+extern const u8 HID_XINPUT_BUTTON_DOWN[];
+extern const u8 HID_XINPUT_BUTTON_UP[];
+
+extern const u8 HID_XINPUT_STICK_L_X[STICK_CONF_ENUM_MAXVALUE];
+extern const u8 HID_XINPUT_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE];
+extern const u8 HID_XINPUT_STICK_R_X[STICK_CONF_ENUM_MAXVALUE];
+extern const u8 HID_XINPUT_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE];
 
 #endif /* _PAD_CONST_H_ */

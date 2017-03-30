@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2016,2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "config_values.h"
+#include "./ConfigValues.hpp"
+#include "../utils/CPRetainVars.hpp"
 #include "utils/logger.h"
-#include "cp_retain_vars.h"
 
 ConfigValues *ConfigValues::instance = NULL;
 
-ConfigValues::ConfigValues()
-{
+ConfigValues::ConfigValues(){
     InitValues();
 }
 
-ConfigValues::~ConfigValues()
-{
-
+ConfigValues::~ConfigValues(){
+    if(HID_DEBUG) log_printf("ConfigValues::~ConfigValues(){\n");
 }
 
 const u8 * ConfigValues::getValuesForPreset(std::map<std::string,const u8*> values,std::string possibleValue){
@@ -46,11 +44,15 @@ bool ConfigValues::setIfValueIsAControllerPresetEx(std::string value,int slot,in
     if(setIfValueIsPreset(presetGCValues,value,slot,keyslot)) return true;
     if(setIfValueIsPreset(presetDS3Values,value,slot,keyslot)) return true;
     if(setIfValueIsPreset(presetDS4Values,value,slot,keyslot)) return true;
+    if(setIfValueIsPreset(presetXInputValues,value,slot,keyslot)) return true;
     return false;
 }
 
 //We need this function here so we can use preset sticks.
 bool ConfigValues::setIfValueIsPreset(std::map<std::string,const u8*> values,std::string possibleValue,int slot,int keyslot){
+    if(slot > gHIDMaxDevices || slot > 0 || keyslot < 0 || keyslot >= CONTRPS_MAX_VALUE){
+        return false;
+    }
     const u8 * values_ = NULL;
     if( keyslot == CONTRPS_VPAD_BUTTON_L_STICK_X ||
         keyslot == CONTRPS_VPAD_BUTTON_L_STICK_Y ||
@@ -100,4 +102,21 @@ int ConfigValues::getPresetValueEx(std::string possibleString){
         if(HID_DEBUG) log_printf("Used pre-defined value! \"%s\" is %d\n",possibleString.c_str(),rightValue);
     }
     return rightValue;
+}
+
+ void ConfigValues::addDeviceNameEx(u16 vid,u16 pid,std::string value){
+    deviceNames[CPStringTools::strfmt("%04X%04X",vid,pid).c_str()] = value;
+ }
+
+std::string ConfigValues::getStringByVIDPIDEx(u16 vid,u16 pid){
+    std::string result = "";
+    std::map<std::string,std::string>::iterator it;
+
+    it = deviceNames.find(CPStringTools::strfmt("%04X%04X",vid,pid));
+    if (it != deviceNames.end()){
+        result = it->second;
+    }else{
+        result = CPStringTools::strfmt("VID: 0x%04X\nPID: 0x%04X",vid,pid);
+    }
+    return result;
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2016,2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "pad_const.h"
-
-const u8 DEF_L_STICK_UP =     201;
-const u8 DEF_L_STICK_DOWN =   202;
-const u8 DEF_L_STICK_LEFT =   203;
-const u8 DEF_L_STICK_RIGHT =  204;
-
-const u8 DEF_R_STICK_UP =     205;
-const u8 DEF_R_STICK_DOWN =   206;
-const u8 DEF_R_STICK_LEFT =   207;
-const u8 DEF_R_STICK_RIGHT =  208;
+#include "PadConst.hpp"
 
 const u8 DEF_R_STICK =        220;
 const u8 DEF_L_STICK =        221;
 
-const u8 DEF_STICK_OFFSET_INVERT =      CONTRPS_VPAD_BUTTON_L_STICK_X_INVERT - CONTRPS_VPAD_BUTTON_L_STICK_X;
-const u8 DEF_STICK_OFFSET_DEADZONE =    CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE - CONTRPS_VPAD_BUTTON_L_STICK_X;
-const u8 DEF_STICK_OFFSET_MINMAX =      CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX - CONTRPS_VPAD_BUTTON_L_STICK_X;
+const u8 DEF_STICK_OFFSET_INVERT    =   CONTRPS_VPAD_BUTTON_L_STICK_X_INVERT   -    CONTRPS_VPAD_BUTTON_L_STICK_X;
+const u8 DEF_STICK_OFFSET_DEADZONE  =   CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE -    CONTRPS_VPAD_BUTTON_L_STICK_X;
+const u8 DEF_STICK_OFFSET_MINMAX    =   CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX   -    CONTRPS_VPAD_BUTTON_L_STICK_X;
 
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! Device names
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const char *HID_GC_STRING         = "GameCube\nUSB-Adapter";
+const char *HID_KEYBOARD_STRING   = "Keyboard";
+const char *HID_MOUSE_STRING      = "Mouse";
+const char *HID_DS3_STRING        = "DualShock 3\nController";
+const char *HID_DS4_STRING        = "DualShock 4\nController";
+const char *HID_NEW_DS4_STRING    = "DualShock 4\nController";
+const char *HID_XINPUT_STRING     = "XInput\nController";
+const char *HID_SWITCH_PRO_STRING = "Switch\nPro Controller";
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! GC-Adapter
@@ -214,4 +215,61 @@ const u8 HID_DS4_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VAL
                                                             0x00, //STICK_CONF_MIN,
                                                             0xFF};//STICK_CONF_MAX,
 
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! XInput
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+const u8 HID_XINPUT_BUTTON_A[]          = { 0x07,HID_XINPUT_BUTTON_A_VALUE};
+const u8 HID_XINPUT_BUTTON_B[]          = { 0x07,HID_XINPUT_BUTTON_B_VALUE};
+const u8 HID_XINPUT_BUTTON_X[]          = { 0x07,HID_XINPUT_BUTTON_X_VALUE};
+const u8 HID_XINPUT_BUTTON_Y[]          = { 0x07,HID_XINPUT_BUTTON_Y_VALUE};
+
+const u8 HID_XINPUT_BUTTON_LB[]         = { 0x06,HID_XINPUT_BUTTON_LB_VALUE};
+const u8 HID_XINPUT_BUTTON_LT[]         = { 0x04,HID_XINPUT_BUTTON_LT_VALUE};
+const u8 HID_XINPUT_BUTTON_L3[]         = { 0x06,HID_XINPUT_BUTTON_L3_VALUE};
+
+const u8 HID_XINPUT_BUTTON_RB[]         = { 0x06,HID_XINPUT_BUTTON_RB_VALUE};
+const u8 HID_XINPUT_BUTTON_RT[]         = { 0x05,HID_XINPUT_BUTTON_RT_VALUE};
+const u8 HID_XINPUT_BUTTON_R3[]         = { 0x06,HID_XINPUT_BUTTON_R3_VALUE};
+
+const u8 HID_XINPUT_BUTTON_START[]      = { 0x06,HID_XINPUT_BUTTON_START_VALUE};
+const u8 HID_XINPUT_BUTTON_BACK[]       = { 0x06,HID_XINPUT_BUTTON_BACK_VALUE};
+const u8 HID_XINPUT_BUTTON_GUIDE[]      = { 0x06,HID_XINPUT_BUTTON_GUIDE_VALUE};
+
+const u8 HID_XINPUT_BUTTON_DPAD_TYPE[]  = { CONTRPDM_Normal,HID_XINPUT_BUTTON_DPAD_MASK_VALUE};
+const u8 HID_XINPUT_BUTTON_LEFT[]       = { 0x07,HID_XINPUT_BUTTON_LEFT_VALUE};
+const u8 HID_XINPUT_BUTTON_RIGHT[]      = { 0x07,HID_XINPUT_BUTTON_RIGHT_VALUE};
+const u8 HID_XINPUT_BUTTON_DOWN[]       = { 0x07,HID_XINPUT_BUTTON_DOWN_VALUE};
+const u8 HID_XINPUT_BUTTON_UP[]         = { 0x07,HID_XINPUT_BUTTON_UP_VALUE};
+
+const u8 HID_XINPUT_STICK_L_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
+                                                            0x00, //STICK_CONF_BYTE,
+                                                            0x80, //STICK_CONF_DEFAULT,
+                                                            0x10, //STICK_CONF_DEADZONE,
+                                                            0x00, //STICK_CONF_INVERT,
+                                                            0x00, //STICK_CONF_MIN,
+                                                            0xFF};//STICK_CONF_MAX,
+
+const u8 HID_XINPUT_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
+                                                            0x01, //STICK_CONF_BYTE,
+                                                            0x80, //STICK_CONF_DEFAULT,
+                                                            0x10, //STICK_CONF_DEADZONE,
+                                                            0x00, //STICK_CONF_INVERT,
+                                                            0x00, //STICK_CONF_MIN,
+                                                            0xFF};//STICK_CONF_MAX,
+
+const u8 HID_XINPUT_STICK_R_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
+                                                            0x02, //STICK_CONF_BYTE,
+                                                            0x80, //STICK_CONF_DEFAULT,
+                                                            0x10, //STICK_CONF_DEADZONE,
+                                                            0x00, //STICK_CONF_INVERT,
+                                                            0x00, //STICK_CONF_MIN,
+                                                            0xFF};//STICK_CONF_MAX,
+
+const u8 HID_XINPUT_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
+                                                            0x03, //STICK_CONF_BYTE,
+                                                            0x80, //STICK_CONF_DEFAULT,
+                                                            0x10, //STICK_CONF_DEADZONE,
+                                                            0x00, //STICK_CONF_INVERT,
+                                                            0x00, //STICK_CONF_MIN,
+                                                            0xFF};//STICK_CONF_MAX,
