@@ -254,6 +254,8 @@ int  ConfigParser::getSlotController(std::string identify){
     this->pid = pid;
     DeviceInfo deviceinfo;
     memset(&deviceinfo,0,sizeof(deviceinfo));
+    deviceinfo.vidpid.vid = vid;
+    deviceinfo.vidpid.pid = pid;
     int result = ControllerPatcherUtils::getDeviceInfoFromVidPid(&deviceinfo);
     int slot = deviceinfo.slotdata.deviceslot;
     int hid = 0;
