@@ -50,7 +50,7 @@ bool ConfigValues::setIfValueIsAControllerPresetEx(std::string value,int slot,in
 
 //We need this function here so we can use preset sticks.
 bool ConfigValues::setIfValueIsPreset(std::map<std::string,const u8*> values,std::string possibleValue,int slot,int keyslot){
-    if(slot > gHIDMaxDevices || slot > 0 || keyslot < 0 || keyslot >= CONTRPS_MAX_VALUE){
+    if(slot > gHIDMaxDevices || slot < 0 || keyslot < 0 || keyslot >= CONTRPS_MAX_VALUE){
         return false;
     }
     const u8 * values_ = NULL;
