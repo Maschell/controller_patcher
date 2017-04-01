@@ -238,7 +238,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isValueSet(HID_Data *
                 result = 1;
             }
         }else{
-            if(cur_data[config_controller[deviceslot][cur_config][0]] & config_controller[deviceslot][cur_config][1]){
+            if((cur_data[config_controller[deviceslot][cur_config][0]] & config_controller[deviceslot][cur_config][1]) == config_controller[deviceslot][cur_config][1]){
                 result = 1;
             }
         }
