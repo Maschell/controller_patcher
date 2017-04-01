@@ -128,11 +128,11 @@ void ConfigParser::parseSingleLine(std::string line){
         u16 hid_slot = getSlot();
 
         if(HID_DEBUG) log_printf("leftpart = \"%s\" \n",cur_values[0].c_str());
-        if(HID_DEBUG) log_printf("rightpart = _%s_ \n",cur_values[1].c_str());
+        if(HID_DEBUG) log_printf("rightpart = \"%s\" \n",cur_values[1].c_str());
         int keyslot =  -1;
 
         if(HID_DEBUG) log_printf("Checking single value\n");
-        if(getType() == PARSE_GAMEPAD /*|| getType() == PARSE_KEYBOARD*/){
+        if(getType() == PARSE_GAMEPAD || getType() == PARSE_KEYBOARD){
             keyslot = ConfigValues::getKeySlotGamePad(cur_values[0]);
         }else if(getType() == PARSE_MOUSE){
             keyslot = ConfigValues::getKeySlotMouse(cur_values[0]);
