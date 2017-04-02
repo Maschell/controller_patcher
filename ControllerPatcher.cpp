@@ -855,6 +855,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(V
 }
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::printVPADButtons(VPADData * buffer){
+    return CONTROLLER_PATCHER_ERROR_NONE;
     /* BROKEN on transitions.*/
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     if(buffer->btns_d != 0x00000000){
