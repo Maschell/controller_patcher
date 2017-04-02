@@ -691,7 +691,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
 
             int buttons_hold = 0;
 
-            for(int pad = 0;pad<deviceinfo->pad_count;pad++){
+            for(int pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
                 buttons_hold = 0;
                 buttondata[pad].btn_h = 0;
                 buttondata[pad].btn_d = 0;

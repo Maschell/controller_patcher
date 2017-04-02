@@ -301,7 +301,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkActivePad(int hi
         if(deviceslot < 0 ) return CONTROLLER_PATCHER_ERROR_DEVICE_SLOT_NOT_FOUND;
         int connected_pads = config_controller[deviceslot][CONTRPS_CONNECTED_PADS][1];
 
-        if(connected_pads & (1 << pad)){
+        if((connected_pads & (1 << pad)) > 0){
             return 1;
         }
     }

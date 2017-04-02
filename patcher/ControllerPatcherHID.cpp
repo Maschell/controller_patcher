@@ -471,8 +471,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(int hidmask,
     if(device_slot < 0){
         return CONTROLLER_PATCHER_ERROR_DEVICE_SLOT_NOT_FOUND;
     }
+
     int real_pad = pad;
-    if(device_slot !=  gHID_SLOT_GC && config_controller[device_slot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE){
+    if((device_slot !=  gHID_SLOT_GC) && config_controller[device_slot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE){
         int pad_count = config_controller[device_slot][CONTRPS_PAD_COUNT][1];
         if(pad_count > HID_MAX_PADS_COUNT) pad_count = HID_MAX_PADS_COUNT;
         pad = (pad/(pad_count))*pad_count;
