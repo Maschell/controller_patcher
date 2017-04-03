@@ -32,6 +32,7 @@
 #define WIIU_CP_TCP_ATTACH      0x01
 #define WIIU_CP_TCP_DETACH      0x02
 #define WIIU_CP_TCP_PING        0xF0
+#define WIIU_CP_TCP_PONG        0xF1
 
 #define WIIU_CP_TCP_ATTACH_CONFIG_FOUND         0xE0
 #define WIIU_CP_TCP_ATTACH_CONFIG_NOT_FOUND     0xE1
@@ -261,6 +262,9 @@ int TCPServer::RunTCP(){
             }
             case WIIU_CP_TCP_PING: { /*ping*/
                 if(HID_DEBUG) log_printf("TCPServer: GOT PING\n");
+                int ret = ControllerPatcherNet::sendbyte(clientfd, WIIU_CP_TCP_PONG);
+                if(ret < 0){ log_printf("TCPServer::RunTCP() Error in %02X: sendbyte PONG\n"); return -1;}
+
                 break;
             }
             default:
