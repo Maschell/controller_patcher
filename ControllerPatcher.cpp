@@ -419,14 +419,23 @@ bool ControllerPatcher::Init(){
         if(HID_DEBUG) log_printf("First time calling the Init\n");
         gConfig_done = HID_INIT_DONE;
         ControllerPatcher::ResetConfig();
-        log_print("Reading config files from SD Card\n");
-        ConfigReader* reader = ConfigReader::getInstance();
-        reader->ReadAllConfigs();
-        log_print("Done with reading config files from SD Card\n");
-        ConfigReader::destroyInstance();
-        gConfig_done = HID_SDCARD_READ;
     }else{
         if(HID_DEBUG) log_print("Config already done!\n");
+    }
+
+    if(gConfig_done != HID_SDCARD_READ){
+        log_print("Reading config files from SD Card\n");
+        ConfigReader* reader = ConfigReader::getInstance();
+        int status = 0;
+        if((status = reader->InitSDCard()) == 0){
+            if(HID_DEBUG) log_printf("ConfigReader::ConfigReader(): SD Card mounted for controller config!\n");
+             reader->ReadAllConfigs();
+            log_print("Done with reading config files from SD Card\n");
+            gConfig_done = HID_SDCARD_READ;
+        }else{
+            log_printf("ConfigReader::ConfigReader() error: SD mounting failed! %d\n",status);
+        }
+        ConfigReader::destroyInstance();
     }
 
     log_print("Initializing the data for button remapping\n");

@@ -66,7 +66,6 @@ class ConfigReader{
         //!Destructor
         ~ConfigReader();
 
-
         int InitSDCard();
         void freeFSHandles();
 

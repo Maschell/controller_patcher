@@ -8,7 +8,7 @@ int ControllerPatcherNet::recvwait(int sock, void *buffer, int len) {
 		ret = recv(sock, buffer, len, 0);
 		if(ret < 0) return ret;
 		len -= ret;
-		buffer += ret;
+		buffer =  (void *)(((char *) buffer) + ret);
 	}
 	return 0;
 }
@@ -38,7 +38,7 @@ int ControllerPatcherNet::sendwait(int sock, const void *buffer, int len) {
 		ret = send(sock, buffer, len, 0);
 		if(ret < 0) return ret;
 		len -= ret;
-		buffer += ret;
+		buffer =  (void *)(((char *) buffer) + ret);
 	}
 	return 0;
 }

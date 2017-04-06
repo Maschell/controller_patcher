@@ -88,7 +88,7 @@ void UDPServer::DoUDPThreadInternal(){
 
     my_cb_user  user;
     while(1){
-        int usingVar = exitThread;
+        //int usingVar = exitThread;
         if(exitThread)break;
         memset(buffer,0,MAX_UDP_SIZE);
         n = recv(sockfd,buffer,MAX_UDP_SIZE,0);

@@ -29,12 +29,6 @@ ConfigReader *ConfigReader::instance = NULL;
 ConfigReader::ConfigReader(){
     InitOSFunctionPointers();
     InitFSFunctionPointers();
-    int status = 0;
-    if((status = InitSDCard()) == 0){
-        if(HID_DEBUG) log_printf("ConfigReader::ConfigReader(): SD Card mounted for controller config!\n");
-	}else{
-        log_printf("ConfigReader::ConfigReader() error: SD mounting failed! %d\n",status);
-	}
 }
 
 void ConfigReader::ReadAllConfigs(){
