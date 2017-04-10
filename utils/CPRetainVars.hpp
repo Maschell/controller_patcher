@@ -56,4 +56,6 @@ extern u8 gOriginalAPDState;
 extern u16 gNetworkController[gHIDMaxDevices][HID_MAX_PADS_COUNT][4];
 extern s32 gHIDNetworkClientID;
 
+extern u8 gUsedProtocolVersion;
+
 #endif // CP_RETAINS_VARS_H_

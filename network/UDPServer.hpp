@@ -23,6 +23,8 @@
 
 #define DEFAULT_UDP_PORT    8113
 
+#define WIIU_CP_UDP_CONTROLLER_READ_DATA        0x03
+
 class UDPServer{
     friend class ControllerPatcher;
 

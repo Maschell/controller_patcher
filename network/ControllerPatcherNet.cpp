@@ -13,7 +13,7 @@ s32 ControllerPatcherNet::recvwait(s32 sock, void *buffer, s32 len) {
 	return 0;
 }
 
-s32 ControllerPatcherNet::recvbyte(s32 sock) {
+u8 ControllerPatcherNet::recvbyte(s32 sock) {
 	unsigned char buffer[1];
 	s32 ret;
 

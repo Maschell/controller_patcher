@@ -21,6 +21,29 @@
 #include "dynamic_libs/socket_functions.h"
 #include "utils/logger.h"
 
+#define WIIU_CP_TCP_HANDSHAKE               WIIU_CP_TCP_HANDSHAKE_VERSION_2
+
+#define WIIU_CP_TCP_HANDSHAKE_VERSION_MIN   WIIU_CP_TCP_HANDSHAKE_VERSION_1
+#define WIIU_CP_TCP_HANDSHAKE_VERSION_MAX   WIIU_CP_TCP_HANDSHAKE_VERSION_2
+
+#define WIIU_CP_TCP_HANDSHAKE_VERSION_1     0x12
+#define WIIU_CP_TCP_HANDSHAKE_VERSION_2     0x13
+
+#define  WIIU_CP_TCP_HANDSHAKE_ABORT        0x30
+
+#define ATTACH 0x01
+#define DETACH 0x00
+
+#define WIIU_CP_TCP_ATTACH      0x01
+#define WIIU_CP_TCP_DETACH      0x02
+#define WIIU_CP_TCP_PING        0xF0
+#define WIIU_CP_TCP_PONG        0xF1
+
+#define WIIU_CP_TCP_ATTACH_CONFIG_FOUND         0xE0
+#define WIIU_CP_TCP_ATTACH_CONFIG_NOT_FOUND     0xE1
+#define WIIU_CP_TCP_ATTACH_USER_DATA_OKAY       0xE8
+#define WIIU_CP_TCP_ATTACH_USER_DATA_BAD        0xE9
+
 #define DEFAULT_TCP_PORT    8112
 
 class TCPServer{

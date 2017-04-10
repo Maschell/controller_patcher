@@ -20,7 +20,7 @@
 #include <string.h>
 #include "../ControllerPatcher.hpp"
 #define MAX_UDP_SIZE 0x578
-#define errno (*__gh_errno_ptr())
+#define wiiu_errno (*__gh_errno_ptr())
 
 ControllerPatcherThread * UDPServer::pThread = NULL;
 UDPServer * UDPServer::instance = NULL;
@@ -92,7 +92,7 @@ void UDPServer::DoUDPThreadInternal(){
         memset(buffer,0,MAX_UDP_SIZE);
         n = recv(sockfd,buffer,MAX_UDP_SIZE,0);
         if (n < 0){
-            s32 errno_ = errno;
+            s32 errno_ = wiiu_errno;
             usleep(2000);
             if(errno_ != 11 && errno_ != 9){
                 break;
@@ -104,47 +104,50 @@ void UDPServer::DoUDPThreadInternal(){
         memcpy((void *)&type,buffer,sizeof(type));
         bufferoffset += sizeof(type);
         switch (buffer[0]) {
-            case 0x03: {
-                u8 count_commands;
-                memcpy((void *)&count_commands,buffer+bufferoffset,sizeof(count_commands));
-                bufferoffset += sizeof(count_commands);
-                for(s32 i = 0;i<count_commands;i++){
+            case WIIU_CP_UDP_CONTROLLER_READ_DATA: {
+                if(gUsedProtocolVersion >= WIIU_CP_TCP_HANDSHAKE_VERSION_1){
+                    u8 count_commands;
+                    memcpy((void *)&count_commands,buffer+bufferoffset,sizeof(count_commands));
+                    bufferoffset += sizeof(count_commands);
+                    for(s32 i = 0;i<count_commands;i++){
 
-                    s32 handle;
-                    u16 deviceSlot;
-                    u16 hid;
-                    u8 padslot;
-                    u8 datasize;
+                        s32 handle;
+                        u16 deviceSlot;
+                        u16 hid;
+                        u8 padslot;
+                        u8 datasize;
 
-                    if(!cpyIncrementBufferOffset((void *)&handle,       (void *)buffer,&bufferoffset,sizeof(handle),    n))continue;
-                    if(!cpyIncrementBufferOffset((void *)&deviceSlot,   (void *)buffer,&bufferoffset,sizeof(deviceSlot),n))continue;
-                    hid = (1  << deviceSlot);
-                    if(!cpyIncrementBufferOffset((void *)&padslot,      (void *)buffer,&bufferoffset,sizeof(padslot),   n))continue;
-                    if(!cpyIncrementBufferOffset((void *)&datasize,     (void *)buffer,&bufferoffset,sizeof(datasize),  n))continue;
-                    u8 * databuffer = (u8*) malloc(datasize * sizeof(u8));
-                    if(!databuffer){
-                        log_printf("UDPServer::DoUDPThreadInternal(line %d): Allocating memory failed\n",__LINE__);
-                        continue;
+                        if(!cpyIncrementBufferOffset((void *)&handle,       (void *)buffer,&bufferoffset,sizeof(handle),    n))continue;
+                        if(!cpyIncrementBufferOffset((void *)&deviceSlot,   (void *)buffer,&bufferoffset,sizeof(deviceSlot),n))continue;
+                        hid = (1  << deviceSlot);
+                        if(!cpyIncrementBufferOffset((void *)&padslot,      (void *)buffer,&bufferoffset,sizeof(padslot),   n))continue;
+                        if(!cpyIncrementBufferOffset((void *)&datasize,     (void *)buffer,&bufferoffset,sizeof(datasize),  n))continue;
+                        u8 * databuffer = (u8*) malloc(datasize * sizeof(u8));
+                        if(!databuffer){
+                            log_printf("UDPServer::DoUDPThreadInternal(line %d): Allocating memory failed\n",__LINE__);
+                            continue;
+                        }
+
+                        //log_printf("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
+                        if(!cpyIncrementBufferOffset((void *)databuffer,    (void *)buffer,&bufferoffset,datasize,          n))continue;
+
+                        memset(&user,0,sizeof(user));
+
+                        user.pad_slot = padslot;
+                        user.slotdata.deviceslot =  deviceSlot;
+                        user.slotdata.hidmask = hid;
+
+                        if(gNetworkController[deviceSlot][padslot][0] == 0){
+                            log_printf("UDPServer::DoUDPThreadInternal(line %d): Ehm. Pad is not connected. STOP SENDING DATA ;) \n",__LINE__);
+                        }else{
+                            ControllerPatcherHID::externHIDReadCallback(handle,databuffer,datasize,&user);
+                        }
+                        if(databuffer){
+                            free(databuffer);
+                            databuffer = NULL;
+                        }
                     }
-
-                    //log_printf("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
-                    if(!cpyIncrementBufferOffset((void *)databuffer,    (void *)buffer,&bufferoffset,datasize,          n))continue;
-
-                    memset(&user,0,sizeof(user));
-
-                    user.pad_slot = padslot;
-                    user.slotdata.deviceslot =  deviceSlot;
-                    user.slotdata.hidmask = hid;
-
-                    if(gNetworkController[deviceSlot][padslot][0] == 0){
-                        log_printf("UDPServer::DoUDPThreadInternal(line %d): Ehm. Pad is not connected. STOP SENDING DATA ;) \n",__LINE__);
-                    }else{
-                        ControllerPatcherHID::externHIDReadCallback(handle,databuffer,datasize,&user);
-                    }
-                    if(databuffer){
-                        free(databuffer);
-                        databuffer = NULL;
-                    }
+                    break;
                 }
                 break;
             }
