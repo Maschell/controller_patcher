@@ -218,7 +218,7 @@ enum Controller_Patcher_DPAD_Settings
  */
 typedef struct _HIDSlotData{
 	u16 deviceslot;     /**< deviceslot number */
-	u16 hidmask;        /**< Used HID-Mask */
+	u32 hidmask;        /**< Used HID-Mask */
 }HIDSlotData;
 
 /**
