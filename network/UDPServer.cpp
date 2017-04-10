@@ -110,10 +110,9 @@ void UDPServer::DoUDPThreadInternal(){
                     memcpy((void *)&count_commands,buffer+bufferoffset,sizeof(count_commands));
                     bufferoffset += sizeof(count_commands);
                     for(s32 i = 0;i<count_commands;i++){
-
                         s32 handle;
                         u16 deviceSlot;
-                        u16 hid;
+                        u32 hid;
                         u8 padslot;
                         u8 datasize;
 
@@ -131,7 +130,6 @@ void UDPServer::DoUDPThreadInternal(){
                         //log_printf("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
                         if(!cpyIncrementBufferOffset((void *)databuffer,    (void *)buffer,&bufferoffset,datasize,          n))continue;
 
-                        memset(&user,0,sizeof(user));
 
                         user.pad_slot = padslot;
                         user.slotdata.deviceslot =  deviceSlot;

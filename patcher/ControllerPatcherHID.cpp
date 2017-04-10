@@ -438,12 +438,12 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
 }
 
 std::vector<HID_Data *> ControllerPatcherHID::getHIDDataAll(){
-    s32 hid = gHIDCurrentDevice;
+    u32 hid = gHIDCurrentDevice;
 
     std::vector<HID_Data *> data_list;
     for(s32 i = 0;i < gHIDMaxDevices;i++){
         if((hid & (1 << i)) != 0){
-            s32 cur_hidmask = config_controller_hidmask[i];
+            u32 cur_hidmask = config_controller_hidmask[i];
             for(s32 pad = 0; pad < HID_MAX_PADS_COUNT; pad++){
                 s32 res;
                 HID_Data * new_data = NULL;
@@ -461,7 +461,7 @@ std::vector<HID_Data *> ControllerPatcherHID::getHIDDataAll(){
 /*
 The slotdata in the HID_Data pointer is empty. We need to provide the hidmask via the parameter
 */
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(s32 hidmask, s32 pad, HID_Data ** data){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(u32 hidmask, s32 pad, HID_Data ** data){
     if(data == NULL) return CONTROLLER_PATCHER_ERROR_INVALID_BUFFER;
     if(!(hidmask & gHIDCurrentDevice)) return CONTROLLER_PATCHER_ERROR_HID_NOT_CONNECTED;
     if(pad < 0 && pad > 3) return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;

@@ -25,8 +25,8 @@ extern ControllerMapping gControllerMapping;
 extern u8 gConfig_done;
 extern u8 gButtonRemappingConfigDone;
 
-extern u16 gHIDAttached;
-extern u16 gHIDCurrentDevice;
+extern u32 gHIDAttached;
+extern u32 gHIDCurrentDevice;
 extern HIDClient gHIDClient;
 
 extern u16 gHIDRegisteredDevices;
@@ -38,12 +38,12 @@ extern u8 gHID_Mouse_Mode;
 extern u32 gGamePadValues[CONTRPS_MAX_VALUE];
 
 extern u8 config_controller[gHIDMaxDevices][CONTRPS_MAX_VALUE][2];
-extern u16 config_controller_hidmask[gHIDMaxDevices];
+extern u32 config_controller_hidmask[gHIDMaxDevices];
 
-extern u16 gHID_LIST_GC;
-extern u16 gHID_LIST_DS3;
-extern u16 gHID_LIST_KEYBOARD;
-extern u16 gHID_LIST_MOUSE;
+extern u32 gHID_LIST_GC;
+extern u32 gHID_LIST_DS3;
+extern u32 gHID_LIST_KEYBOARD;
+extern u32 gHID_LIST_MOUSE;
 extern u16 gGamePadSlot;
 
 extern u16 gHID_SLOT_GC;

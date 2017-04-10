@@ -48,7 +48,7 @@ class ControllerPatcherUtils{
 
         \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful. The returned value is the deviceslot of the given HID-Mask
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR getDeviceSlot(s32 hidmask);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR getDeviceSlot(u32 hidmask);
 
         /**
         \brief Returns the device slot for a given HID-Mask.
@@ -154,7 +154,7 @@ class ControllerPatcherUtils{
 
             \return When the functions failed result < 0 is returned. If the pad is active/connected, 1 is returned.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR checkActivePad(s32 hidmask,s32 pad);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR checkActivePad(u32 hidmask,s32 pad);
 
         /**
             \brief Returns the first active pad of devices with the given HID-Mask. Currently only implemented for the GC-Adapter. Every other pad will always return 0.
@@ -163,7 +163,7 @@ class ControllerPatcherUtils{
 
             \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful. The returned value is fist active pad.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR getActivePad(s32 hidmask);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR getActivePad(u32 hidmask);
 
     /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * Stick functions

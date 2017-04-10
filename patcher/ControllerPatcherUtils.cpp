@@ -228,7 +228,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isValueSet(HID_Data *
     u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
     if(cur_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    s32 hidmask = data->slotdata.hidmask;
+    u32 hidmask = data->slotdata.hidmask;
     s32 deviceslot = data->slotdata.deviceslot;
 
     s32 result = CONTROLLER_PATCHER_ERROR_NONE;
@@ -292,7 +292,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonData(VPADDat
  * Pad Status functions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkActivePad(s32 hidmask,s32 pad){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkActivePad(u32 hidmask,s32 pad){
     if(hidmask & gHID_LIST_GC && pad >= 0 && pad <= 3){
         if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[pad].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[pad].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 1;
         return CONTROLLER_PATCHER_ERROR_NO_PAD_CONNECTED;
@@ -309,7 +309,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkActivePad(s32 hi
 }
 
 /*
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getActivePad(s32 hidmask){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getActivePad(u32 hidmask){
      if(hidmask & gHID_LIST_GC){
         if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[0].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[0].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 0;
         if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[1].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[1].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 1;
@@ -609,7 +609,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setTouch(HID_Data * d
 }
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkAndSetMouseMode(HID_Data * data){
-    s32 hidmask = data->slotdata.hidmask;
+    u32 hidmask = data->slotdata.hidmask;
 
     if(hidmask & gHID_LIST_KEYBOARD){
         u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
@@ -817,7 +817,7 @@ void ControllerPatcherUtils::setConfigValue(u8 * dest, u8 first, u8 second){
     dest[1] = second;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDeviceSlot(s32 hidmask){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDeviceSlot(u32 hidmask){
     for(s32 i = 0;i < gHIDMaxDevices;i++){
         if(hidmask & config_controller_hidmask[i]){
               return i;

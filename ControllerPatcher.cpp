@@ -138,7 +138,6 @@ void ControllerPatcher::ResetConfig(){
     config_controller_hidmask[ds4_slot] =                                                           ds4_hid;
     config_controller_hidmask[xinput_slot] =                                                        xinput_hid;
 
-
     /* We need to give the GamePad, Mouse and Keyboard a unique VID/PID to find the right slots.*/
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! GamePad
@@ -355,7 +354,6 @@ void ControllerPatcher::ResetConfig(){
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! XInput
     //!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[xinput_slot][CONTRPS_VID],                           (HID_XINPUT_VID>>8)&0xFF,               HID_XINPUT_VID&0xFF);
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[xinput_slot][CONTRPS_PID],                           (HID_XINPUT_PID>>8)&0xFF,               HID_XINPUT_PID&0xFF);
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[xinput_slot][CONTRPS_BUF_SIZE],                      CONTROLLER_PATCHER_VALUE_SET,           128);
@@ -616,8 +614,8 @@ bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,s32
             return false;
         }
 
-        s32 hidmask = device_info.slotdata.hidmask;
-        s32 pad = padinfo->pad;
+        u32 hidmask = device_info.slotdata.hidmask;
+        u32 pad = padinfo->pad;
 
         HID_Data * data_cur;
 

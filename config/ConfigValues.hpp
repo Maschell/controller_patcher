@@ -483,12 +483,12 @@ private:
 
         presetSticks["XINPUT_STICK_L_X"] =                              HID_XINPUT_STICK_L_X;
         presetSticks["XINPUT_STICK_L_Y"] =                              HID_XINPUT_STICK_L_Y;
-        presetSticks["XINPUT_STICK_R_X"] =                              HID_XINPUT_STICK_L_X;
+        presetSticks["XINPUT_STICK_R_X"] =                              HID_XINPUT_STICK_R_X;
         presetSticks["XINPUT_STICK_R_Y"] =                              HID_XINPUT_STICK_R_Y;
 
         presetSticks["GC_DPAD_MODE"] =                                  HID_GC_BUTTON_DPAD_TYPE;
         presetSticks["DS3_DPAD_MODE"] =                                 HID_DS3_BUTTON_DPAD_TYPE;
-        presetSticks["DS4_DPAD_MODE"] =                                 HID_XINPUT_BUTTON_DPAD_TYPE;
+        presetSticks["DS4_DPAD_MODE"] =                                 HID_DS4_BUTTON_DPAD_TYPE;
         presetSticks["XINPUT_DPAD_MODE"] =                              HID_XINPUT_BUTTON_DPAD_TYPE;
 
         gGamePadValuesToCONTRPSString["VPAD_BUTTON_A"] =  				CONTRPS_VPAD_BUTTON_A;
