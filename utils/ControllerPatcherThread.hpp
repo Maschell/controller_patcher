@@ -29,7 +29,7 @@ public:
 	typedef void (* Callback)(ControllerPatcherThread *thread, void *arg);
 
 	//! constructor
-	ControllerPatcherThread(int iAttr, int iPriority = 16, int iStackSize = 0x8000, ControllerPatcherThread::Callback callback = NULL, void *callbackArg = NULL)
+	ControllerPatcherThread(s32 iAttr, s32 iPriority = 16, s32 iStackSize = 0x8000, ControllerPatcherThread::Callback callback = NULL, void *callbackArg = NULL)
 		: pThread(NULL)
 		, pThreadStack(NULL)
 		, pCallback(callback)
@@ -49,7 +49,7 @@ public:
 	//! destructor
 	virtual ~ControllerPatcherThread() {shutdownThread(); }
 
-	static ControllerPatcherThread *create(ControllerPatcherThread::Callback callback, void *callbackArg, int iAttr = eAttributeNone, int iPriority = 16, int iStackSize = 0x8000)
+	static ControllerPatcherThread *create(ControllerPatcherThread::Callback callback, void *callbackArg, s32 iAttr = eAttributeNone, s32 iPriority = 16, s32 iStackSize = 0x8000)
 	{
 	    return ( new ControllerPatcherThread(iAttr, iPriority, iStackSize, callback, callbackArg) );
 	}
@@ -67,7 +67,7 @@ public:
 	//! Resume thread
 	virtual void resumeThread(void) { if(!isThreadSuspended()) return; if(pThread) OSResumeThread(pThread); }
 	//! Set thread priority
-	virtual void setThreadPriority(int prio) { if(pThread) OSSetThreadPriority(pThread, prio); }
+	virtual void setThreadPriority(s32 prio) { if(pThread) OSSetThreadPriority(pThread, prio); }
 	//! Check if thread is suspended
 	virtual bool isThreadSuspended(void) const { if(pThread) return OSIsThreadSuspended(pThread); return false; }
 	//! Check if thread is terminated
@@ -105,13 +105,13 @@ public:
 	    eAttributePinnedAff         = 0x10
 	};
 private:
-	static int threadCallback(int argc, void *arg)
+	static s32 threadCallback(s32 argc, void *arg)
 	{
 		//! After call to start() continue with the internal function
 		((ControllerPatcherThread *) arg)->executeThread();
 		return 0;
 	}
-    int iAttributes;
+    s32 iAttributes;
 	void *pThread;
 	u8 *pThreadStack;
 	Callback pCallback;

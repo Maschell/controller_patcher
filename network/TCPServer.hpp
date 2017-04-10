@@ -40,7 +40,7 @@ private:
         }
     }
 
-    TCPServer(int port);
+    TCPServer(s32 port);
     ~TCPServer();
 
     void CloseSockets();
@@ -50,18 +50,18 @@ private:
     static void DoTCPThread(ControllerPatcherThread *thread, void *arg);
     void DoTCPThreadInternal();
     static void DetachConnectedNetworkController();
-    static void AttachDetach(int attach);
+    static void AttachDetach(s32 attach);
     void DetachAndDelete();
     static TCPServer *instance;
 
-    int RunTCP();
+    s32 RunTCP();
 
     struct sockaddr_in sock_addr;
-    volatile int sockfd = -1;
-    volatile int clientfd = -1;
+    volatile s32 sockfd = -1;
+    volatile s32 clientfd = -1;
 
 
-    volatile int exitThread = 0;
+    volatile s32 exitThread = 0;
     static ControllerPatcherThread *pThread;
 };
 

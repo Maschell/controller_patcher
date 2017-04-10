@@ -48,7 +48,7 @@ class ControllerPatcherUtils{
 
         \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful. The returned value is the deviceslot of the given HID-Mask
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR getDeviceSlot(int hidmask);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR getDeviceSlot(s32 hidmask);
 
         /**
         \brief Returns the device slot for a given HID-Mask.
@@ -58,7 +58,7 @@ class ControllerPatcherUtils{
 
         \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful. The actual result will be store in the given my_cb_user **.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR getDataByHandle(int handle, my_cb_user ** data);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR getDataByHandle(s32 handle, my_cb_user ** data);
 
         /**
         \brief Returns the VID/PID for the given device slot.
@@ -68,7 +68,7 @@ class ControllerPatcherUtils{
 
         \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful. The actual result will be store in the given DeviceVIDPIDInfo *.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR getVIDPIDbyDeviceSlot(int deviceslot, DeviceVIDPIDInfo * vidpid);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR getVIDPIDbyDeviceSlot(s32 deviceslot, DeviceVIDPIDInfo * vidpid);
 
             /** \brief Set the VPAD data for a given KPAD data.
          *
@@ -92,7 +92,7 @@ class ControllerPatcherUtils{
          * \return When the functions failed result < 0 is returned.If the result is >= 0 the function was successful.
          *
          */
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR getButtonPressed(HID_Data * data, int * buttons_hold, int VPADButton);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR getButtonPressed(HID_Data * data, s32 * buttons_hold, s32 VPADButton);
 
 
         /** \brief Checks if a given value is set in the HID_DATA given the data in the slot number provided by cur_config.
@@ -102,7 +102,7 @@ class ControllerPatcherUtils{
          * \return When the functions failed result < 0 is returned. If the value is set, 1 will be returned. Otherwise 0.
          *
          */
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR isValueSet(HID_Data * data,int cur_config);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR isValueSet(HID_Data * data,s32 cur_config);
 
 
         /** \brief Checks if a given key in the keyboard data is pressed.
@@ -112,7 +112,7 @@ class ControllerPatcherUtils{
          * \return When the functions failed result < 0 is returned. If the key is active pressed, 1 is returned.
          *
          */
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR isInKeyboardData(unsigned char * keyboardData,int key);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR isInKeyboardData(unsigned char * keyboardData,s32 key);
 
     /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * Utils for setting the Button data
@@ -128,7 +128,7 @@ class ControllerPatcherUtils{
          * \return When the functions failed result < 0 is returned. If the pad is active/connected, 1 is returned.
          *
          */
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setButtonRemappingData(VPADData * old_buffer, VPADData * new_buffer,u32 VPADButton, int CONTRPS_SLOT);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setButtonRemappingData(VPADData * old_buffer, VPADData * new_buffer,u32 VPADButton, s32 CONTRPS_SLOT);
 
         /**
             \brief Checks if a given button (oldVPADButton) is set in a given VPADData struct (old_buffer). If its set, it will set an other
@@ -154,7 +154,7 @@ class ControllerPatcherUtils{
 
             \return When the functions failed result < 0 is returned. If the pad is active/connected, 1 is returned.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR checkActivePad(int hidmask,int pad);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR checkActivePad(s32 hidmask,s32 pad);
 
         /**
             \brief Returns the first active pad of devices with the given HID-Mask. Currently only implemented for the GC-Adapter. Every other pad will always return 0.
@@ -163,7 +163,7 @@ class ControllerPatcherUtils{
 
             \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful. The returned value is fist active pad.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR getActivePad(int hidmask);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR getActivePad(s32 hidmask);
 
     /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * Stick functions
@@ -266,7 +266,7 @@ class ControllerPatcherUtils{
 
             \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR checkValueinConfigController(int device_slot,int CONTRPS_slot,int expectedValue);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR checkValueinConfigController(s32 device_slot,s32 CONTRPS_slot,s32 expectedValue);
 
         /**
             \brief Sets two u8 values to the given pointer.
@@ -304,7 +304,7 @@ class ControllerPatcherUtils{
             \param current input data
             \return The relative slot in the device
         **/
-        static int getPadSlotInAdapter(int deviceslot, u8 * input_data);
+        static s32 getPadSlotInAdapter(s32 deviceslot, u8 * input_data);
 
          /**
         \brief returns a pointer to the ControllerMapping to the given controller type

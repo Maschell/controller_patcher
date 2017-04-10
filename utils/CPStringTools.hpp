@@ -8,7 +8,7 @@ class CPStringTools{
         static bool EndsWith(const std::string& a, const std::string& b);
         static std::vector<std::string> StringSplit(const std::string & inValue, const std::string & splitter);
         static std::string removeCharFromString(std::string& input,char toBeRemoved);
-        static const char *byte_to_binary(int x);
+        static const char *byte_to_binary(s32 x);
         static std::string strfmt(const char * format, ...);
 };
 

@@ -61,7 +61,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static int getKeySlotGamePad(std::string possibleValue)
+    static s32 getKeySlotGamePad(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -70,7 +70,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static int getKeySlotMouse(std::string possibleValue)
+    static s32 getKeySlotMouse(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -80,7 +80,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static int getKeySlotDefaultSingleValue(std::string possibleValue)
+    static s32 getKeySlotDefaultSingleValue(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -90,7 +90,7 @@ private:
     /**
     Returns -1 if not found
     **/
-    static int getKeySlotDefaultPairedValue(std::string possibleValue)
+    static s32 getKeySlotDefaultPairedValue(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -100,7 +100,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static int getPresetValuesKeyboard(std::string possibleValue)
+    static s32 getPresetValuesKeyboard(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -110,7 +110,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static int getPresetValue(std::string possibleValue)
+    static s32 getPresetValue(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -120,7 +120,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static int setIfValueIsAControllerPreset(std::string value,int slot,int keyslot)
+    static s32 setIfValueIsAControllerPreset(std::string value,s32 slot,s32 keyslot)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -165,13 +165,14 @@ private:
     std::map<std::string,const u8*> presetXInputValues;
     std::map<std::string,const u8*> presetSticks;
 
-    int getValueFromMap(std::map<std::string,int> values,std::string nameOfString);
+    s32 getValueFromMap(std::map<std::string,int> values,std::string nameOfString);
 
-    bool checkIfValueIsAControllerPreset(std::string value,int slot,int keyslot);
+    bool checkIfValueIsAControllerPreset(std::string value,s32 slot,s32 keyslot);
 
-    int getPresetValueEx(std::string possibleString);
+    s32 getPresetValueEx(std::string possibleString);
 
 	void InitValues(){
+        log_printf("ConfigValues::InitValues: Init values for the configuration\n");
         CONTPRStringToValue["VPAD_BUTTON_A"] =                          CONTRPS_VPAD_BUTTON_A;
         CONTPRStringToValue["VPAD_BUTTON_B"] =                          CONTRPS_VPAD_BUTTON_B;
         CONTPRStringToValue["VPAD_BUTTON_X"] =                          CONTRPS_VPAD_BUTTON_X;
@@ -519,7 +520,6 @@ private:
         gGamePadValuesToCONTRPSString["VPAD_STICK_L_EMULATION_UP"] =    CONTRPS_VPAD_STICK_L_EMULATION_UP;
         gGamePadValuesToCONTRPSString["VPAD_STICK_L_EMULATION_DOWN"] =  CONTRPS_VPAD_STICK_L_EMULATION_DOWN;
 
-        log_printf("Value device names \n");
         deviceNames[CPStringTools::strfmt("%04X%04X",HID_GC_VID,       HID_GC_PID).c_str()]                = HID_GC_STRING;
         deviceNames[CPStringTools::strfmt("%04X%04X",HID_KEYBOARD_VID, HID_KEYBOARD_PID).c_str()]          = HID_KEYBOARD_STRING;
         deviceNames[CPStringTools::strfmt("%04X%04X",HID_MOUSE_VID,    HID_MOUSE_PID).c_str()]             = HID_MOUSE_STRING;
@@ -528,13 +528,12 @@ private:
         deviceNames[CPStringTools::strfmt("%04X%04X",HID_DS4_VID,      HID_DS4_PID).c_str()]               = HID_DS4_STRING;
         deviceNames[CPStringTools::strfmt("%04X%04X",HID_XINPUT_VID,   HID_XINPUT_PID).c_str()]            = HID_XINPUT_STRING;
         deviceNames[CPStringTools::strfmt("%04X%04X",HID_SWITCH_PRO_VID,   HID_SWITCH_PRO_PID).c_str()]    = HID_SWITCH_PRO_STRING;
-        log_printf("Value init done\n");
     }
 
     const u8 * getValuesForPreset(std::map<std::string,const u8*> values,std::string possibleValue);
 
-    bool setIfValueIsPreset(std::map<std::string,const u8*> values,std::string possibleValue,int slot,int keyslot);
-    bool setIfValueIsAControllerPresetEx(std::string value,int slot,int keyslot);
+    bool setIfValueIsPreset(std::map<std::string,const u8*> values,std::string possibleValue,s32 slot,s32 keyslot);
+    bool setIfValueIsAControllerPresetEx(std::string value,s32 slot,s32 keyslot);
 
     void addDeviceNameEx(u16 vid,u16 pid,std::string value);
     std::string getStringByVIDPIDEx(u16 vid,u16 pid);

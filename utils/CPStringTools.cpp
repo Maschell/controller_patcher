@@ -17,7 +17,7 @@ std::vector<std::string> CPStringTools::StringSplit(const std::string & inValue,
     std::string value = inValue;
     std::vector<std::string> result;
     while (true) {
-        unsigned int index = value.find(splitter);
+        u32 index = value.find(splitter);
         if (index == std::string::npos) {
             result.push_back(value);
             break;
@@ -36,11 +36,11 @@ std::vector<std::string> CPStringTools::StringSplit(const std::string & inValue,
     return result;
 }
 
-const char * CPStringTools::byte_to_binary(int x){
+const char * CPStringTools::byte_to_binary(s32 x){
     static char b[9];
     b[0] = '\0';
 
-    int z;
+    s32 z;
     for (z = 128; z > 0; z >>= 1)
     {
         strcat(b, ((x & z) == z) ? "1" : "0");

@@ -59,11 +59,11 @@ private:
 
     bool parseConfigString(std::string content);
 
-    int getSlotController(std::string identify);
+    s32 getSlotController(std::string identify);
 
-    int checkExistingController(int vid, int pid);
+    s32 checkExistingController(s32 vid, s32 pid);
 
-    int getValueFromKeyValue(std::string value_pair,std::string expectedKey,std::string delimiter);
+    s32 getValueFromKeyValue(std::string value_pair,std::string expectedKey,std::string delimiter);
 
     bool resetConfig();
 

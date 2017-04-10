@@ -40,15 +40,15 @@ private:
         }
     }
 
-    UDPServer(int port);
+    UDPServer(s32 port);
     ~UDPServer();
     void StartUDPThread(UDPServer * server);
     static void DoUDPThread(ControllerPatcherThread *thread, void *arg);
     void DoUDPThreadInternal();
-    bool cpyIncrementBufferOffset(void * target, void * source, int * offset, int typesize, int maximum);
+    bool cpyIncrementBufferOffset(void * target, void * source, s32 * offset, s32 typesize, s32 maximum);
 
-    volatile int sockfd = -1;
-    volatile int exitThread = 0;
+    volatile s32 sockfd = -1;
+    volatile s32 exitThread = 0;
 
     static UDPServer *instance;
     static ControllerPatcherThread *pThread;

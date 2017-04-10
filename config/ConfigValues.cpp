@@ -28,7 +28,7 @@ ConfigValues::ConfigValues(){
 }
 
 ConfigValues::~ConfigValues(){
-    if(HID_DEBUG) log_printf("ConfigValues::~ConfigValues(){\n");
+    if(HID_DEBUG) log_printf("ConfigValues::~ConfigValues(line %d){\n",__LINE__);
 }
 
 const u8 * ConfigValues::getValuesForPreset(std::map<std::string,const u8*> values,std::string possibleValue){
@@ -40,7 +40,7 @@ const u8 * ConfigValues::getValuesForPreset(std::map<std::string,const u8*> valu
     return NULL;
 }
 
-bool ConfigValues::setIfValueIsAControllerPresetEx(std::string value,int slot,int keyslot){
+bool ConfigValues::setIfValueIsAControllerPresetEx(std::string value,s32 slot,s32 keyslot){
     if(setIfValueIsPreset(presetGCValues,value,slot,keyslot)) return true;
     if(setIfValueIsPreset(presetDS3Values,value,slot,keyslot)) return true;
     if(setIfValueIsPreset(presetDS4Values,value,slot,keyslot)) return true;
@@ -49,7 +49,7 @@ bool ConfigValues::setIfValueIsAControllerPresetEx(std::string value,int slot,in
 }
 
 //We need this function here so we can use preset sticks.
-bool ConfigValues::setIfValueIsPreset(std::map<std::string,const u8*> values,std::string possibleValue,int slot,int keyslot){
+bool ConfigValues::setIfValueIsPreset(std::map<std::string,const u8*> values,std::string possibleValue,s32 slot,s32 keyslot){
     if(slot > gHIDMaxDevices || slot < 0 || keyslot < 0 || keyslot >= CONTRPS_MAX_VALUE){
         return false;
     }
@@ -58,9 +58,9 @@ bool ConfigValues::setIfValueIsPreset(std::map<std::string,const u8*> values,std
         keyslot == CONTRPS_VPAD_BUTTON_L_STICK_Y ||
         keyslot == CONTRPS_VPAD_BUTTON_R_STICK_X ||
         keyslot == CONTRPS_VPAD_BUTTON_R_STICK_Y){
-        if(HID_DEBUG) log_printf("This may be a predefined stick %s\n",possibleValue.c_str());
+        if(HID_DEBUG) log_printf("ConfigValues::setIfValueIsPreset(line %d): This may be a predefined stick %s\n",__LINE__,possibleValue.c_str());
         if((values_ = ConfigValues::getValuesStickPreset(possibleValue)) != NULL){
-            if(HID_DEBUG) log_printf("Found predefined stick!\n");
+            if(HID_DEBUG) log_printf("ConfigValues::setIfValueIsPreset(line %d): Found predefined stick!\n",__LINE__);
             config_controller[slot][keyslot][0] =                           values_[STICK_CONF_BYTE];       //CONTRPS_VPAD_BUTTON_L_STICK_X
             config_controller[slot][keyslot][1] =                           values_[STICK_CONF_DEFAULT];
             config_controller[slot][keyslot+DEF_STICK_OFFSET_INVERT][0] =   CONTROLLER_PATCHER_VALUE_SET;   //CONTRPS_VPAD_BUTTON_L_STICK_X_INVERT
@@ -83,7 +83,7 @@ bool ConfigValues::setIfValueIsPreset(std::map<std::string,const u8*> values,std
 }
 
 
-int ConfigValues::getValueFromMap(std::map<std::string,int> values,std::string nameOfString){
+s32 ConfigValues::getValueFromMap(std::map<std::string,int> values,std::string nameOfString){
     std::map<std::string,int>::iterator it;
     it = values.find(nameOfString);
     if (it != values.end()){
@@ -94,12 +94,12 @@ int ConfigValues::getValueFromMap(std::map<std::string,int> values,std::string n
     return -1;
 }
 
-int ConfigValues::getPresetValueEx(std::string possibleString){
-    int rightValue = -1;
+s32 ConfigValues::getPresetValueEx(std::string possibleString){
+    s32 rightValue = -1;
     if((rightValue = getValueFromMap(gGamePadValuesToCONTRPSString,possibleString))!= -1){
-        if(HID_DEBUG) log_printf("Used pre-defined VPAD_VALUE! \"%s\" is %d\n",possibleString.c_str(),rightValue);
+        if(HID_DEBUG) log_printf("ConfigValues::getPresetValueEx(line %d): Used pre-defined VPAD_VALUE! \"%s\" is %d\n",__LINE__,possibleString.c_str(),rightValue);
     }else if((rightValue = getValueFromMap(presetValues,possibleString))!= -1){
-        if(HID_DEBUG) log_printf("Used pre-defined value! \"%s\" is %d\n",possibleString.c_str(),rightValue);
+        if(HID_DEBUG) log_printf("ConfigValues::getPresetValueEx(line %d): Used pre-defined value! \"%s\" is %d\n",__LINE__,possibleString.c_str(),rightValue);
     }
     return rightValue;
 }

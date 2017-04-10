@@ -33,9 +33,9 @@ static u32 last_button_hold[4] = {0,0,0,0};
 static VPADData myVPADBuffer[4];
 
 void ControllerPatcher::InitButtonMapping(){
-    if(HID_DEBUG) log_printf("init_button_remapping! called! \n");
+    if(HID_DEBUG) log_printf("ControllerPatcher::InitButtonMapping(line %d): Init called \n",__LINE__);
     if(!gButtonRemappingConfigDone){
-        if(HID_DEBUG) log_printf("init_button_remapping! Remapping is running! \n");
+        if(HID_DEBUG) log_printf("ControllerPatcher::InitButtonMapping(line %d): Remapping is running! \n",__LINE__);
         gButtonRemappingConfigDone = 1;
         memset(gGamePadValues,0,sizeof(gGamePadValues)); // Init / Invalid everything
 
@@ -71,7 +71,7 @@ void ControllerPatcher::InitButtonMapping(){
 }
 
 void ControllerPatcher::ResetConfig(){
-    memset(&gControllerMapping,0,sizeof(ControllerMapping));
+    memset(&gControllerMapping,0,sizeof(gControllerMapping));
     disableControllerMapping();
     memset(config_controller,CONTROLLER_PATCHER_INVALIDVALUE,sizeof(config_controller)); // Init / Invalid everything
     memset(config_controller_hidmask,0,sizeof(config_controller_hidmask)); // Init / Invalid everything
@@ -93,12 +93,12 @@ void ControllerPatcher::ResetConfig(){
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     gGamePadSlot = slotdata.deviceslot;
     u32 gGamePadHid = slotdata.hidmask;
-    if(HID_DEBUG) log_printf("Gamepad HID-Mask %s deviceslot: %d\n",CPStringTools::byte_to_binary(gGamePadHid),gGamePadSlot);
+    if(HID_DEBUG) log_printf("ControllerPatcher::ResetConfig(line %d): Register Gamepad-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gGamePadHid),gGamePadSlot);
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     gMouseSlot = slotdata.deviceslot;
     gHID_LIST_MOUSE = slotdata.hidmask;
-    if(HID_DEBUG) log_printf("Mouse HID-Mask %s deviceslot: %d\n",CPStringTools::byte_to_binary(gHID_LIST_MOUSE),gMouseSlot);
+    if(HID_DEBUG) log_printf("ControllerPatcher::ResetConfig(line %d): Register Mouse-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_MOUSE),gMouseSlot);
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 keyboard_slot = slotdata.deviceslot;
@@ -106,30 +106,30 @@ void ControllerPatcher::ResetConfig(){
     gHID_LIST_KEYBOARD = keyboard_hid;
     gHID_SLOT_KEYBOARD = keyboard_slot;
 
-    if(HID_DEBUG) log_printf("Keyboard HID-Mask %s deviceslot: %d\n",CPStringTools::byte_to_binary(gHID_LIST_KEYBOARD),gHID_SLOT_KEYBOARD);
+    if(HID_DEBUG) log_printf("ControllerPatcher::ResetConfig(line %d): Register Keyboard-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_KEYBOARD),gHID_SLOT_KEYBOARD);
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 gc_slot = slotdata.deviceslot;
     u32 gc_hid = slotdata.hidmask;
     gHID_LIST_GC = gc_hid;
     gHID_SLOT_GC = gc_slot;
-    if(HID_DEBUG) log_printf("GC-Adapter HID-Mask %s deviceslot: %d\n",CPStringTools::byte_to_binary(gHID_LIST_GC),gHID_SLOT_GC);
+    if(HID_DEBUG) log_printf("ControllerPatcher::ResetConfig(line %d): Register GC-Adapter-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_GC),gHID_SLOT_GC);
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 ds3_slot = slotdata.deviceslot;
     u32 ds3_hid = slotdata.hidmask;
     gHID_LIST_DS3 = ds3_hid;
-    if(HID_DEBUG) log_printf("DS3 HID-Mask %s deviceslot: %d\n",CPStringTools::byte_to_binary(gHID_LIST_DS3),ds3_slot);
+    if(HID_DEBUG) log_printf("ControllerPatcher::ResetConfig(line %d): Register DS3-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_DS3),ds3_slot);
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 ds4_slot = slotdata.deviceslot;
     u32 ds4_hid = slotdata.hidmask;
-    if(HID_DEBUG) log_printf("DS4 HID-Mask %s deviceslot: %d\n",CPStringTools::byte_to_binary(ds4_hid),ds4_slot);
+    if(HID_DEBUG) log_printf("ControllerPatcher::ResetConfig(line %d): Register DS4-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(ds4_hid),ds4_slot);
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 xinput_slot = slotdata.deviceslot;
     u32 xinput_hid = slotdata.hidmask;
-    if(HID_DEBUG) log_printf("XInput HID-Mask %s deviceslot: %d\n",CPStringTools::byte_to_binary(xinput_hid),xinput_slot);
+    if(HID_DEBUG) log_printf("ControllerPatcher::ResetConfig(line %d): Register XInput-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(xinput_hid),xinput_slot);
 
     config_controller_hidmask[gc_slot] =                                                            gHID_LIST_GC;
     config_controller_hidmask[ds3_slot] =                                                           gHID_LIST_DS3;
@@ -408,37 +408,37 @@ bool ControllerPatcher::Init(){
     InitVPadFunctionPointers();
     InitPadScoreFunctionPointers();
 
-    if(HID_DEBUG) log_printf("ControllerPatcher::Init() called! \n");
+    if(HID_DEBUG) log_printf("ControllerPatcher::Init(line %d): Init called! \n",__LINE__);
 
     if(syshid_handle == 0){
-         log_printf("Failed to load the HID API \n");
+         log_printf("ControllerPatcher::Init(line %d): Failed to load the HID API \n",__LINE__);
          return false;
     }
 
     if(gConfig_done == HID_INIT_NOT_DONE){
-        if(HID_DEBUG) log_printf("First time calling the Init\n");
+        if(HID_DEBUG) log_printf("ControllerPatcher::Init(line %d): First time calling the Init\n",__LINE__);
         gConfig_done = HID_INIT_DONE;
         ControllerPatcher::ResetConfig();
     }else{
-        if(HID_DEBUG) log_print("Config already done!\n");
+        if(HID_DEBUG) log_printf("ControllerPatcher::Init(line %d): ControllerPatcher::Init(): Config already done!\n",__LINE__);
     }
 
     if(gConfig_done != HID_SDCARD_READ){
-        log_print("Reading config files from SD Card\n");
+        log_printf("ControllerPatcher::Init(line %d): Reading config files from SD Card\n",__LINE__);
         ConfigReader* reader = ConfigReader::getInstance();
-        int status = 0;
+        s32 status = 0;
         if((status = reader->InitSDCard()) == 0){
-            if(HID_DEBUG) log_printf("ConfigReader::ConfigReader(): SD Card mounted for controller config!\n");
+            if(HID_DEBUG) log_printf("ControllerPatcher::Init(line %d):  SD Card mounted for controller config!\n",__LINE__);
              reader->ReadAllConfigs();
-            log_print("Done with reading config files from SD Card\n");
+            log_printf("ControllerPatcher::Init(line %d): Done with reading config files from SD Card\n",__LINE__);
             gConfig_done = HID_SDCARD_READ;
         }else{
-            log_printf("ConfigReader::ConfigReader() error: SD mounting failed! %d\n",status);
+            log_printf("ControllerPatcher::Init(line %d): SD mounting failed! %d\n",__LINE__,status);
         }
         ConfigReader::destroyInstance();
     }
 
-    log_print("Initializing the data for button remapping\n");
+    log_printf("ControllerPatcher::Init(line %d): Initializing the data for button remapping\n",__LINE__);
     InitButtonMapping();
 
     if(!gHIDAttached){
@@ -460,22 +460,21 @@ void ControllerPatcher::stopNetworkServer(){
 
 
 void ControllerPatcher::DeInit(){
-    if(HID_DEBUG) log_printf("ControllerPatcher::DeInit() called! \n");
+    if(HID_DEBUG) log_printf("ControllerPatcher::DeInit(line %d) called! \n",__LINE__);
 
     if(gHIDAttached) HIDDelClient(&gHIDClient);
 
     //Resetting the state of the last pressed data.
     buttonRemapping_lastButtonsHold = 0;
-    memset(last_button_hold,0,sizeof(u32)*4);
-    memset(myVPADBuffer,0,sizeof(VPADData)*4);
-
-    memset(&gControllerMapping,0,sizeof(ControllerMapping));
-    memset(&gHIDClient,0,sizeof(HIDClient));
-    memset(gHID_Devices,0,sizeof(HID_DEVICE_DATA) * gHIDMaxDevices);
-    memset(gGamePadValues,0,sizeof(u32) * CONTRPS_MAX_VALUE);
-    memset(config_controller,0,sizeof(u8) * gHIDMaxDevices * CONTRPS_MAX_VALUE * 2);
-    memset(config_controller_hidmask,0,sizeof(u16) * gHIDMaxDevices);
-    memset(gNetworkController,0,sizeof(u16) * gHIDMaxDevices * HID_MAX_PADS_COUNT * 4);
+    memset(last_button_hold,0,sizeof(last_button_hold));
+    memset(myVPADBuffer,0,sizeof(myVPADBuffer));
+    memset(&gControllerMapping,0,sizeof(gControllerMapping));
+    memset(&gHIDClient,0,sizeof(gHIDClient));
+    memset(gHID_Devices,0,sizeof(gHID_Devices));
+    memset(gGamePadValues,0,sizeof(gGamePadValues));
+    memset(config_controller,0,sizeof(config_controller));
+    memset(config_controller_hidmask,0,sizeof(config_controller_hidmask));
+    memset(gNetworkController,0,sizeof(gNetworkController));
 
     gConfig_done = HID_INIT_NOT_DONE;
     gButtonRemappingConfigDone = 0;
@@ -512,24 +511,24 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::disableControllerMapping()
 }
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::disableWiiUEnergySetting(){
-    int res;
+    s32 res;
     if(IMIsDimEnabled(&res) == 0){
         if(res == 1){
-            log_print("Dim was orignally enabled!\n");
+            if(HID_DEBUG) log_print("ControllerPatcher::disableWiiUEnergySetting(): Dim was orignally enabled!\n");
             gOriginalDimState = 1;
         }
     }
 
     if(IMIsAPDEnabled(&res) == 0){
         if(res == 1){
-            log_print("Auto power down was orignally enabled!\n");
+            if(HID_DEBUG) log_print("ControllerPatcher::disableWiiUEnergySetting(): Auto power down was orignally enabled!\n");
             gOriginalAPDState = 1;
         }
     }
 
     IMDisableDim();
     IMDisableAPD();
-    log_print("Disable Energy savers\n");
+    log_print("ControllerPatcher::disableWiiUEnergySetting(): Disable Energy savers\n");
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
@@ -537,11 +536,11 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::restoreWiiUEnergySetting()
 
     //Check if we need to enable Auto Power down again on exiting
     if(gOriginalAPDState == 1){
-        log_print("Auto shutdown was on before using HID to VPAD. Setting it to on again.\n");
+        log_print("ControllerPatcher::restoreWiiUEnergySetting(): Auto shutdown was on before using HID to VPAD. Setting it to on again.\n");
         IMEnableAPD();
     }
     if(gOriginalDimState == 1){
-        log_print("Burn-in reduction was on before using HID to VPAD. Setting it to on again.\n");
+        log_print("ControllerPatcher::restoreWiiUEnergySetting(): Burn-in reduction was on before using HID to VPAD. Setting it to on again.\n");
         IMEnableDim();
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
@@ -551,8 +550,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::resetControllerMapping(UCo
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
 
     if(cm_map_pad == NULL){return CONTROLLER_PATCHER_ERROR_NULL_POINTER;}
-
-    memset(cm_map_pad,0,sizeof(ControllerMappingPAD));
+    memset(cm_map_pad,0,sizeof(*cm_map_pad));
 
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
@@ -560,9 +558,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::resetControllerMapping(UCo
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::addControllerMapping(UController_Type type,ControllerMappingPADInfo config){
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
 
-    int result = 0;
+    s32 result = 0;
 
-    for(int i=0;i<HID_MAX_DEVICES_PER_SLOT;i++){
+    for(s32 i=0;i<HID_MAX_DEVICES_PER_SLOT;i++){
         ControllerMappingPADInfo * info = &(cm_map_pad->pad_infos[i]);
         if(info != NULL && !info->active){
             info->active = 1;
@@ -584,13 +582,13 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::addControllerMapping(UCont
 }
 
 
-int ControllerPatcher::getActiveMappingSlot(UController_Type type){
+s32 ControllerPatcher::getActiveMappingSlot(UController_Type type){
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
 
     if(cm_map_pad == NULL){return -1;}
 
-    int connected = -1;
-    for(int i =0;i<HID_MAX_DEVICES_PER_SLOT;i++){
+    s32 connected = -1;
+    for(s32 i =0;i<HID_MAX_DEVICES_PER_SLOT;i++){
         if(cm_map_pad->pad_infos[i].active || cm_map_pad->pad_infos[i].type == CM_Type_RealController){
             connected = i;
             break;
@@ -600,7 +598,7 @@ int ControllerPatcher::getActiveMappingSlot(UController_Type type){
     return connected;
 }
 
-bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,int mapping_slot){
+bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,s32 mapping_slot){
     ControllerMappingPADInfo * padinfo = getControllerMappingInfo(type,mapping_slot);
     if(!padinfo){
         return false;
@@ -608,18 +606,18 @@ bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,int
     if(padinfo->active){
         DeviceInfo device_info;
 
-        memset(&device_info,0,sizeof(DeviceInfo));
+        memset(&device_info,0,sizeof(device_info));
 
         device_info.vidpid.vid = padinfo->vidpid.vid;
         device_info.vidpid.pid = padinfo->vidpid.pid;
 
-        int res;
+        s32 res;
         if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
             return false;
         }
 
-        int hidmask = device_info.slotdata.hidmask;
-        int pad = padinfo->pad;
+        s32 hidmask = device_info.slotdata.hidmask;
+        s32 pad = padinfo->pad;
 
         HID_Data * data_cur;
 
@@ -632,7 +630,7 @@ bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,int
     return false;
 }
 
-ControllerMappingPADInfo * ControllerPatcher::getControllerMappingInfo(UController_Type type,int mapping_slot){
+ControllerMappingPADInfo * ControllerPatcher::getControllerMappingInfo(UController_Type type,s32 mapping_slot){
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
 
     if(cm_map_pad == NULL){return NULL;}
@@ -651,7 +649,7 @@ HID_Mouse_Data * ControllerPatcher::getMouseData(){
 
     HID_Mouse_Data * result = NULL;
 
-    for(int i;i<HID_MAX_DEVICES_PER_SLOT;i++){
+    for(s32 i;i<HID_MAX_DEVICES_PER_SLOT;i++){
         ControllerMappingPADInfo * padinfo = &(CMPAD->pad_infos[i]);
         if(!padinfo->active){
             break;
@@ -670,18 +668,18 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumble(UController_Type
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(InputData * output,int array_size){
-    int hid = gHIDCurrentDevice;
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(InputData * output,s32 array_size){
+    s32 hid = gHIDCurrentDevice;
     HID_Data * data_cur;
     VPADData pad_buffer;
     VPADData * buffer = &pad_buffer;
-    int result = CONTROLLER_PATCHER_ERROR_NONE;
-    for(int i = 0;i< gHIDMaxDevices;i++){
+    s32 result = CONTROLLER_PATCHER_ERROR_NONE;
+    for(s32 i = 0;i< gHIDMaxDevices;i++){
         if((hid & (1 << i)) != 0){
-            memset(buffer,0,sizeof(VPADData));
+            memset(buffer,0,sizeof(*buffer));
 
-            int newhid = (1 << i);
-            int deviceslot = ControllerPatcherUtils::getDeviceSlot(newhid);
+            s32 newhid = (1 << i);
+            s32 deviceslot = ControllerPatcherUtils::getDeviceSlot(newhid);
             if(deviceslot < 0) continue;
             DeviceInfo * deviceinfo = &(output[result].device_info);
             InputButtonData * buttondata = output[result].button_data;
@@ -698,14 +696,14 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
                 deviceinfo->pad_count = HID_MAX_PADS_COUNT;
             }
 
-            int buttons_hold = 0;
+            s32 buttons_hold = 0;
 
-            for(int pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
+            for(s32 pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
                 buttons_hold = 0;
                 buttondata[pad].btn_h = 0;
                 buttondata[pad].btn_d = 0;
                 buttondata[pad].btn_r = 0;
-                int res;
+                s32 res;
 
                 if((res = ControllerPatcherHID::getHIDData(deviceinfo->slotdata.hidmask,pad,&data_cur)) < 0){
                         continue;
@@ -750,34 +748,34 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
     return result;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHID(void * data,int chan, int mode){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHID(void * data,s32 chan, s32 mode){
     if(chan < 0 || chan > 3) return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;
     //if(gControllerMapping.proController[chan].enabled == 0) return CONTROLLER_PATCHER_ERROR_MAPPING_DISABLED;
 
     VPADData * vpad_buffer = &myVPADBuffer[chan];
-    memset(vpad_buffer,0,sizeof(VPADData));
+    memset(vpad_buffer,0,sizeof(*vpad_buffer));
 
     std::vector<HID_Data *> data_list;
 
-    for(int i = 0;i<HID_MAX_DEVICES_PER_SLOT;i++){
+    for(s32 i = 0;i<HID_MAX_DEVICES_PER_SLOT;i++){
         ControllerMappingPADInfo cm_map_pad_info = gControllerMapping.proController[chan].pad_infos[i];
         if(!cm_map_pad_info.active){
             continue;
         }
         DeviceInfo device_info;
-        memset(&device_info,0,sizeof(DeviceInfo));
+        memset(&device_info,0,sizeof(device_info));
 
         device_info.vidpid.vid = cm_map_pad_info.vidpid.vid;
         device_info.vidpid.pid = cm_map_pad_info.vidpid.pid;
 
-        int res;
+        s32 res;
         if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
             log_printf("ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) = %d\n",res);
             continue;
         }
 
-        int hidmask = device_info.slotdata.hidmask;
-        int pad = cm_map_pad_info.pad;
+        s32 hidmask = device_info.slotdata.hidmask;
+        s32 pad = cm_map_pad_info.pad;
 
         HID_Data * data_cur;
 
@@ -791,7 +789,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
     if(data_list.empty()){
         return CONTROLLER_PATCHER_ERROR_FAILED_TO_GET_HIDDATA;
     }
-    int res = 0;
+    s32 res = 0;
     if((res = ControllerPatcherHID::setVPADControllerData(vpad_buffer,data_list)) < 0) return res;
     //make it configurable?
     //ControllerPatcher::printVPADButtons(vpad_buffer); //Leads to random crashes on transitions.
@@ -815,8 +813,8 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(VPADData * buffer){
     //if(gControllerMapping.gamepad.enabled == 0) return CONTROLLER_PATCHER_ERROR_MAPPING_DISABLED;
 
-    int hidmask = 0;
-    int pad = 0;
+    s32 hidmask = 0;
+    s32 pad = 0;
 
     ControllerMappingPAD cm_map_pad = gControllerMapping.gamepad;
     std::vector<HID_Data *> data_list;
@@ -824,7 +822,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(V
     if (cm_map_pad.useAll == 1) {
         data_list = ControllerPatcherHID::getHIDDataAll();
     }else{
-        for(int i = 0;i<HID_MAX_DEVICES_PER_SLOT;i++){
+        for(s32 i = 0;i<HID_MAX_DEVICES_PER_SLOT;i++){
             ControllerMappingPADInfo cm_map_pad_info = cm_map_pad.pad_infos[i];
             if(cm_map_pad_info.active == 1){
                 DeviceInfo device_info;
@@ -841,7 +839,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(V
                 HID_Data * data;
 
                 pad = cm_map_pad_info.pad;
-                int res = ControllerPatcherHID::getHIDData(hidmask,pad,&data);
+                s32 res = ControllerPatcherHID::getHIDData(hidmask,pad,&data);
                 if(res < 0){
                     continue;
                     //return CONTROLLER_PATCHER_ERROR_FAILED_TO_GET_HIDDATA;
@@ -904,10 +902,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::printVPADButtons(VPADData 
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::buttonRemapping(VPADData * buffer,int buffer_count){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::buttonRemapping(VPADData * buffer,s32 buffer_count){
     if(!gButtonRemappingConfigDone) return CONTROLLER_PATCHER_ERROR_CONFIG_NOT_DONE;
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
-    for(int i = 0;i < buffer_count;i++){
+    for(s32 i = 0;i < buffer_count;i++){
         VPADData new_data;
         memset(&new_data,0,sizeof(new_data));
 

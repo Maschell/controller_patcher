@@ -25,8 +25,8 @@
 ControllerPatcherThread * UDPServer::pThread = NULL;
 UDPServer * UDPServer::instance = NULL;
 
-UDPServer::UDPServer(int port){
-    int ret;
+UDPServer::UDPServer(s32 port){
+    s32 ret;
 	struct sockaddr_in addr;
 
     addr.sin_family = AF_INET;
@@ -35,7 +35,7 @@ UDPServer::UDPServer(int port){
 
     this->sockfd = ret = socket(AF_INET, SOCK_DGRAM, 0);
     if(ret == -1) return;
-    int enable = 1;
+    s32 enable = 1;
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
     ret = bind(sockfd, (sockaddr *)&addr, 16);
     if(ret < 0) return;
@@ -47,7 +47,6 @@ UDPServer::~UDPServer(){
     ControllerPatcherThread * pThreadPointer = UDPServer::pThread;
     if(pThreadPointer != NULL){
         exitThread = 1;
-        log_printf("%08X\n",pThreadPointer);
         if(pThreadPointer != NULL){
             delete pThreadPointer;
             UDPServer::pThread = NULL;
@@ -57,7 +56,7 @@ UDPServer::~UDPServer(){
             this->sockfd = -1;
         }
     }
-    if(HID_DEBUG) log_printf("UDPServer Thread has been closed\n");
+    if(HID_DEBUG) log_printf("UDPServer::~UDPServer(line %d): Thread has been closed\n",__LINE__);
 
 
 }
@@ -67,9 +66,9 @@ void UDPServer::StartUDPThread(UDPServer * server){
     UDPServer::pThread->resumeThread();
 }
 
-bool UDPServer::cpyIncrementBufferOffset(void * target, void * source, int * offset, int typesize, int maximum){
+bool UDPServer::cpyIncrementBufferOffset(void * target, void * source, s32 * offset, s32 typesize, s32 maximum){
     if(((int)*offset + typesize) > maximum){
-        log_printf("UDPServer::cpyIncrementBufferOffset: Transfer error. Excepted %04X bytes, but only got %04X\n",(*offset + typesize),maximum);
+        log_printf("UDPServer::cpyIncrementBufferOffset(line %d): Transfer error. Excepted %04X bytes, but only got %04X\n",__LINE__,(*offset + typesize),maximum);
         return false;
     }
     memcpy(target,(void*)((u32)source+(*offset)),typesize);
@@ -84,23 +83,23 @@ void UDPServer::DoUDPThread(ControllerPatcherThread *thread, void *arg){
 
 void UDPServer::DoUDPThreadInternal(){
     u8 buffer[MAX_UDP_SIZE];
-    int n;
+    s32 n;
 
     my_cb_user  user;
     while(1){
-        //int usingVar = exitThread;
+        //s32 usingVar = exitThread;
         if(exitThread)break;
         memset(buffer,0,MAX_UDP_SIZE);
         n = recv(sockfd,buffer,MAX_UDP_SIZE,0);
         if (n < 0){
-            int errno_ = errno;
+            s32 errno_ = errno;
             usleep(2000);
             if(errno_ != 11 && errno_ != 9){
                 break;
             }
           continue;
         }
-        int bufferoffset = 0;
+        s32 bufferoffset = 0;
         u8 type;
         memcpy((void *)&type,buffer,sizeof(type));
         bufferoffset += sizeof(type);
@@ -109,9 +108,9 @@ void UDPServer::DoUDPThreadInternal(){
                 u8 count_commands;
                 memcpy((void *)&count_commands,buffer+bufferoffset,sizeof(count_commands));
                 bufferoffset += sizeof(count_commands);
-                for(int i = 0;i<count_commands;i++){
+                for(s32 i = 0;i<count_commands;i++){
 
-                    int handle;
+                    s32 handle;
                     u16 deviceSlot;
                     u16 hid;
                     u8 padslot;
@@ -124,7 +123,7 @@ void UDPServer::DoUDPThreadInternal(){
                     if(!cpyIncrementBufferOffset((void *)&datasize,     (void *)buffer,&bufferoffset,sizeof(datasize),  n))continue;
                     u8 * databuffer = (u8*) malloc(datasize * sizeof(u8));
                     if(!databuffer){
-                        log_printf("UDPServer::DoUDPThreadInternal(): Allocating memory failed\n");
+                        log_printf("UDPServer::DoUDPThreadInternal(line %d): Allocating memory failed\n",__LINE__);
                         continue;
                     }
 
@@ -138,7 +137,7 @@ void UDPServer::DoUDPThreadInternal(){
                     user.slotdata.hidmask = hid;
 
                     if(gNetworkController[deviceSlot][padslot][0] == 0){
-                        log_printf("Ehm. Pad is not connected. STOP SENDING DATA ;) \n");
+                        log_printf("UDPServer::DoUDPThreadInternal(line %d): Ehm. Pad is not connected. STOP SENDING DATA ;) \n",__LINE__);
                     }else{
                         ControllerPatcherHID::externHIDReadCallback(handle,databuffer,datasize,&user);
                     }
@@ -154,5 +153,5 @@ void UDPServer::DoUDPThreadInternal(){
             }
         }
     }
-    if(HID_DEBUG) log_printf("UDPServer Thread ended\n");
+    if(HID_DEBUG) log_printf("UDPServer::DoUDPThreadInternal(line %d): UDPServer Thread ended\n",__LINE__);
 }

@@ -28,14 +28,13 @@
  * public implementation for the network controller
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-int ControllerPatcherHID::externAttachDetachCallback(HIDDevice *p_device, unsigned int attach){
-    log_printf("ControllerPatcherHID::externAttachDetachCallback called\n");
+s32 ControllerPatcherHID::externAttachDetachCallback(HIDDevice *p_device, u32 attach){
     HIDClient client;
     memset(&client,0,sizeof(client));
     return AttachDetachCallback(&client,p_device,attach);
 }
 
-void ControllerPatcherHID::externHIDReadCallback(unsigned int handle, unsigned char *buf, unsigned int bytes_transfered, my_cb_user * usr){
+void ControllerPatcherHID::externHIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr){
     HIDReadCallback(handle,buf,bytes_transfered,usr);
 }
 
@@ -43,11 +42,11 @@ void ControllerPatcherHID::externHIDReadCallback(unsigned int handle, unsigned c
  * private implementation for the HID Api.
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-int ControllerPatcherHID::myAttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, unsigned int attach){
+s32 ControllerPatcherHID::myAttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, u32 attach){
     return AttachDetachCallback(p_client,p_device,attach);
 }
 
-void ControllerPatcherHID::myHIDMouseReadCallback(unsigned int handle, int error, unsigned char *buf, unsigned int bytes_transfered, void *p_user){
+void ControllerPatcherHID::myHIDMouseReadCallback(u32 handle, s32 error, unsigned char *buf, u32 bytes_transfered, void *p_user){
 	if(error == 0){
         my_cb_user *usr = (my_cb_user*)p_user;
 
@@ -95,7 +94,7 @@ void ControllerPatcherHID::myHIDMouseReadCallback(unsigned int handle, int error
 	}
 }
 
-void ControllerPatcherHID::myHIDReadCallback(unsigned int handle, int error, unsigned char *buf, unsigned int bytes_transfered, void *p_user){
+void ControllerPatcherHID::myHIDReadCallback(u32 handle, s32 error, unsigned char *buf, u32 bytes_transfered, void *p_user){
     if(error == 0 && p_user != NULL && gHIDAttached)
 	{
 	    my_cb_user *usr = (my_cb_user*)p_user;
@@ -114,9 +113,9 @@ void ControllerPatcherHID::myHIDReadCallback(unsigned int handle, int error, uns
  * Intern Callback actions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, unsigned int attach){
+s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, u32 attach){
     if(attach){
-        log_printf("vid %04x pid %04x connected\n", SWAP16(p_device->vid),SWAP16(p_device->pid));
+        log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): vid %04x pid %04x connected\n",__LINE__, SWAP16(p_device->vid),SWAP16(p_device->pid));
         if(HID_DEBUG) log_printf("interface index  %02x\n", p_device->interface_index);
         if(HID_DEBUG) log_printf("sub class        %02x\n", p_device->sub_class);
         if(HID_DEBUG) log_printf("protocol         %02x\n", p_device->protocol);
@@ -124,7 +123,7 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
         if(HID_DEBUG) log_printf("max packet out   %02x\n", p_device->max_packet_size_tx);
     }
     if(!attach){
-        log_printf("vid %04x pid %04x disconnected\n", SWAP16(p_device->vid),SWAP16(p_device->pid));
+        log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): vid %04x pid %04x disconnected\n",__LINE__, SWAP16(p_device->vid),SWAP16(p_device->pid));
     }
     DeviceInfo device_info;
     memset(&device_info,0,sizeof(DeviceInfo));
@@ -143,18 +142,18 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
         slotdata->deviceslot = gMouseSlot;
         //log_printf("Found Mouse: device: %s slot: %d\n",byte_to_binary(device_info.hid),device_info.slot);
     }else{
-        int ret;
+        s32 ret;
         if((ret = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
-            log_printf("ControllerPatcherHID::AttachDetachCallback: ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) failed %d \n",ret);
+            log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) failed %d \n",__LINE__,ret);
             return HID_DEVICE_DETACH;
         }else{
-            if(HID_DEBUG) log_printf("ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) success %d \n",ret);
+            log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) success %d \n",__LINE__,ret);
         }
     }
 
     if(slotdata->hidmask){
         if(attach){
-            int bufSize = 64;
+            s32 bufSize = 64;
             if(slotdata->hidmask != gHID_LIST_MOUSE && config_controller[slotdata->deviceslot][CONTRPS_BUF_SIZE][0] == CONTROLLER_PATCHER_VALUE_SET){
                 bufSize = config_controller[slotdata->deviceslot][CONTRPS_BUF_SIZE][1];
             }
@@ -167,7 +166,7 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             usr->handle = p_device->handle;
             gHIDAttached |= slotdata->hidmask;
             gHIDCurrentDevice |= slotdata->hidmask;
-            int pads_per_device = 1;
+            s32 pads_per_device = 1;
             if(config_controller[slotdata->deviceslot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE){
                 pads_per_device = config_controller[slotdata->deviceslot][CONTRPS_PAD_COUNT][1];
                 if(pads_per_device > HID_MAX_PADS_COUNT){//maximum of HID_MAX_PADS_COUNT
@@ -175,14 +174,14 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 }
             }
 
-            int pad_count = config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1];
+            s32 pad_count = config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1];
             if(pad_count > 0x0F) pad_count = 0;
 
-            int pad_slot = 0;
+            s32 pad_slot = 0;
 
-            int failed = 1;
+            s32 failed = 1;
 
-            for(int i = 0;i<HID_MAX_PADS_COUNT;i += pads_per_device){
+            for(s32 i = 0;i<HID_MAX_PADS_COUNT;i += pads_per_device){
                 if(!(pad_count & (1 << i))){
                     failed = 0;
                     pad_count |= (1 << i);
@@ -192,7 +191,7 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             }
 
             if(failed){
-                log_printf("ControllerPatcherHID::AttachDetachCallback error: I can only handle %d devices of the same type. Sorry \n",HID_MAX_PADS_COUNT);
+                log_printf("ControllerPatcherHID::AttachDetachCallback(line %d) error: I can only handle %d devices of the same type. Sorry \n",__LINE__,HID_MAX_PADS_COUNT);
                 if(buf){
                     free(buf);
                     buf = NULL;
@@ -212,11 +211,11 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             usr->pads_per_device = pads_per_device;
             usr->pad_slot = pad_slot;
 
-            for(int i = 0;i<pads_per_device;i++){
+            for(s32 i = 0;i<pads_per_device;i++){
                 memset(&gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i],0,sizeof(HID_Data));
 
                 gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i].handle = p_device->handle;
-                //log_printf("saved handle %d to slot %d and pad %d\n",p_device->handle,slotdata->deviceslot,pad_slot);
+                //log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): saved handle %d to slot %d and pad %d\n",__LINE__,p_device->handle,slotdata->deviceslot,pad_slot);
 
                 gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i].user_data = usr;
                 gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i].slotdata = device_info.slotdata;
@@ -225,7 +224,7 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 DCInvalidateRange(&gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i],sizeof(HID_Data));
             }
 
-            if(HID_DEBUG) log_print("AttachDetachCallback: Device successfully attached\n");
+            if(HID_DEBUG) log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): Device successfully attached\n",__LINE__);
 
             if(slotdata->hidmask == gHID_LIST_GC){ // GC PAD
                 //The GC Adapter has all ports in one device. Set them all.
@@ -260,8 +259,8 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
 
         }else{
             my_cb_user * user_data = NULL;
-            int founddata = 0;
-            for(int i = 0;i<HID_MAX_PADS_COUNT;i++){
+            s32 founddata = 0;
+            for(s32 i = 0;i<HID_MAX_PADS_COUNT;i++){
                 if(gHID_Devices[slotdata->deviceslot].pad_data[i].handle == p_device->handle){
                     gHID_Devices[slotdata->deviceslot].pad_data[i].handle = 0;
 
@@ -286,7 +285,7 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 free(user_data);
                 user_data = NULL;
             }else{
-                if(founddata) log_print("ControllerPatcherHID::AttachDetachCallback: user_data null. You may have a memory leak.\n");
+                if(founddata) log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): user_data null. You may have a memory leak.\n",__LINE__);
                 return HID_DEVICE_DETACH;
             }
             if(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1] == 0){
@@ -302,23 +301,23 @@ int ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                     gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
                 }
             }else{
-                if(HID_DEBUG)log_printf("ControllerPatcherHID::AttachDetachCallback: We still have pad for deviceslot %d connected.\n",slotdata->deviceslot);
+                if(HID_DEBUG)log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): We still have pad for deviceslot %d connected.\n",__LINE__,slotdata->deviceslot);
             }
-            if(HID_DEBUG)log_print("AttachDetachCallback: Device successfully detached\n");
+            if(HID_DEBUG)log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): Device successfully detached\n",__LINE__);
         }
     }else{
-        log_print("ControllerPatcherHID::AttachDetachCallback: HID-Device currently not supported! You can add support through config files\n");
+        log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): HID-Device currently not supported! You can add support through config files\n",__LINE__);
 	}
 	return HID_DEVICE_DETACH;
 }
 
-void ControllerPatcherHID::HIDReadCallback(unsigned int handle, unsigned char *buf, unsigned int bytes_transfered, my_cb_user * usr){
+void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr){
         //log_printf("my_read_cbInternal: %d %08X %d\n",bytes_transfered,usr->slotdata.hidmask,usr->slotdata.deviceslot);
         if(usr->slotdata.hidmask == gHID_LIST_GC){
 
             HID_Data * data_ptr = NULL;
             //Copy the data for all 4 pads
-            for(int i = 0;i<4;i++){
+            for(s32 i = 0;i<4;i++){
                 data_ptr = &(gHID_Devices[gHID_SLOT_GC].pad_data[i]);
                 memcpy(&(data_ptr->data_union.controller.last_hid_data[0]),&(data_ptr->data_union.controller.cur_hid_data[0]),10); //save last data.
                 memcpy(&(data_ptr->data_union.controller.cur_hid_data[0]),&buf[(i*9)+1],9);                  //save new data.
@@ -326,7 +325,7 @@ void ControllerPatcherHID::HIDReadCallback(unsigned int handle, unsigned char *b
             }
 
             /*
-            int i = 0;
+            s32 i = 0;
             log_printf("GC1 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
             log_printf("GC2 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
             log_printf("GC3 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
@@ -334,8 +333,8 @@ void ControllerPatcherHID::HIDReadCallback(unsigned int handle, unsigned char *b
             HIDGCRumble(handle,usr);
 		}else if(usr->slotdata.hidmask != 0){
 
-            int dsize = (HID_MAX_DATA_LENGTH_PER_PAD > bytes_transfered)? bytes_transfered : HID_MAX_DATA_LENGTH_PER_PAD;
-            int skip = 0;
+            s32 dsize = (HID_MAX_DATA_LENGTH_PER_PAD > bytes_transfered)? bytes_transfered : HID_MAX_DATA_LENGTH_PER_PAD;
+            s32 skip = 0;
 
             //Input filter
             if(        config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][0] != CONTROLLER_PATCHER_INVALIDVALUE){
@@ -373,7 +372,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     HID_Data * data_cur;
 
-    int buttons_hold;
+    s32 buttons_hold;
     for(u32 i = 0;i<data.size();i++){
         data_cur = data[i];
 
@@ -411,7 +410,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
         ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_STICK_R);
 
         u32 last_emulate_stick =  (data_cur->last_buttons) & VPAD_MASK_EMULATED_STICKS; // We should only need the emulated stick data.
-        int last_realbuttons = (data_cur->last_buttons) & VPAD_MASK_BUTTONS;
+        s32 last_realbuttons = (data_cur->last_buttons) & VPAD_MASK_BUTTONS;
 
         buffer->btns_h |= buttons_hold;
         buffer->btns_d |= (buttons_hold & (~last_realbuttons));
@@ -439,17 +438,17 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
 }
 
 std::vector<HID_Data *> ControllerPatcherHID::getHIDDataAll(){
-    int hid = gHIDCurrentDevice;
+    s32 hid = gHIDCurrentDevice;
 
     std::vector<HID_Data *> data_list;
-    for(int i = 0;i < gHIDMaxDevices;i++){
+    for(s32 i = 0;i < gHIDMaxDevices;i++){
         if((hid & (1 << i)) != 0){
-            int cur_hidmask = config_controller_hidmask[i];
-            for(int pad = 0; pad < HID_MAX_PADS_COUNT; pad++){
-                int res;
+            s32 cur_hidmask = config_controller_hidmask[i];
+            for(s32 pad = 0; pad < HID_MAX_PADS_COUNT; pad++){
+                s32 res;
                 HID_Data * new_data = NULL;
                 if((res = ControllerPatcherHID::getHIDData(cur_hidmask,pad,&new_data)) < 0){ // Checks if the pad is invalid.
-                    log_printf("ControllerPatcherHID::getHIDDataAll() error: Error getting the HID data from HID(%s) CHAN(). Error %d\n",CPStringTools::byte_to_binary(cur_hidmask),pad,res);
+                    log_printf("ControllerPatcherHID::getHIDDataAll(line %d): error: Error getting the HID data from HID(%s) CHAN(). Error %d\n",__LINE__,CPStringTools::byte_to_binary(cur_hidmask),pad,res);
                     continue;
                 }
                 if(new_data != NULL) data_list.push_back(new_data);
@@ -462,24 +461,24 @@ std::vector<HID_Data *> ControllerPatcherHID::getHIDDataAll(){
 /*
 The slotdata in the HID_Data pointer is empty. We need to provide the hidmask via the parameter
 */
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(int hidmask, int pad, HID_Data ** data){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(s32 hidmask, s32 pad, HID_Data ** data){
     if(data == NULL) return CONTROLLER_PATCHER_ERROR_INVALID_BUFFER;
     if(!(hidmask & gHIDCurrentDevice)) return CONTROLLER_PATCHER_ERROR_HID_NOT_CONNECTED;
     if(pad < 0 && pad > 3) return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;
 
-    int device_slot = ControllerPatcherUtils::getDeviceSlot(hidmask);
+    s32 device_slot = ControllerPatcherUtils::getDeviceSlot(hidmask);
     if(device_slot < 0){
         return CONTROLLER_PATCHER_ERROR_DEVICE_SLOT_NOT_FOUND;
     }
 
-    int real_pad = pad;
+    s32 real_pad = pad;
     if((device_slot !=  gHID_SLOT_GC) && config_controller[device_slot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE){
-        int pad_count = config_controller[device_slot][CONTRPS_PAD_COUNT][1];
+        s32 pad_count = config_controller[device_slot][CONTRPS_PAD_COUNT][1];
         if(pad_count > HID_MAX_PADS_COUNT) pad_count = HID_MAX_PADS_COUNT;
         pad = (pad/(pad_count))*pad_count;
     }
 
-    int result = ControllerPatcherUtils::checkActivePad(hidmask,pad);
+    s32 result = ControllerPatcherUtils::checkActivePad(hidmask,pad);
 
     if(result < 0){ //Not pad connected to adapter
         return CONTROLLER_PATCHER_ERROR_NO_PAD_CONNECTED;
@@ -491,10 +490,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(int hidmask,
 }
 
 
-void ControllerPatcherHID::HIDGCRumble(unsigned int handle,my_cb_user *usr){
-    int rumblechanged = 0;
+void ControllerPatcherHID::HIDGCRumble(u32 handle,my_cb_user *usr){
+    s32 rumblechanged = 0;
 
-    for(int i = 0;i<HID_MAX_PADS_COUNT;i++){
+    for(s32 i = 0;i<HID_MAX_PADS_COUNT;i++){
         HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[i]);
         if(data_ptr->rumbleActive != usr->rumblestatus[i]){
             usr->rumblestatus[i] = data_ptr->rumbleActive;
@@ -508,8 +507,8 @@ void ControllerPatcherHID::HIDGCRumble(unsigned int handle,my_cb_user *usr){
     }
 }
 
-void ControllerPatcherHID::HIDRumble(unsigned int handle,my_cb_user *usr,u32 pad){
-    int rumblechanged = 0;
+void ControllerPatcherHID::HIDRumble(u32 handle,my_cb_user *usr,u32 pad){
+    s32 rumblechanged = 0;
     HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[pad]);
     if(data_ptr->rumbleActive != usr->rumblestatus[pad]){
         usr->rumblestatus[pad] = data_ptr->rumbleActive;
@@ -538,7 +537,7 @@ static u8 ds3_rumble_Report[48] =
     0x00, 0x00, 0x00,
 };
 
-void ControllerPatcherHID::HIDDS3Rumble(unsigned int handle,my_cb_user *usr,int rumble){
+void ControllerPatcherHID::HIDDS3Rumble(u32 handle,my_cb_user *usr,s32 rumble){
     memcpy(usr->buf, ds3_rumble_Report, 48);
 
     if (rumble) {

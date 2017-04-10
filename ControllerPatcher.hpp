@@ -39,6 +39,7 @@
 #include "network/TCPServer.hpp"
 #include "network/UDPServer.hpp"
 
+#include "dynamic_libs/sys_functions.h"
 #include "dynamic_libs/syshid_functions.h"
 #include "dynamic_libs/socket_functions.h"
 #include "dynamic_libs/padscore_functions.h"
@@ -100,7 +101,7 @@ class ControllerPatcher{
             @return When the functions failed result < 0 is returned. If the result is == 0 the function was successful.
         **/
 
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setProControllerDataFromHID(void * data,int chan,int mode = PRO_CONTROLLER_MODE_KPADDATA);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setProControllerDataFromHID(void * data,s32 chan,s32 mode = PRO_CONTROLLER_MODE_KPADDATA);
 
 
         /**
@@ -167,14 +168,14 @@ class ControllerPatcher{
 
             @return The first active mapping slot for the given controller type will be returned. If the controller type is not set active, -1 will be returned.
         **/
-        static int getActiveMappingSlot(UController_Type type);
+        static s32 getActiveMappingSlot(UController_Type type);
 
         /**
             @param type: The type of the controller.
             @param mapping_slot: information about the added controller.
             @return When the functions failed result < 0 is returned. Otherwise a pointer to a ControllerMappingPADInfo is returned.
         **/
-        static ControllerMappingPADInfo * getControllerMappingInfo(UController_Type type,int mapping_slot);
+        static ControllerMappingPADInfo * getControllerMappingInfo(UController_Type type,s32 mapping_slot);
 
         /**
             Checks if a emulated controller is connected for the given controller type / mapping slot.
@@ -184,7 +185,7 @@ class ControllerPatcher{
 
             @return
         **/
-        static bool isControllerConnectedAndActive(UController_Type type,int mapping_slot = 0);
+        static bool isControllerConnectedAndActive(UController_Type type,s32 mapping_slot = 0);
 
         /**
             Search for a connected mouse and returns a pointer to it's data.
@@ -210,7 +211,7 @@ class ControllerPatcher{
 
             @return When the functions failed result < 0 is returned. If the result is == 0 the function was successful. If the result is > 0 the number of stored sets in the array is returned.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevices(InputData * output,int array_size);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevices(InputData * output,s32 array_size);
 
         /**
             Remaps the buttons in the given \p VPADData pointer. InitButtonMapping() needs to be called before calling this. The information about the remapping is stored in the config_controller array.
@@ -220,7 +221,7 @@ class ControllerPatcher{
 
             @return When the functions failed result < 0 is returned. If the result is == 0 the function was successful.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR buttonRemapping(VPADData * buffer, int buffer_count);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR buttonRemapping(VPADData * buffer, s32 buffer_count);
 
         /**
             Prints the current pressed down buttons of the given \p VPADData pointer. Uses the utils/logger.c UDP logger..

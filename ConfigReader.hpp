@@ -51,7 +51,7 @@ class ConfigReader{
             }
         }
 
-        static int getNumberOfLoadedFiles(){
+        static s32 getNumberOfLoadedFiles(){
             return ConfigReader::numberValidFiles;
         }
 
@@ -59,14 +59,14 @@ class ConfigReader{
             ConfigReader::numberValidFiles++;
         }
         void ReadAllConfigs();
-        static int numberValidFiles;
+        static s32 numberValidFiles;
 
         //!Constructor
         ConfigReader();
         //!Destructor
         ~ConfigReader();
 
-        int InitSDCard();
+        s32 InitSDCard();
         void freeFSHandles();
 
         void * pClient = NULL;
