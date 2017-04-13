@@ -18,6 +18,7 @@
 #define CP_RETAINS_VARS_H_
 
 #include "dynamic_libs/syshid_functions.h"
+#include "dynamic_libs/padscore_functions.h"
 #include "../patcher/ControllerPatcherDefs.h"
 
 extern ControllerMapping gControllerMapping;
@@ -57,5 +58,10 @@ extern u16 gNetworkController[gHIDMaxDevices][HID_MAX_PADS_COUNT][4];
 extern s32 gHIDNetworkClientID;
 
 extern u8 gUsedProtocolVersion;
+
+extern wpad_connect_callback_t gConnectCallback[4];
+extern wpad_extension_callback_t gExtensionCallback[4];
+extern u8 gCallbackCooldown;
+
 
 #endif // CP_RETAINS_VARS_H_

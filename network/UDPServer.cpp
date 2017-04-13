@@ -62,7 +62,16 @@ UDPServer::~UDPServer(){
 }
 
 void UDPServer::StartUDPThread(UDPServer * server){
-    UDPServer::pThread = ControllerPatcherThread::create(UDPServer::DoUDPThread, (void*)server, ControllerPatcherThread::eAttributeAffCore2,17);
+    s32 priority = 28;
+    if(OSGetTitleID() == 0x00050000101c9300 || //The Legend of Zelda Breath of the Wild JPN
+       OSGetTitleID() == 0x00050000101c9400 || //The Legend of Zelda Breath of the Wild USA
+       OSGetTitleID() == 0x00050000101c9500 || //The Legend of Zelda Breath of the Wild EUR
+       OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
+       OSGetTitleID() == 0x00050000101a3c00){  //The Binding of Isaac: Rebirth USA
+        priority = 10;
+        log_printf("UDPServer::StartUDPThread(line %d): This game needs higher thread priority. We set it to %d\n",__LINE__,priority);
+    }
+    UDPServer::pThread = ControllerPatcherThread::create(UDPServer::DoUDPThread, (void*)server, ControllerPatcherThread::eAttributeAffCore2,priority);
     UDPServer::pThread->resumeThread();
 }
 
@@ -127,9 +136,8 @@ void UDPServer::DoUDPThreadInternal(){
                             continue;
                         }
 
-                        //log_printf("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
                         if(!cpyIncrementBufferOffset((void *)databuffer,    (void *)buffer,&bufferoffset,datasize,          n))continue;
-
+                        //log_printf("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
 
                         user.pad_slot = padslot;
                         user.slotdata.deviceslot =  deviceSlot;

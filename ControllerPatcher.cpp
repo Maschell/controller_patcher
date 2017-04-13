@@ -78,6 +78,10 @@ void ControllerPatcher::ResetConfig(){
     memset(gNetworkController,0,sizeof(gNetworkController)); // Init / Invalid everything
     memset(gHID_Devices,0,sizeof(gHID_Devices)); // Init / Invalid everything
 
+    memset(gConnectCallback,0,sizeof(gConnectCallback));
+    memset(gExtensionCallback,0,sizeof(gExtensionCallback));
+    gCallbackCooldown = 0;
+
     gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
     gHID_LIST_GC = 0;
     gHID_LIST_DS3 = 0;
@@ -473,6 +477,10 @@ void ControllerPatcher::DeInit(){
     memset(config_controller,0,sizeof(config_controller));
     memset(config_controller_hidmask,0,sizeof(config_controller_hidmask));
     memset(gNetworkController,0,sizeof(gNetworkController));
+
+    memset(gConnectCallback,0,sizeof(gConnectCallback));
+    memset(gExtensionCallback,0,sizeof(gExtensionCallback));
+    gCallbackCooldown = 0;
 
     gConfig_done = HID_INIT_NOT_DONE;
     gButtonRemappingConfigDone = 0;

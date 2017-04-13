@@ -56,3 +56,7 @@ u8 gOriginalAPDState __attribute__((section(".data"))) = 0;
 u16 gNetworkController[gHIDMaxDevices][HID_MAX_PADS_COUNT][4] __attribute__((section(".data")));
 s32 gHIDNetworkClientID __attribute__((section(".data"))) = 0;
 u8 gUsedProtocolVersion  __attribute__((section(".data"))) = WIIU_CP_TCP_HANDSHAKE;
+
+wpad_connect_callback_t gConnectCallback[4] __attribute__((section(".data")));
+wpad_extension_callback_t gExtensionCallback[4] __attribute__((section(".data")));
+u8 gCallbackCooldown  __attribute__((section(".data"))) = 0;

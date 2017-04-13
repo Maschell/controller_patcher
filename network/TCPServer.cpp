@@ -61,7 +61,16 @@ void TCPServer::CloseSockets(){
 }
 
 void TCPServer::StartTCPThread(TCPServer * server){
-    TCPServer::pThread = ControllerPatcherThread::create(TCPServer::DoTCPThread, (void*)server, ControllerPatcherThread::eAttributeAffCore2,28);
+    s32 priority = 28;
+    if(OSGetTitleID() == 0x00050000101c9300 || //The Legend of Zelda Breath of the Wild JPN
+       OSGetTitleID() == 0x00050000101c9400 || //The Legend of Zelda Breath of the Wild USA
+       OSGetTitleID() == 0x00050000101c9500 || //The Legend of Zelda Breath of the Wild EUR
+       OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
+       OSGetTitleID() == 0x00050000101a3c00){  //The Binding of Isaac: Rebirth USA
+        priority = 10;
+        log_printf("TCPServer::StartTCPThread(line %d): This game needs higher thread priority. We set it to %d\n",__LINE__,priority);
+    }
+    TCPServer::pThread = ControllerPatcherThread::create(TCPServer::DoTCPThread, (void*)server, ControllerPatcherThread::eAttributeAffCore2,priority);
     TCPServer::pThread->resumeThread();
 }
 
