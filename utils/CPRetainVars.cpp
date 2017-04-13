@@ -59,4 +59,7 @@ u8 gUsedProtocolVersion  __attribute__((section(".data"))) = WIIU_CP_TCP_HANDSHA
 
 wpad_connect_callback_t gConnectCallback[4] __attribute__((section(".data")));
 wpad_extension_callback_t gExtensionCallback[4] __attribute__((section(".data")));
-u8 gCallbackCooldown  __attribute__((section(".data"))) = 0;
+u8 gCallbackCooldown __attribute__((section(".data"))) = 0;
+
+u32 gUDPClientip __attribute__((section(".data"))) = 0;
+

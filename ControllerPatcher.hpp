@@ -38,6 +38,7 @@
 #include "./config/ConfigValues.hpp"
 #include "network/TCPServer.hpp"
 #include "network/UDPServer.hpp"
+#include "network/UDPClient.hpp"
 
 #include "dynamic_libs/sys_functions.h"
 #include "dynamic_libs/syshid_functions.h"

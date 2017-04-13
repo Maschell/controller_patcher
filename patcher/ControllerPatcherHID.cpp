@@ -508,18 +508,40 @@ void ControllerPatcherHID::HIDGCRumble(u32 handle,my_cb_user *usr){
 }
 
 void ControllerPatcherHID::HIDRumble(u32 handle,my_cb_user *usr,u32 pad){
+    if(usr == NULL || pad > HID_MAX_PADS_COUNT) return;
+
     s32 rumblechanged = 0;
     HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[pad]);
     if(data_ptr->rumbleActive != usr->rumblestatus[pad]){
         usr->rumblestatus[pad] = data_ptr->rumbleActive;
         rumblechanged = 1;
     }
-    if(rumblechanged){
+    usr->rumbleForce[pad]--;
+    if(rumblechanged || usr->rumbleForce[pad] <= 0){
+        //log_printf("Rumble: %d %d\n",usr->rumblestatus[pad],usr->rumbleForce[pad]);
+        //Seding to the network client!
+        char bytes[6];
+
+        s32 i = 0;
+        bytes[i++] = 0x01;
+        bytes[i++] = (handle >> 24) & 0xFF;
+        bytes[i++] = (handle >> 16) & 0xFF;
+        bytes[i++] = (handle >> 8) & 0xFF;
+        bytes[i++] = handle & 0xFF;
+        bytes[i++] = usr->rumblestatus[pad];
+
+        UDPClient * instance = UDPClient::getInstance();
+        if(instance != NULL){
+            instance->sendData(bytes,6);
+        }
+
+
         if(usr->slotdata.hidmask == gHID_LIST_DS3){
             HIDDS3Rumble(handle,usr,usr->rumblestatus[pad]);
         }else{
             // Not implemented for other devices =(
         }
+        usr->rumbleForce[pad] = 10;
     }
 }
 

@@ -232,6 +232,7 @@ typedef struct _my_cb_user{
 	u32 pads_per_device; /**< Number of maximum pads of this device */
 	u8 pad_slot; /**< number of the pad that will be used */
 	u8 rumblestatus[HID_MAX_PADS_COUNT]; /**< Current status of the device rumble */
+	u8 rumbleForce[HID_MAX_PADS_COUNT];
 }my_cb_user;
 
 /**

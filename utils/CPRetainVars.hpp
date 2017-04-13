@@ -63,5 +63,7 @@ extern wpad_connect_callback_t gConnectCallback[4];
 extern wpad_extension_callback_t gExtensionCallback[4];
 extern u8 gCallbackCooldown;
 
+extern u32 gUDPClientip;
+
 
 #endif // CP_RETAINS_VARS_H_

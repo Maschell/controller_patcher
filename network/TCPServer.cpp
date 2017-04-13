@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "TCPServer.hpp"
+#include "UDPClient.hpp"
 #include <malloc.h>
 #include <stdio.h>
 #include <sys/time.h>
@@ -317,8 +318,13 @@ void TCPServer::DoTCPThreadInternal(){
             **/
 
             clientfd = ret = accept(sockfd, (sockaddr *)&(sock_addr), &len);
+
             if(ret == -1){ ErrorHandling(); break;}
             log_printf("TCPServer::DoTCPThreadInternal(line %d): TCP Connection accepted! Sending my protocol version: %d (0x%02X)\n",__LINE__, (WIIU_CP_TCP_HANDSHAKE - WIIU_CP_TCP_HANDSHAKE_VERSION_1)+1,WIIU_CP_TCP_HANDSHAKE);
+
+            gUDPClientip = sock_addr.sin_addr.s_addr;
+            UDPClient::createInstance();
+
             s32 ret;
             ret = ControllerPatcherNet::sendbyte(clientfd, WIIU_CP_TCP_HANDSHAKE); //Hey I'm a WiiU console!
             if(ret < 0){ log_printf("TCPServer::DoTCPThreadInternal(line %d): Error sendbyte: %02X\n",__LINE__,WIIU_CP_TCP_HANDSHAKE); ErrorHandling(); break;}
@@ -355,10 +361,13 @@ void TCPServer::DoTCPThreadInternal(){
             clientfd = -1;
         }while(0);
         log_printf("TCPServer::DoTCPThreadInternal(line %d): Connection closed\n",__LINE__);
+        gUDPClientip = 0;
+        UDPClient::destroyInstance();
         TCPServer::DetachAndDelete(); //Clear connected controller
         CloseSockets();
 		continue;
 	}
+
 }
 
 void TCPServer::DoTCPThread(ControllerPatcherThread *thread, void *arg){

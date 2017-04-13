@@ -457,6 +457,7 @@ void ControllerPatcher::startNetworkServer(){
 
 void ControllerPatcher::stopNetworkServer(){
     UDPServer::destroyInstance();
+    UDPClient::destroyInstance();
     TCPServer::destroyInstance();
 }
 
