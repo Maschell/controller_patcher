@@ -370,6 +370,12 @@ enum UController_Type{
     UController_Type_Pro4,
 };
 
+#define UController_Type_Gamepad_Name gettext("GamePad")
+#define UController_Type_Pro1_Name gettext("Pro Controller 1")
+#define UController_Type_Pro2_Name gettext("Pro Controller 2")
+#define UController_Type_Pro3_Name gettext("Pro Controller 3")
+#define UController_Type_Pro4_Name gettext("Pro Controller 4")
+
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  * VID/PID values
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
