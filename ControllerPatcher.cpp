@@ -78,7 +78,8 @@ void ControllerPatcher::ResetConfig(){
     memset(gNetworkController,0,sizeof(gNetworkController)); // Init / Invalid everything
     memset(gHID_Devices,0,sizeof(gHID_Devices)); // Init / Invalid everything
 
-    memset(gConnectCallback,0,sizeof(gConnectCallback));
+    memset(gWPADConnectCallback,0,sizeof(gWPADConnectCallback));
+    memset(gKPADConnectCallback,0,sizeof(gKPADConnectCallback));
     memset(gExtensionCallback,0,sizeof(gExtensionCallback));
     gCallbackCooldown = 0;
 
@@ -479,7 +480,8 @@ void ControllerPatcher::DeInit(){
     memset(config_controller_hidmask,0,sizeof(config_controller_hidmask));
     memset(gNetworkController,0,sizeof(gNetworkController));
 
-    memset(gConnectCallback,0,sizeof(gConnectCallback));
+    memset(gWPADConnectCallback,0,sizeof(gWPADConnectCallback));
+    memset(gKPADConnectCallback,0,sizeof(gKPADConnectCallback));
     memset(gExtensionCallback,0,sizeof(gExtensionCallback));
     gCallbackCooldown = 0;
 

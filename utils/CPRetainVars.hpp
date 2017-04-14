@@ -59,11 +59,11 @@ extern s32 gHIDNetworkClientID;
 
 extern u8 gUsedProtocolVersion;
 
-extern wpad_connect_callback_t gConnectCallback[4];
+extern wpad_connect_callback_t gWPADConnectCallback[4];
+extern wpad_connect_callback_t gKPADConnectCallback[4];
 extern wpad_extension_callback_t gExtensionCallback[4];
 extern u8 gCallbackCooldown;
 
 extern u32 gUDPClientip;
-
 
 #endif // CP_RETAINS_VARS_H_
