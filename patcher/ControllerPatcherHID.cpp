@@ -491,19 +491,22 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(u32 hidmask,
 
 
 void ControllerPatcherHID::HIDGCRumble(u32 handle,my_cb_user *usr){
+    if(usr == NULL) return;
     s32 rumblechanged = 0;
 
-    for(s32 i = 0;i<HID_MAX_PADS_COUNT;i++){
+    for(s32 i = 0;i<HID_GC_PAD_COUNT;i++){
         HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[i]);
         if(data_ptr->rumbleActive != usr->rumblestatus[i]){
-            usr->rumblestatus[i] = data_ptr->rumbleActive;
-            usr->buf[i+1] = usr->rumblestatus[i];
             rumblechanged = 1;
         }
+        usr->rumblestatus[i] = data_ptr->rumbleActive;
+        usr->buf[i+1] = usr->rumblestatus[i];
     }
-    if(rumblechanged){
-            usr->buf[0] = 0x11;
-            HIDWrite(handle, usr->buf, 5, NULL, NULL);
+    usr->rumbleForce[0]--;
+    if(rumblechanged || usr->rumbleForce[0] <= 0){
+        usr->buf[0] = 0x11;
+        HIDWrite(handle, usr->buf, 5, NULL, NULL);
+        usr->rumbleForce[0] = 10;
     }
 }
 
