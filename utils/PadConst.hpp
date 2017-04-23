@@ -171,4 +171,42 @@ extern const u8 HID_XINPUT_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE];
 extern const u8 HID_XINPUT_STICK_R_X[STICK_CONF_ENUM_MAXVALUE];
 extern const u8 HID_XINPUT_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE];
 
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! Switch Pro Controller
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_A[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_B[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_X[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_Y[];
+
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_L[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_ZL[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_STICK_L[];
+
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_R[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_ZR[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_STICK_R[];
+
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_PLUS[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_MINUS[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_HOME[];
+
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_TYPE[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_N[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_NE[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_E[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_SE[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_S[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_SW[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_W[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_NW[];
+extern const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_NEUTRAL[];
+
+
+extern const u8 HID_SWITCH_PRO_BT_STICK_L_X[STICK_CONF_ENUM_MAXVALUE];
+extern const u8 HID_SWITCH_PRO_BT_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE];
+extern const u8 HID_SWITCH_PRO_BT_STICK_R_X[STICK_CONF_ENUM_MAXVALUE];
+extern const u8 HID_SWITCH_PRO_BT_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE];
+
 #endif /* _PAD_CONST_H_ */

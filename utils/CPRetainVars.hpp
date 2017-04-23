@@ -44,6 +44,7 @@ extern u32 config_controller_hidmask[gHIDMaxDevices];
 extern u32 gHID_LIST_GC;
 extern u32 gHID_LIST_DS3;
 extern u32 gHID_LIST_KEYBOARD;
+extern u32 gHID_LIST_SWITCH_PRO;
 extern u32 gHID_LIST_MOUSE;
 extern u16 gGamePadSlot;
 

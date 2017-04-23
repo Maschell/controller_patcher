@@ -242,6 +242,34 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 HIDSetIdle(p_device->handle,p_device->interface_index,1,NULL,NULL);
                 gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
                 HIDRead(p_device->handle, buf, p_device->max_packet_size_rx, myHIDMouseReadCallback, usr);
+            }else if (slotdata->hidmask == gHID_LIST_SWITCH_PRO){
+                s32 read_result = HIDRead(p_device->handle, usr->buf, usr->transfersize, NULL, NULL);
+                if(read_result == 64){
+                    if(usr->buf[01] == 0x01){ //We need to do the handshake
+                        log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): Switch Pro Controller handshake needed\n",__LINE__);
+                        /**
+                            Thanks to ShinyQuagsire23 for the values (https://github.com/shinyquagsire23/HID-Joy-Con-Whispering)
+                        **/
+                        //Get MAC
+                        buf[0] = 0x80;
+                        buf[1] = 0x01;
+                        HIDWrite(p_device->handle, usr->buf, 2, NULL,NULL);
+                        HIDRead(p_device->handle, usr->buf, usr->transfersize, NULL, NULL);
+                        //Do handshake
+                        buf[0] = 0x80;
+                        buf[1] = 0x02;
+                        HIDWrite(p_device->handle, usr->buf, 2, NULL,NULL);
+                        HIDRead(p_device->handle, usr->buf, usr->transfersize, NULL, NULL);
+                        //Talk over HID only.
+                        buf[0] = 0x80;
+                        buf[1] = 0x04;
+                        HIDWrite(p_device->handle, usr->buf, 2, NULL,NULL);
+                        HIDRead(p_device->handle, usr->buf, usr->transfersize, NULL, NULL);
+                    }else{
+                        log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): Switch Pro Controller handshake already done\n",__LINE__);
+                    }
+                    HIDRead(p_device->handle, usr->buf, usr->transfersize, myHIDReadCallback, usr);
+                }
             }else if (slotdata->hidmask == gHID_LIST_KEYBOARD){
                 HIDSetProtocol(p_device->handle, p_device->interface_index, 1, 0, 0);
                 HIDSetIdle(p_device->handle, p_device->interface_index, 0, 0, 0);
@@ -312,56 +340,141 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
 }
 
 void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr){
-        //log_printf("my_read_cbInternal: %d %08X %d\n",bytes_transfered,usr->slotdata.hidmask,usr->slotdata.deviceslot);
-        if(usr->slotdata.hidmask == gHID_LIST_GC){
+    //log_printf("my_read_cbInternal: %d %08X %d\n",bytes_transfered,usr->slotdata.hidmask,usr->slotdata.deviceslot);
+    if(usr->slotdata.hidmask == gHID_LIST_GC){
 
-            HID_Data * data_ptr = NULL;
-            //Copy the data for all 4 pads
-            for(s32 i = 0;i<4;i++){
-                data_ptr = &(gHID_Devices[gHID_SLOT_GC].pad_data[i]);
-                memcpy(&(data_ptr->data_union.controller.last_hid_data[0]),&(data_ptr->data_union.controller.cur_hid_data[0]),10); //save last data.
-                memcpy(&(data_ptr->data_union.controller.cur_hid_data[0]),&buf[(i*9)+1],9);                  //save new data.
+        HID_Data * data_ptr = NULL;
+        //Copy the data for all 4 pads
+        for(s32 i = 0;i<4;i++){
+            data_ptr = &(gHID_Devices[gHID_SLOT_GC].pad_data[i]);
+            memcpy(&(data_ptr->data_union.controller.last_hid_data[0]),&(data_ptr->data_union.controller.cur_hid_data[0]),10); //save last data.
+            memcpy(&(data_ptr->data_union.controller.cur_hid_data[0]),&buf[(i*9)+1],9);                  //save new data.
 
-            }
+        }
 
-            /*
-            s32 i = 0;
-            log_printf("GC1 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
-            log_printf("GC2 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
-            log_printf("GC3 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
-            log_printf("GC4 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X \n",     buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);*/
-            HIDGCRumble(handle,usr);
-		}else if(usr->slotdata.hidmask != 0){
+        /*
+        s32 i = 0;
+        log_printf("GC1 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
+        log_printf("GC2 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
+        log_printf("GC3 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
+        log_printf("GC4 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X \n",     buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);*/
+        HIDGCRumble(handle,usr);
+    }else if(usr->slotdata.hidmask != 0){
+        //Depending on how the switch pro controller is connected, it has a different data format. At first we had the Bluetooth version, so we need to convert
+        //the USB one into it now. (When it's connected via USB). The network client always sends the BT version, even if connected via USB to the PC.
+        if(usr->slotdata.hidmask == gHID_LIST_SWITCH_PRO && buf != NULL && bytes_transfered >= 0x20){
+            u8 buffer[0x13];
+            memcpy(buffer,buf+0x0D,0x013);
 
-            s32 dsize = (HID_MAX_DATA_LENGTH_PER_PAD > bytes_transfered)? bytes_transfered : HID_MAX_DATA_LENGTH_PER_PAD;
-            s32 skip = 0;
+            /**
+                Thanks to ShinyQuagsire23 for the values (https://github.com/shinyquagsire23/HID-Joy-Con-Whispering)
+            **/
+            buf[0] = 0x80;
+            buf[1] = 0x92;
+            buf[2] = 0x00;
+            buf[3] = 0x01;
+            buf[4] = 0x00;
+            buf[5] = 0x00;
+            buf[6] = 0x00;
+            buf[7] = 0x00;
+            buf[8] = 0x1F;
+            //We want to get the next input!
+            s32 res = HIDWrite(handle, buf, 9, NULL,NULL);
 
-            //Input filter
-            if(        config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][0] != CONTROLLER_PATCHER_INVALIDVALUE){
-                if(buf[config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][0]] != config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][1]){
-                    skip = 1;
+            if(res == 9){ //Check if it's the USB data format.
+                if(buffer[1]  == 0) return;
+                //Converting the buttons
+                u32 buttons = (((u32*)(buffer))[0]) & 0xFFFFFF00;
+                u32 newButtons = 0;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_A_VALUE)          == HID_SWITCH_PRO_USB_BUTTON_A_VALUE)         newButtons |= HID_SWITCH_PRO_BT_BUTTON_A_VALUE;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_B_VALUE)          == HID_SWITCH_PRO_USB_BUTTON_B_VALUE)         newButtons |= HID_SWITCH_PRO_BT_BUTTON_B_VALUE;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_X_VALUE)          == HID_SWITCH_PRO_USB_BUTTON_X_VALUE)         newButtons |= HID_SWITCH_PRO_BT_BUTTON_X_VALUE;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_Y_VALUE)          == HID_SWITCH_PRO_USB_BUTTON_Y_VALUE)         newButtons |= HID_SWITCH_PRO_BT_BUTTON_Y_VALUE;
+
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_PLUS_VALUE)       == HID_SWITCH_PRO_USB_BUTTON_PLUS_VALUE)      newButtons |= HID_SWITCH_PRO_BT_BUTTON_PLUS_VALUE;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_MINUS_VALUE)      == HID_SWITCH_PRO_USB_BUTTON_MINUS_VALUE)     newButtons |= HID_SWITCH_PRO_BT_BUTTON_MINUS_VALUE;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_HOME_VALUE)       == HID_SWITCH_PRO_USB_BUTTON_HOME_VALUE)      newButtons |= HID_SWITCH_PRO_BT_BUTTON_HOME_VALUE;
+                //if((buttons & SWITCH_PRO_USB_BUTTON_SCREENSHOT) == HID_SWITCH_PRO_USB_BUTTON_SCREENSHOT) newButtons |= HID_SWITCH_PRO_BT_BUTTON_SCREENSHOT;
+
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_R_VALUE)          == HID_SWITCH_PRO_USB_BUTTON_R_VALUE)         newButtons |= HID_SWITCH_PRO_BT_BUTTON_R_VALUE;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_ZR_VALUE)         == HID_SWITCH_PRO_USB_BUTTON_ZR_VALUE)        newButtons |= HID_SWITCH_PRO_BT_BUTTON_ZR_VALUE;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_STICK_R_VALUE)    == HID_SWITCH_PRO_USB_BUTTON_STICK_R_VALUE)   newButtons |= HID_SWITCH_PRO_BT_BUTTON_STICK_R_VALUE;
+
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_L_VALUE)          == HID_SWITCH_PRO_USB_BUTTON_L_VALUE)         newButtons |= HID_SWITCH_PRO_BT_BUTTON_L_VALUE;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_ZL_VALUE)         == HID_SWITCH_PRO_USB_BUTTON_ZL_VALUE)        newButtons |= HID_SWITCH_PRO_BT_BUTTON_ZL_VALUE;
+                if((buttons & HID_SWITCH_PRO_USB_BUTTON_STICK_L_VALUE)    == HID_SWITCH_PRO_USB_BUTTON_STICK_L_VALUE)   newButtons |= HID_SWITCH_PRO_BT_BUTTON_STICK_L_VALUE;
+
+                u8 dpad = buffer[2];
+                u8 dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_NEUTRAL_VALUE;
+
+                //Converting the DPAD
+                if(((dpad & HID_SWITCH_PRO_USB_BUTTON_UP_VALUE)           == HID_SWITCH_PRO_USB_BUTTON_UP_VALUE) &&
+                         ((dpad & HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)  == HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)){
+                    dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_NE_VALUE;
+                }else if(((dpad & HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE) &&
+                         ((dpad & HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)  == HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)){
+                    dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_SE_VALUE;
+                }else if(((dpad & HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE) &&
+                         ((dpad & HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)){
+                    dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_SW_VALUE;
+                }else if(((dpad & HID_SWITCH_PRO_USB_BUTTON_UP_VALUE)     == HID_SWITCH_PRO_USB_BUTTON_UP_VALUE) &&
+                         ((dpad & HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)){
+                    dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_NW_VALUE;
+                }else if((dpad & HID_SWITCH_PRO_USB_BUTTON_UP_VALUE)      == HID_SWITCH_PRO_USB_BUTTON_UP_VALUE){
+                    dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_N_VALUE;
+                }else if((dpad &  HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)  == HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE){
+                    dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_E_VALUE;
+                }else if((dpad &  HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE){
+                    dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_S_VALUE;
+                }else if((dpad &  HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE){
+                    dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_W_VALUE;
                 }
+
+                //Converting the stick data
+                u8 LX = (u8) ((u16) ((buffer[0x04] << 8 &0xFF00) | (((u16)buffer[0x03])&0xFF)) >> 0x04);
+                u8 LY = (u8)((buffer[0x05] *-1));
+                u8 RX = (u8) ((u16) ((buffer[0x07] << 8 &0xFF00) | (((u16)buffer[0x06])&0xFF)) >> 0x04);
+                u8 RY = (u8)((buffer[0x08] *-1));
+
+                buf[0]  = (newButtons >> 24) & 0xFF;
+                buf[1]  = (newButtons >> 16) & 0xFF;
+                buf[2] |= dpadResult;
+                buf[4]  = LX;
+                buf[6]  = LY;
+                buf[8]  = RX;
+                buf[10] = RY;
             }
+        }
 
-           if(!skip){
-                u32 slot = 0;
-                if(usr->pad_slot < HID_MAX_PADS_COUNT){
-                    slot = usr->pad_slot;
-                }
-                slot += ControllerPatcherUtils::getPadSlotInAdapter(usr->slotdata.deviceslot,buf); // If the controller has multiple slots, we need to use the right one.
+        s32 dsize = (HID_MAX_DATA_LENGTH_PER_PAD > bytes_transfered)? bytes_transfered : HID_MAX_DATA_LENGTH_PER_PAD;
+        s32 skip = 0;
 
-                HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[slot]);
-
-                memcpy(&(data_ptr->data_union.controller.last_hid_data[0]),&(data_ptr->data_union.controller.cur_hid_data[0]),dsize);    // save the last data.
-                memcpy(&(data_ptr->data_union.controller.cur_hid_data[0]),&buf[0],dsize);                                                // save the new data.
-
-                DCFlushRange(&gHID_Devices[usr->slotdata.deviceslot].pad_data[slot],sizeof(HID_Data));
-
-                data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[slot]);
-
-                HIDRumble(handle,usr,slot);
+        //Input filter
+        if(        config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][0] != CONTROLLER_PATCHER_INVALIDVALUE){
+            if(buf[config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][0]] != config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][1]){
+                skip = 1;
             }
-		}
+        }
+
+       if(!skip){
+            u32 slot = 0;
+            if(usr->pad_slot < HID_MAX_PADS_COUNT){
+                slot = usr->pad_slot;
+            }
+            slot += ControllerPatcherUtils::getPadSlotInAdapter(usr->slotdata.deviceslot,buf); // If the controller has multiple slots, we need to use the right one.
+
+            HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[slot]);
+
+            memcpy(&(data_ptr->data_union.controller.last_hid_data[0]),&(data_ptr->data_union.controller.cur_hid_data[0]),dsize);    // save the last data.
+            memcpy(&(data_ptr->data_union.controller.cur_hid_data[0]),&buf[0],dsize);                                                // save the new data.
+
+            DCFlushRange(&gHID_Devices[usr->slotdata.deviceslot].pad_data[slot],sizeof(HID_Data));
+
+            data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[slot]);
+
+            HIDRumble(handle,usr,slot);
+        }
+    }
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------

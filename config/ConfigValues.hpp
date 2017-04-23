@@ -163,6 +163,7 @@ private:
     std::map<std::string,const u8*> presetDS3Values;
     std::map<std::string,const u8*> presetDS4Values;
     std::map<std::string,const u8*> presetXInputValues;
+    std::map<std::string,const u8*> presetSwitchProValues;
     std::map<std::string,const u8*> presetSticks;
 
     s32 getValueFromMap(std::map<std::string,int> values,std::string nameOfString);
@@ -272,11 +273,9 @@ private:
         CONTPRStringToValueSingle["DOUBLE_USE"] =                       CONTRPS_DOUBLE_USE;
         CONTPRStringToValueSingle["PAD_COUNT"] =                        CONTRPS_PAD_COUNT;
 
-
         mouseLeftValues["LEFT_CLICK"] =                                 CONTRPS_VPAD_BUTTON_LEFT;
         mouseLeftValues["RIGHT_CLICK"] =                                CONTRPS_VPAD_BUTTON_RIGHT;
         mouseLeftValues["EMULATED_STICK"] =                             CONTRPS_MOUSE_STICK;
-
 
         presetGCValues["GC_BUTTON_A"] =                                 HID_GC_BUTTON_A;
         presetGCValues["GC_BUTTON_B"] =                                 HID_GC_BUTTON_B;
@@ -362,6 +361,34 @@ private:
         presetXInputValues["XINPUT_BUTTON_DPAD_RIGHT"] =                HID_XINPUT_BUTTON_RIGHT;
 
         presetXInputValues["XINPUT_BUTTON_GUIDE"] =                     HID_XINPUT_BUTTON_GUIDE;
+
+        presetSwitchProValues["SWITCH_PRO_BUTTON_A"] =                  HID_SWITCH_PRO_BT_BUTTON_A;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_B"] =                  HID_SWITCH_PRO_BT_BUTTON_B;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_X"] =                  HID_SWITCH_PRO_BT_BUTTON_X;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_Y"] =                  HID_SWITCH_PRO_BT_BUTTON_Y;
+
+        presetSwitchProValues["SWITCH_PRO_BUTTON_PLUS"] =               HID_SWITCH_PRO_BT_BUTTON_PLUS;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_MINUS"] =              HID_SWITCH_PRO_BT_BUTTON_MINUS;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_HOME"] =               HID_SWITCH_PRO_BT_BUTTON_HOME;
+
+        presetSwitchProValues["SWITCH_PRO_BUTTON_L"] =                  HID_SWITCH_PRO_BT_BUTTON_L;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_R"] =                  HID_SWITCH_PRO_BT_BUTTON_R;
+
+        presetSwitchProValues["SWITCH_PRO_BUTTON_ZL"] =                 HID_SWITCH_PRO_BT_BUTTON_ZL;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_ZR"] =                 HID_SWITCH_PRO_BT_BUTTON_ZR;
+
+        presetSwitchProValues["SWITCH_PRO_BUTTON_STICK_L"] =            HID_SWITCH_PRO_BT_BUTTON_STICK_L;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_STICK_R"] =            HID_SWITCH_PRO_BT_BUTTON_STICK_R;
+
+        presetSwitchProValues["SWITCH_PRO_BUTTON_DPAD_N"] =             HID_SWITCH_PRO_BT_BUTTON_DPAD_N;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_DPAD_NE"] =            HID_SWITCH_PRO_BT_BUTTON_DPAD_NE;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_DPAD_E"] =             HID_SWITCH_PRO_BT_BUTTON_DPAD_E;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_DPAD_SE"] =            HID_SWITCH_PRO_BT_BUTTON_DPAD_SE;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_DPAD_S"] =             HID_SWITCH_PRO_BT_BUTTON_DPAD_S;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_DPAD_SW"] =            HID_SWITCH_PRO_BT_BUTTON_DPAD_SW;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_DPAD_W"] =             HID_SWITCH_PRO_BT_BUTTON_DPAD_W;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_DPAD_NW"] =            HID_SWITCH_PRO_BT_BUTTON_DPAD_NW;
+        presetSwitchProValues["SWITCH_PRO_BUTTON_DPAD_NEUTRAL"] =       HID_SWITCH_PRO_BT_BUTTON_DPAD_NEUTRAL;
 
         presetKeyboardValues["KEYBOARD_SHIFT"] =                        HID_KEYBOARD_BUTTON_SHIFT;
         presetKeyboardValues["KEYBOARD_A"] =                            HID_KEYBOARD_BUTTON_A;
@@ -486,10 +513,16 @@ private:
         presetSticks["XINPUT_STICK_R_X"] =                              HID_XINPUT_STICK_R_X;
         presetSticks["XINPUT_STICK_R_Y"] =                              HID_XINPUT_STICK_R_Y;
 
+        presetSticks["SWITCH_PRO_STICK_L_X"] =                          HID_SWITCH_PRO_BT_STICK_L_X;
+        presetSticks["SWITCH_PRO_STICK_L_Y"] =                          HID_SWITCH_PRO_BT_STICK_L_Y;
+        presetSticks["SWITCH_PRO_STICK_R_X"] =                          HID_SWITCH_PRO_BT_STICK_R_X;
+        presetSticks["SWITCH_PRO_STICK_R_Y"] =                          HID_SWITCH_PRO_BT_STICK_R_Y;
+
         presetSticks["GC_DPAD_MODE"] =                                  HID_GC_BUTTON_DPAD_TYPE;
         presetSticks["DS3_DPAD_MODE"] =                                 HID_DS3_BUTTON_DPAD_TYPE;
         presetSticks["DS4_DPAD_MODE"] =                                 HID_DS4_BUTTON_DPAD_TYPE;
         presetSticks["XINPUT_DPAD_MODE"] =                              HID_XINPUT_BUTTON_DPAD_TYPE;
+        presetSticks["SWITCH_PRO_DPAD_MODE"] =                          HID_SWITCH_PRO_BT_BUTTON_DPAD_TYPE;
 
         gGamePadValuesToCONTRPSString["VPAD_BUTTON_A"] =  				CONTRPS_VPAD_BUTTON_A;
         gGamePadValuesToCONTRPSString["VPAD_BUTTON_B"] =                CONTRPS_VPAD_BUTTON_B;
@@ -520,14 +553,14 @@ private:
         gGamePadValuesToCONTRPSString["VPAD_STICK_L_EMULATION_UP"] =    CONTRPS_VPAD_STICK_L_EMULATION_UP;
         gGamePadValuesToCONTRPSString["VPAD_STICK_L_EMULATION_DOWN"] =  CONTRPS_VPAD_STICK_L_EMULATION_DOWN;
 
-        deviceNames[CPStringTools::strfmt("%04X%04X",HID_GC_VID,       HID_GC_PID).c_str()]                = HID_GC_STRING;
-        deviceNames[CPStringTools::strfmt("%04X%04X",HID_KEYBOARD_VID, HID_KEYBOARD_PID).c_str()]          = HID_KEYBOARD_STRING;
-        deviceNames[CPStringTools::strfmt("%04X%04X",HID_MOUSE_VID,    HID_MOUSE_PID).c_str()]             = HID_MOUSE_STRING;
-        deviceNames[CPStringTools::strfmt("%04X%04X",HID_DS3_VID,      HID_DS3_PID).c_str()]               = HID_DS3_STRING;
-        deviceNames[CPStringTools::strfmt("%04X%04X",HID_NEW_DS4_VID,  HID_NEW_DS4_PID).c_str()]           = HID_NEW_DS4_STRING;
-        deviceNames[CPStringTools::strfmt("%04X%04X",HID_DS4_VID,      HID_DS4_PID).c_str()]               = HID_DS4_STRING;
-        deviceNames[CPStringTools::strfmt("%04X%04X",HID_XINPUT_VID,   HID_XINPUT_PID).c_str()]            = HID_XINPUT_STRING;
-        deviceNames[CPStringTools::strfmt("%04X%04X",HID_SWITCH_PRO_VID,   HID_SWITCH_PRO_PID).c_str()]    = HID_SWITCH_PRO_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_GC_VID,        HID_GC_PID).c_str()]                = HID_GC_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_KEYBOARD_VID,  HID_KEYBOARD_PID).c_str()]          = HID_KEYBOARD_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_MOUSE_VID,     HID_MOUSE_PID).c_str()]             = HID_MOUSE_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_DS3_VID,       HID_DS3_PID).c_str()]               = HID_DS3_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_NEW_DS4_VID,   HID_NEW_DS4_PID).c_str()]           = HID_NEW_DS4_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_DS4_VID,       HID_DS4_PID).c_str()]               = HID_DS4_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_XINPUT_VID,    HID_XINPUT_PID).c_str()]            = HID_XINPUT_STRING;
+        deviceNames[CPStringTools::strfmt("%04X%04X",HID_SWITCH_PRO_VID,HID_SWITCH_PRO_PID).c_str()]        = HID_SWITCH_PRO_STRING;
     }
 
     const u8 * getValuesForPreset(std::map<std::string,const u8*> values,std::string possibleValue);

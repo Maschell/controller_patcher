@@ -273,3 +273,70 @@ const u8 HID_XINPUT_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_
                                                             0x00, //STICK_CONF_INVERT,
                                                             0x00, //STICK_CONF_MIN,
                                                             0xFF};//STICK_CONF_MAX,
+
+
+
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! Switch Pro Controller
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+const u8 HID_SWITCH_PRO_BT_BUTTON_A[]             = { 0x00,(u8)((HID_SWITCH_PRO_BT_BUTTON_A_VALUE >> 24) & 0xFF)};
+const u8 HID_SWITCH_PRO_BT_BUTTON_B[]             = { 0x00,(u8)((HID_SWITCH_PRO_BT_BUTTON_B_VALUE >> 24) & 0xFF)};
+const u8 HID_SWITCH_PRO_BT_BUTTON_X[]             = { 0x00,(u8)((HID_SWITCH_PRO_BT_BUTTON_X_VALUE >> 24) & 0xFF)};
+const u8 HID_SWITCH_PRO_BT_BUTTON_Y[]             = { 0x00,(u8)((HID_SWITCH_PRO_BT_BUTTON_Y_VALUE >> 24) & 0xFF)};
+
+const u8 HID_SWITCH_PRO_BT_BUTTON_L[]             = { 0x00,(u8)((HID_SWITCH_PRO_BT_BUTTON_L_VALUE >> 24) & 0xFF)};
+const u8 HID_SWITCH_PRO_BT_BUTTON_ZL[]            = { 0x00,(u8)((HID_SWITCH_PRO_BT_BUTTON_ZL_VALUE >> 24) & 0xFF)};
+const u8 HID_SWITCH_PRO_BT_BUTTON_STICK_L[]       = { 0x01,(u8)((HID_SWITCH_PRO_BT_BUTTON_STICK_L_VALUE >> 16) & 0xFF)};
+
+const u8 HID_SWITCH_PRO_BT_BUTTON_R[]             = { 0x00,(u8)((HID_SWITCH_PRO_BT_BUTTON_R_VALUE >> 24) & 0xFF)};
+const u8 HID_SWITCH_PRO_BT_BUTTON_ZR[]            = { 0x00,(u8)((HID_SWITCH_PRO_BT_BUTTON_ZR_VALUE >> 24) & 0xFF)};
+const u8 HID_SWITCH_PRO_BT_BUTTON_STICK_R[]       = { 0x01,(u8)((HID_SWITCH_PRO_BT_BUTTON_STICK_R_VALUE >> 16) & 0xFF)};
+
+const u8 HID_SWITCH_PRO_BT_BUTTON_PLUS[]          = { 0x01,(u8)((HID_SWITCH_PRO_BT_BUTTON_PLUS_VALUE >> 16) & 0xFF)};
+const u8 HID_SWITCH_PRO_BT_BUTTON_MINUS[]         = { 0x01,(u8)((HID_SWITCH_PRO_BT_BUTTON_MINUS_VALUE >> 16) & 0xFF)};
+const u8 HID_SWITCH_PRO_BT_BUTTON_HOME[]          = { 0x01,(u8)((HID_SWITCH_PRO_BT_BUTTON_HOME_VALUE >> 16) & 0xFF)};
+
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_TYPE[]     = { CONTRPDM_Hat,HID_SWITCH_PRO_BT_BUTTON_DPAD_MASK_VALUE};
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_N[]        = { 0x02,HID_SWITCH_PRO_BT_BUTTON_DPAD_N_VALUE};
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_NE[]       = { 0x02,HID_SWITCH_PRO_BT_BUTTON_DPAD_NE_VALUE};
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_E[]        = { 0x02,HID_SWITCH_PRO_BT_BUTTON_DPAD_E_VALUE};
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_SE[]       = { 0x02,HID_SWITCH_PRO_BT_BUTTON_DPAD_SE_VALUE};
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_S[]        = { 0x02,HID_SWITCH_PRO_BT_BUTTON_DPAD_S_VALUE};
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_SW[]       = { 0x02,HID_SWITCH_PRO_BT_BUTTON_DPAD_SW_VALUE};
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_W[]        = { 0x02,HID_SWITCH_PRO_BT_BUTTON_DPAD_W_VALUE};
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_NW[]       = { 0x02,HID_SWITCH_PRO_BT_BUTTON_DPAD_NW_VALUE};
+const u8 HID_SWITCH_PRO_BT_BUTTON_DPAD_NEUTRAL[]  = { 0x02,HID_SWITCH_PRO_BT_BUTTON_DPAD_NEUTRAL_VALUE};
+
+
+const u8 HID_SWITCH_PRO_BT_STICK_L_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
+                                                            0x04, //STICK_CONF_BYTE,
+                                                            0x80, //STICK_CONF_DEFAULT,
+                                                            0x01, //STICK_CONF_DEADZONE,
+                                                            0x00, //STICK_CONF_INVERT,
+                                                            0x28, //STICK_CONF_MIN,
+                                                            0xDF};//STICK_CONF_MAX,
+
+const u8 HID_SWITCH_PRO_BT_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
+                                                            0x06, //STICK_CONF_BYTE,
+                                                            0x80, //STICK_CONF_DEFAULT,
+                                                            0x06, //STICK_CONF_DEADZONE,
+                                                            0x01, //STICK_CONF_INVERT,
+                                                            0x16, //STICK_CONF_MIN,
+                                                            0xD7};//STICK_CONF_MAX,
+
+const u8 HID_SWITCH_PRO_BT_STICK_R_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
+                                                            0x08, //STICK_CONF_BYTE,
+                                                            0x80, //STICK_CONF_DEFAULT,
+                                                            0x04, //STICK_CONF_DEADZONE,
+                                                            0x00, //STICK_CONF_INVERT,
+                                                            0x29, //STICK_CONF_MIN,
+                                                            0xE2};//STICK_CONF_MAX,
+
+const u8 HID_SWITCH_PRO_BT_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
+                                                            0x0A, //STICK_CONF_BYTE,
+                                                            0x80, //STICK_CONF_DEFAULT,
+                                                            0x08, //STICK_CONF_DEADZONE,
+                                                            0x01, //STICK_CONF_INVERT,
+                                                            0x22, //STICK_CONF_MIN,
+                                                            0xE4};//STICK_CONF_MAX,

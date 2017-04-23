@@ -45,6 +45,7 @@ bool ConfigValues::setIfValueIsAControllerPresetEx(std::string value,s32 slot,s3
     if(setIfValueIsPreset(presetDS3Values,value,slot,keyslot)) return true;
     if(setIfValueIsPreset(presetDS4Values,value,slot,keyslot)) return true;
     if(setIfValueIsPreset(presetXInputValues,value,slot,keyslot)) return true;
+    if(setIfValueIsPreset(presetSwitchProValues,value,slot,keyslot)) return true;
     return false;
 }
 

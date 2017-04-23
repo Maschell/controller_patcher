@@ -43,6 +43,7 @@ u32 config_controller_hidmask[gHIDMaxDevices] __attribute__((section(".data")));
 u32 gHID_LIST_GC __attribute__((section(".data"))) = 0;
 u32 gHID_LIST_DS3 __attribute__((section(".data"))) = 0;
 u32 gHID_LIST_KEYBOARD __attribute__((section(".data"))) = 0;
+u32 gHID_LIST_SWITCH_PRO __attribute__((section(".data"))) = 0;
 u32 gHID_LIST_MOUSE __attribute__((section(".data"))) = 0;
 
 u16 gGamePadSlot __attribute__((section(".data"))) = 0;

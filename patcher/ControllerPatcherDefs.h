@@ -524,6 +524,62 @@ enum UController_Type{
 #define HID_XINPUT_PAD_COUNT               1
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ * Switch Pro Controller
+ *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+#define HID_SWITCH_PRO_USB_BUTTON_A_VALUE           0x08000000
+#define HID_SWITCH_PRO_USB_BUTTON_B_VALUE           0x04000000
+#define HID_SWITCH_PRO_USB_BUTTON_X_VALUE           0x02000000
+#define HID_SWITCH_PRO_USB_BUTTON_Y_VALUE           0x01000000
+#define HID_SWITCH_PRO_USB_BUTTON_PLUS_VALUE        0x00020000
+#define HID_SWITCH_PRO_USB_BUTTON_MINUS_VALUE       0x00010000
+#define HID_SWITCH_PRO_USB_BUTTON_HOME_VALUE        0x00100000
+#define HID_SWITCH_PRO_USB_BUTTON_SCREENSHOT_VALUE  0x00200000
+#define HID_SWITCH_PRO_USB_BUTTON_R_VALUE           0x40000000
+#define HID_SWITCH_PRO_USB_BUTTON_ZR_VALUE          0x80000000
+#define HID_SWITCH_PRO_USB_BUTTON_STICK_R_VALUE     0x00040000
+#define HID_SWITCH_PRO_USB_BUTTON_L_VALUE           0x00004000
+#define HID_SWITCH_PRO_USB_BUTTON_ZL_VALUE          0x00008000
+#define HID_SWITCH_PRO_USB_BUTTON_STICK_L_VALUE     0x00080000
+
+#define HID_SWITCH_PRO_USB_BUTTON_DPAD_MASK_VALUE   0x0F
+#define HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE        0x08 // 2
+#define HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE       0x04 // 2
+#define HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE        0x01 // 2
+#define HID_SWITCH_PRO_USB_BUTTON_UP_VALUE          0x02 // 2
+
+#define HID_SWITCH_PRO_BT_BUTTON_A_VALUE            0x02000000
+#define HID_SWITCH_PRO_BT_BUTTON_B_VALUE            0x01000000
+#define HID_SWITCH_PRO_BT_BUTTON_X_VALUE            0x08000000
+#define HID_SWITCH_PRO_BT_BUTTON_Y_VALUE            0x04000000
+#define HID_SWITCH_PRO_BT_BUTTON_PLUS_VALUE         0x00020000
+#define HID_SWITCH_PRO_BT_BUTTON_MINUS_VALUE        0x00010000
+#define HID_SWITCH_PRO_BT_BUTTON_HOME_VALUE         0x00100000
+
+#define HID_SWITCH_PRO_BT_BUTTON_R_VALUE            0x20000000
+#define HID_SWITCH_PRO_BT_BUTTON_ZR_VALUE           0x80000000
+#define HID_SWITCH_PRO_BT_BUTTON_STICK_R_VALUE      0x00080000
+
+#define HID_SWITCH_PRO_BT_BUTTON_L_VALUE            0x10000000
+#define HID_SWITCH_PRO_BT_BUTTON_ZL_VALUE           0x40000000
+#define HID_SWITCH_PRO_BT_BUTTON_STICK_L_VALUE      0x00040000
+
+
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_MASK_VALUE    0x0F
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_N_VALUE       0x00 // 2
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_NE_VALUE      0x01 // 2
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_E_VALUE       0x02 // 2
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_SE_VALUE      0x03 // 2
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_S_VALUE       0x04 // 2
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_SW_VALUE      0x05 // 2
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_W_VALUE       0x06 // 2
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_NW_VALUE      0x07 // 2
+#define HID_SWITCH_PRO_BT_BUTTON_DPAD_NEUTRAL_VALUE 0x08 // 2
+
+
+#define HID_SWITCH_PRO_BT_PAD_COUNT                 1
+
+/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  * Keyboard (Full list is on: http://www.freebsddiary.org/APC/usb_hid_usages.php)
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 

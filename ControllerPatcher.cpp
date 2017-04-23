@@ -136,12 +136,18 @@ void ControllerPatcher::ResetConfig(){
     u32 xinput_hid = slotdata.hidmask;
     if(HID_DEBUG) log_printf("ControllerPatcher::ResetConfig(line %d): Register XInput-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(xinput_hid),xinput_slot);
 
+    ControllerPatcherUtils::getNextSlotData(&slotdata);
+    u32 switch_pro_slot = slotdata.deviceslot;
+    gHID_LIST_SWITCH_PRO = slotdata.hidmask;
+    log_printf("ControllerPatcher::ResetConfig(line %d): Register Switch-Pro-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_SWITCH_PRO),switch_pro_slot);
+
     config_controller_hidmask[gc_slot] =                                                            gHID_LIST_GC;
     config_controller_hidmask[ds3_slot] =                                                           gHID_LIST_DS3;
     config_controller_hidmask[keyboard_slot] =                                                      gHID_LIST_KEYBOARD;
     config_controller_hidmask[gMouseSlot] =                                                         gHID_LIST_MOUSE;
     config_controller_hidmask[ds4_slot] =                                                           ds4_hid;
     config_controller_hidmask[xinput_slot] =                                                        xinput_hid;
+    config_controller_hidmask[switch_pro_slot] =                                                    gHID_LIST_SWITCH_PRO;
 
     /* We need to give the GamePad, Mouse and Keyboard a unique VID/PID to find the right slots.*/
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -149,6 +155,57 @@ void ControllerPatcher::ResetConfig(){
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[gGamePadSlot][CONTRPS_VID],                            0xAF,0xFE);
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[gGamePadSlot][CONTRPS_PID],                            0xAA,0xAA);
+
+    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //! Switch Pro Controller
+    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VID],                           (HID_SWITCH_PRO_VID>>8)&0xFF,                   HID_SWITCH_PRO_VID&0xFF);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_PID],                           (HID_SWITCH_PRO_PID>>8)&0xFF,                   HID_SWITCH_PRO_PID&0xFF);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_A],                 HID_SWITCH_PRO_BT_BUTTON_A[0],                  HID_SWITCH_PRO_BT_BUTTON_A[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_B],                 HID_SWITCH_PRO_BT_BUTTON_B[0],                  HID_SWITCH_PRO_BT_BUTTON_B[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_X],                 HID_SWITCH_PRO_BT_BUTTON_X[0],                  HID_SWITCH_PRO_BT_BUTTON_X[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_Y],                 HID_SWITCH_PRO_BT_BUTTON_Y[0],                  HID_SWITCH_PRO_BT_BUTTON_Y[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_DPAD_MODE],                     CONTROLLER_PATCHER_VALUE_SET,                   HID_SWITCH_PRO_BT_BUTTON_DPAD_TYPE[CONTRDPAD_MODE]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_DPAD_MASK],                     CONTROLLER_PATCHER_VALUE_SET,                   HID_SWITCH_PRO_BT_BUTTON_DPAD_TYPE[CONTRDPAD_MASK]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_DPAD_N],            HID_SWITCH_PRO_BT_BUTTON_DPAD_N[0],             HID_SWITCH_PRO_BT_BUTTON_DPAD_N[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_DPAD_NE],           HID_SWITCH_PRO_BT_BUTTON_DPAD_NE[0],            HID_SWITCH_PRO_BT_BUTTON_DPAD_NE[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_DPAD_E],            HID_SWITCH_PRO_BT_BUTTON_DPAD_E[0],             HID_SWITCH_PRO_BT_BUTTON_DPAD_E[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_DPAD_SE],           HID_SWITCH_PRO_BT_BUTTON_DPAD_SE[0],            HID_SWITCH_PRO_BT_BUTTON_DPAD_SE[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_DPAD_S],            HID_SWITCH_PRO_BT_BUTTON_DPAD_S[0],             HID_SWITCH_PRO_BT_BUTTON_DPAD_S[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_DPAD_SW],           HID_SWITCH_PRO_BT_BUTTON_DPAD_SW[0],            HID_SWITCH_PRO_BT_BUTTON_DPAD_SW[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_DPAD_W],            HID_SWITCH_PRO_BT_BUTTON_DPAD_W[0],             HID_SWITCH_PRO_BT_BUTTON_DPAD_W[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_DPAD_NW],           HID_SWITCH_PRO_BT_BUTTON_DPAD_NW[0],            HID_SWITCH_PRO_BT_BUTTON_DPAD_NW[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL],      HID_SWITCH_PRO_BT_BUTTON_DPAD_NEUTRAL[0],       HID_SWITCH_PRO_BT_BUTTON_DPAD_NEUTRAL[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_PLUS],              HID_SWITCH_PRO_BT_BUTTON_PLUS[0],               HID_SWITCH_PRO_BT_BUTTON_PLUS[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_MINUS],             HID_SWITCH_PRO_BT_BUTTON_MINUS[0],              HID_SWITCH_PRO_BT_BUTTON_MINUS[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_L],                 HID_SWITCH_PRO_BT_BUTTON_L[0],                  HID_SWITCH_PRO_BT_BUTTON_L[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_R],                 HID_SWITCH_PRO_BT_BUTTON_R[0],                  HID_SWITCH_PRO_BT_BUTTON_R[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_ZL],                HID_SWITCH_PRO_BT_BUTTON_ZL[0],                 HID_SWITCH_PRO_BT_BUTTON_ZL[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_ZR],                HID_SWITCH_PRO_BT_BUTTON_ZR[0],                 HID_SWITCH_PRO_BT_BUTTON_ZR[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_STICK_L],           HID_SWITCH_PRO_BT_BUTTON_STICK_L[0],            HID_SWITCH_PRO_BT_BUTTON_STICK_L[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_STICK_R],           HID_SWITCH_PRO_BT_BUTTON_STICK_R[0],            HID_SWITCH_PRO_BT_BUTTON_STICK_R[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_HOME],              HID_SWITCH_PRO_BT_BUTTON_HOME[0],               HID_SWITCH_PRO_BT_BUTTON_HOME[1]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,                   HID_SWITCH_PRO_BT_PAD_COUNT);
+
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_L_STICK_X],          HID_SWITCH_PRO_BT_STICK_L_X[STICK_CONF_BYTE],  HID_SWITCH_PRO_BT_STICK_L_X[STICK_CONF_DEFAULT]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,                  HID_SWITCH_PRO_BT_STICK_L_X[STICK_CONF_DEADZONE]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],   HID_SWITCH_PRO_BT_STICK_L_X[STICK_CONF_MIN],   HID_SWITCH_PRO_BT_STICK_L_X[STICK_CONF_MAX]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_L_STICK_X_INVERT],   CONTROLLER_PATCHER_VALUE_SET,                  HID_SWITCH_PRO_BT_STICK_L_X[STICK_CONF_INVERT]);
+
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_L_STICK_Y],          HID_SWITCH_PRO_BT_STICK_L_Y[STICK_CONF_BYTE],  HID_SWITCH_PRO_BT_STICK_L_Y[STICK_CONF_DEFAULT]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,                  HID_SWITCH_PRO_BT_STICK_L_Y[STICK_CONF_DEADZONE]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX],   HID_SWITCH_PRO_BT_STICK_L_Y[STICK_CONF_MIN],   HID_SWITCH_PRO_BT_STICK_L_Y[STICK_CONF_MAX]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_L_STICK_Y_INVERT],   CONTROLLER_PATCHER_VALUE_SET,                  HID_SWITCH_PRO_BT_STICK_L_Y[STICK_CONF_INVERT]);
+
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_R_STICK_X],          HID_SWITCH_PRO_BT_STICK_R_X[STICK_CONF_BYTE],  HID_SWITCH_PRO_BT_STICK_R_X[STICK_CONF_DEFAULT]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,                  HID_SWITCH_PRO_BT_STICK_R_X[STICK_CONF_DEADZONE]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX],   HID_SWITCH_PRO_BT_STICK_R_X[STICK_CONF_MIN],   HID_SWITCH_PRO_BT_STICK_R_X[STICK_CONF_MAX]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_R_STICK_X_INVERT],   CONTROLLER_PATCHER_VALUE_SET,                  HID_SWITCH_PRO_BT_STICK_R_X[STICK_CONF_INVERT]);
+
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y],          HID_SWITCH_PRO_BT_STICK_R_Y[STICK_CONF_BYTE],  HID_SWITCH_PRO_BT_STICK_R_Y[STICK_CONF_DEFAULT]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,                  HID_SWITCH_PRO_BT_STICK_R_Y[STICK_CONF_DEADZONE]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX],   HID_SWITCH_PRO_BT_STICK_R_Y[STICK_CONF_MIN],   HID_SWITCH_PRO_BT_STICK_R_Y[STICK_CONF_MAX]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[switch_pro_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT],   CONTROLLER_PATCHER_VALUE_SET,                  HID_SWITCH_PRO_BT_STICK_R_Y[STICK_CONF_INVERT]);
 
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! Mouse
@@ -495,6 +552,7 @@ void ControllerPatcher::DeInit(){
     gHID_LIST_DS3 = 0;
     gHID_LIST_KEYBOARD = 0;
     gHID_LIST_MOUSE = 0;
+    gHID_LIST_SWITCH_PRO = 0;
 
     gGamePadSlot = 0;
     gHID_SLOT_GC = 0;
