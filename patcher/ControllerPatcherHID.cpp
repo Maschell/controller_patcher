@@ -95,17 +95,15 @@ void ControllerPatcherHID::myHIDMouseReadCallback(u32 handle, s32 error, unsigne
 }
 
 void ControllerPatcherHID::myHIDReadCallback(u32 handle, s32 error, unsigned char *buf, u32 bytes_transfered, void *p_user){
-    if(error == 0 && p_user != NULL && gHIDAttached)
-	{
+    if(error == 0 && p_user != NULL && gHIDAttached){
 	    my_cb_user *usr = (my_cb_user*)p_user;
 
 	    HIDReadCallback(handle,buf,bytes_transfered,usr);
-	    if(usr->slotdata.hidmask == gHID_LIST_GC){
-            HIDRead(handle, usr->buf, bytes_transfered, myHIDReadCallback, usr);
-	    }else if(usr->slotdata.hidmask != 0){
+
+        if(usr->slotdata.hidmask == gHID_LIST_DS4){
 	        usleep(1000*2); //DS4 is way tooo fast. sleeping to reduce lag. (need to check the other pads)
-            HIDRead(handle, usr->buf, bytes_transfered, myHIDReadCallback, usr);
 	    }
+        HIDRead(handle, usr->buf, bytes_transfered, myHIDReadCallback, usr);
 	}
 }
 
@@ -147,7 +145,7 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) failed %d \n",__LINE__,ret);
             return HID_DEVICE_DETACH;
         }else{
-            log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) success %d \n",__LINE__,ret);
+            //log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) success %d \n",__LINE__,ret);
         }
     }
 
@@ -175,7 +173,7 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             }
 
             s32 pad_count = config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1];
-            if(pad_count > 0x0F) pad_count = 0;
+            if(pad_count > 0x0F) pad_count = 0; //???
 
             s32 pad_slot = 0;
 
@@ -340,6 +338,8 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
 }
 
 void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr){
+    ControllerPatcherUtils::doSampling(usr->slotdata.deviceslot,usr->pad_slot,false);
+
     //log_printf("my_read_cbInternal: %d %08X %d\n",bytes_transfered,usr->slotdata.hidmask,usr->slotdata.deviceslot);
     if(usr->slotdata.hidmask == gHID_LIST_GC){
 
@@ -615,11 +615,11 @@ void ControllerPatcherHID::HIDGCRumble(u32 handle,my_cb_user *usr){
         usr->rumblestatus[i] = data_ptr->rumbleActive;
         usr->buf[i+1] = usr->rumblestatus[i];
     }
-    usr->rumbleForce[0]--;
-    if(rumblechanged || usr->rumbleForce[0] <= 0){
+    usr->forceRumbleInTicks[0]--;
+    if(rumblechanged || usr->forceRumbleInTicks[0] <= 0){
         usr->buf[0] = 0x11;
         HIDWrite(handle, usr->buf, 5, NULL, NULL);
-        usr->rumbleForce[0] = 10;
+        usr->forceRumbleInTicks[0] = 10;
     }
 }
 
@@ -632,8 +632,8 @@ void ControllerPatcherHID::HIDRumble(u32 handle,my_cb_user *usr,u32 pad){
         usr->rumblestatus[pad] = data_ptr->rumbleActive;
         rumblechanged = 1;
     }
-    usr->rumbleForce[pad]--;
-    if(rumblechanged || usr->rumbleForce[pad] <= 0){
+    usr->forceRumbleInTicks[pad]--;
+    if(rumblechanged || usr->forceRumbleInTicks[pad] <= 0){
         //log_printf("Rumble: %d %d\n",usr->rumblestatus[pad],usr->rumbleForce[pad]);
         //Seding to the network client!
         char bytes[6];
@@ -657,7 +657,7 @@ void ControllerPatcherHID::HIDRumble(u32 handle,my_cb_user *usr,u32 pad){
         }else{
             // Not implemented for other devices =(
         }
-        usr->rumbleForce[pad] = 10;
+        usr->forceRumbleInTicks[pad] = 10;
     }
 }
 

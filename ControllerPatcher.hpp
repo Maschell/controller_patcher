@@ -236,6 +236,8 @@ class ControllerPatcher{
         static std::string getIdentifierByVIDPID(u16 vid,u16 pid);
 
         static void destroyConfigHelper();
+
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR doSamplingForDeviceSlot(u16 device_slot);
 };
 
 #endif /* _CONTROLLER_PATCHER_H_ */

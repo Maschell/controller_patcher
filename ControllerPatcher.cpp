@@ -86,6 +86,7 @@ void ControllerPatcher::ResetConfig(){
     gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
     gHID_LIST_GC = 0;
     gHID_LIST_DS3 = 0;
+    gHID_LIST_DS4 = 0;
     gHID_LIST_KEYBOARD = 0;
     gHID_LIST_MOUSE = 0;
     gGamePadSlot = 0;
@@ -129,6 +130,7 @@ void ControllerPatcher::ResetConfig(){
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 ds4_slot = slotdata.deviceslot;
     u32 ds4_hid = slotdata.hidmask;
+    gHID_LIST_DS4 = ds4_hid;
     if(HID_DEBUG) log_printf("ControllerPatcher::ResetConfig(line %d): Register DS4-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(ds4_hid),ds4_slot);
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
@@ -141,11 +143,12 @@ void ControllerPatcher::ResetConfig(){
     gHID_LIST_SWITCH_PRO = slotdata.hidmask;
     log_printf("ControllerPatcher::ResetConfig(line %d): Register Switch-Pro-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_SWITCH_PRO),switch_pro_slot);
 
+
     config_controller_hidmask[gc_slot] =                                                            gHID_LIST_GC;
     config_controller_hidmask[ds3_slot] =                                                           gHID_LIST_DS3;
     config_controller_hidmask[keyboard_slot] =                                                      gHID_LIST_KEYBOARD;
     config_controller_hidmask[gMouseSlot] =                                                         gHID_LIST_MOUSE;
-    config_controller_hidmask[ds4_slot] =                                                           ds4_hid;
+    config_controller_hidmask[ds4_slot] =                                                           gHID_LIST_DS4;
     config_controller_hidmask[xinput_slot] =                                                        xinput_hid;
     config_controller_hidmask[switch_pro_slot] =                                                    gHID_LIST_SWITCH_PRO;
 
@@ -468,6 +471,17 @@ bool ControllerPatcher::Init(){
     InitVPadFunctionPointers();
     InitPadScoreFunctionPointers();
 
+    gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead + 0x1F0);
+    if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK){
+        //In Firmware <= 5.1.2 the offset changes
+        gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead + 0x1F8);
+        if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK){
+            //Should never happen. I looked into the padscore.rpl of ALL firmwares.
+            gSamplingCallback = NULL;
+        }
+    }
+    log_printf("ControllerPatcher::Init(line %d): Found the gSamplingCallback at %08X \n",__LINE__,gSamplingCallback);
+
     if(HID_DEBUG) log_printf("ControllerPatcher::Init(line %d): Init called! \n",__LINE__);
 
     if(syshid_handle == 0){
@@ -519,7 +533,6 @@ void ControllerPatcher::stopNetworkServer(){
     TCPServer::destroyInstance();
 }
 
-
 void ControllerPatcher::DeInit(){
     if(HID_DEBUG) log_printf("ControllerPatcher::DeInit(line %d) called! \n",__LINE__);
 
@@ -550,6 +563,7 @@ void ControllerPatcher::DeInit(){
     gHID_Mouse_Mode = HID_MOUSE_MODE_TOUCH;
     gHID_LIST_GC = 0;
     gHID_LIST_DS3 = 0;
+    gHID_LIST_DS4 = 0;
     gHID_LIST_KEYBOARD = 0;
     gHID_LIST_MOUSE = 0;
     gHID_LIST_SWITCH_PRO = 0;
@@ -648,7 +662,6 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::addControllerMapping(UCont
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-
 s32 ControllerPatcher::getActiveMappingSlot(UController_Type type){
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
 
@@ -675,8 +688,7 @@ bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,s32
 
         memset(&device_info,0,sizeof(device_info));
 
-        device_info.vidpid.vid = padinfo->vidpid.vid;
-        device_info.vidpid.pid = padinfo->vidpid.pid;
+        device_info.vidpid = padinfo->vidpid;
 
         s32 res;
         if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
@@ -751,11 +763,11 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
             DeviceInfo * deviceinfo = &(output[result].device_info);
             InputButtonData * buttondata = output[result].button_data;
 
-            deviceinfo->slotdata.deviceslot =    deviceslot;
-            deviceinfo->slotdata.hidmask =     newhid;
+            deviceinfo->slotdata.deviceslot = deviceslot;
+            deviceinfo->slotdata.hidmask = newhid;
 
-            deviceinfo->vidpid.vid =     config_controller[deviceslot][CONTRPS_VID][0] * 0x100 + config_controller[deviceslot][CONTRPS_VID][1];
-            deviceinfo->vidpid.pid =     config_controller[deviceslot][CONTRPS_PID][0] * 0x100 + config_controller[deviceslot][CONTRPS_PID][1];
+            deviceinfo->vidpid.vid = config_controller[deviceslot][CONTRPS_VID][0] * 0x100 + config_controller[deviceslot][CONTRPS_VID][1];
+            deviceinfo->vidpid.pid = config_controller[deviceslot][CONTRPS_PID][0] * 0x100 + config_controller[deviceslot][CONTRPS_PID][1];
 
             if(config_controller[deviceslot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE){
                 deviceinfo->pad_count = config_controller[deviceslot][CONTRPS_PAD_COUNT][1];
@@ -765,7 +777,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
 
             s32 buttons_hold = 0;
 
-            for(s32 pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
+            for(s32 pad = 0;pad<deviceinfo->pad_count;pad++){
                 buttons_hold = 0;
                 buttondata[pad].btn_h = 0;
                 buttondata[pad].btn_d = 0;
@@ -833,8 +845,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
         DeviceInfo device_info;
         memset(&device_info,0,sizeof(device_info));
 
-        device_info.vidpid.vid = cm_map_pad_info.vidpid.vid;
-        device_info.vidpid.pid = cm_map_pad_info.vidpid.pid;
+        device_info.vidpid = cm_map_pad_info.vidpid;
 
         s32 res;
         if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
@@ -893,10 +904,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(V
     }else{
         for(s32 i = 0;i<HID_MAX_DEVICES_PER_SLOT;i++){
             ControllerMappingPADInfo cm_map_pad_info = cm_map_pad.pad_infos[i];
-            if(cm_map_pad_info.active == 1){
+            if(cm_map_pad_info.active){
                 DeviceInfo device_info;
-                device_info.vidpid.vid = cm_map_pad_info.vidpid.vid;
-                device_info.vidpid.pid = cm_map_pad_info.vidpid.pid;
+                memset(&device_info,0,sizeof(device_info));
+                device_info.vidpid = cm_map_pad_info.vidpid;
 
                 if(ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) < 0){
                     continue;
@@ -1033,4 +1044,8 @@ std::string ControllerPatcher::getIdentifierByVIDPID(u16 vid,u16 pid){
 void ControllerPatcher::destroyConfigHelper(){
     ConfigReader::destroyInstance();
     ConfigValues::destroyInstance();
+}
+
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::doSamplingForDeviceSlot(u16 device_slot){
+    return ControllerPatcherUtils::doSampling(device_slot,0,true);
 }

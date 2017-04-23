@@ -314,6 +314,8 @@ class ControllerPatcherUtils{
         \return pointer to ControllerMapping data, null is type was invalid
         **/
         static ControllerMappingPAD * getControllerMappingByType(UController_Type type);
+
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR doSampling(u16 deviceslot,u8 padslot,bool ignorePadSlot);
 };
 
 #endif /* _CONTROLLER_PATCHER_UTIL_H_ */

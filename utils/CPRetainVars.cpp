@@ -42,6 +42,7 @@ u32 config_controller_hidmask[gHIDMaxDevices] __attribute__((section(".data")));
 
 u32 gHID_LIST_GC __attribute__((section(".data"))) = 0;
 u32 gHID_LIST_DS3 __attribute__((section(".data"))) = 0;
+u32 gHID_LIST_DS4 __attribute__((section(".data"))) = 0;
 u32 gHID_LIST_KEYBOARD __attribute__((section(".data"))) = 0;
 u32 gHID_LIST_SWITCH_PRO __attribute__((section(".data"))) = 0;
 u32 gHID_LIST_MOUSE __attribute__((section(".data"))) = 0;
@@ -61,6 +62,11 @@ u8 gUsedProtocolVersion  __attribute__((section(".data"))) = WIIU_CP_TCP_HANDSHA
 wpad_connect_callback_t gWPADConnectCallback[4] __attribute__((section(".data")));
 wpad_connect_callback_t gKPADConnectCallback[4] __attribute__((section(".data")));
 wpad_extension_callback_t gExtensionCallback[4] __attribute__((section(".data")));
+wpad_sampling_callback_t gSamplingCallback __attribute__((section(".data"))) = 0;
 u8 gCallbackCooldown __attribute__((section(".data"))) = 0;
 
 u32 gUDPClientip __attribute__((section(".data"))) = 0;
+ControllerMappingPADInfo* gProPadInfo[4] __attribute__((section(".data"))) = {&gControllerMapping.proController[0].pad_infos[0],
+                                                                               &gControllerMapping.proController[1].pad_infos[0],
+                                                                               &gControllerMapping.proController[2].pad_infos[0],
+                                                                               &gControllerMapping.proController[3].pad_infos[0]} ;

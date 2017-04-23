@@ -29,6 +29,8 @@
 
 #include <gctypes.h>
 
+#define FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK 0x9421FFB8
+
 #define HID_INIT_NOT_DONE   0
 #define HID_INIT_DONE       1
 #define HID_SDCARD_READ     2
@@ -232,7 +234,7 @@ typedef struct _my_cb_user{
 	u32 pads_per_device; /**< Number of maximum pads of this device */
 	u8 pad_slot; /**< number of the pad that will be used */
 	u8 rumblestatus[HID_MAX_PADS_COUNT]; /**< Current status of the device rumble */
-	u8 rumbleForce[HID_MAX_PADS_COUNT];
+	u8 forceRumbleInTicks[HID_MAX_PADS_COUNT];
 }my_cb_user;
 
 /**

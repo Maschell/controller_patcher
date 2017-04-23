@@ -43,6 +43,7 @@ extern u32 config_controller_hidmask[gHIDMaxDevices];
 
 extern u32 gHID_LIST_GC;
 extern u32 gHID_LIST_DS3;
+extern u32 gHID_LIST_DS4;
 extern u32 gHID_LIST_KEYBOARD;
 extern u32 gHID_LIST_SWITCH_PRO;
 extern u32 gHID_LIST_MOUSE;
@@ -63,8 +64,10 @@ extern u8 gUsedProtocolVersion;
 extern wpad_connect_callback_t gWPADConnectCallback[4];
 extern wpad_connect_callback_t gKPADConnectCallback[4];
 extern wpad_extension_callback_t gExtensionCallback[4];
+extern wpad_sampling_callback_t gSamplingCallback;
 extern u8 gCallbackCooldown;
 
 extern u32 gUDPClientip;
+extern ControllerMappingPADInfo* gProPadInfo[4];
 
 #endif // CP_RETAINS_VARS_H_
