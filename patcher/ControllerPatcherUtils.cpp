@@ -737,10 +737,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRea
     if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_R_EMULATION_UP;
     if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_DOWN;
 
-    pro_buffer->l_stick_x = (s16) (vpad_buffer->lstick.x * 1200.0f);
-    pro_buffer->l_stick_y = (s16) (vpad_buffer->lstick.y * 1200.0f);
-    pro_buffer->r_stick_x = (s16) (vpad_buffer->rstick.x * 1200.0f);
-    pro_buffer->r_stick_y = (s16) (vpad_buffer->rstick.y * 1200.0f);
+    pro_buffer->l_stick_x = (s16) (vpad_buffer->lstick.x * 950.0f);
+    pro_buffer->l_stick_y = (s16) (vpad_buffer->lstick.y * 950.0f);
+    pro_buffer->r_stick_x = (s16) (vpad_buffer->rstick.x * 950.0f);
+    pro_buffer->r_stick_y = (s16) (vpad_buffer->rstick.y * 950.0f);
 
     pro_buffer->buttons = buttons_hold;
 
@@ -796,9 +796,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToVPAD(VPADD
     vpad_buffer->rstick.x = pro_buffer->pro.rstick_x;
     vpad_buffer->rstick.y = pro_buffer->pro.rstick_y;
 
-    vpad_buffer->btns_h = buttons_hold;
-    vpad_buffer->btns_d = (buttons_hold & (~*lastButtonsPressesVPAD));
-    vpad_buffer->btns_r = (*lastButtonsPressesVPAD & (~buttons_hold));
+    vpad_buffer->btns_h |= buttons_hold;
+    vpad_buffer->btns_d |= (buttons_hold & (~*lastButtonsPressesVPAD));
+    vpad_buffer->btns_r |= (*lastButtonsPressesVPAD & (~buttons_hold));
 
     *lastButtonsPressesVPAD = buttons_hold;
 
