@@ -769,15 +769,16 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
             deviceinfo->vidpid.vid = config_controller[deviceslot][CONTRPS_VID][0] * 0x100 + config_controller[deviceslot][CONTRPS_VID][1];
             deviceinfo->vidpid.pid = config_controller[deviceslot][CONTRPS_PID][0] * 0x100 + config_controller[deviceslot][CONTRPS_PID][1];
 
+            /* not needed
             if(config_controller[deviceslot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE){
                 deviceinfo->pad_count = config_controller[deviceslot][CONTRPS_PAD_COUNT][1];
             }else{
                 deviceinfo->pad_count = HID_MAX_PADS_COUNT;
-            }
+            }*/
 
             s32 buttons_hold = 0;
 
-            for(s32 pad = 0;pad<deviceinfo->pad_count;pad++){
+            for(s32 pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
                 buttons_hold = 0;
                 buttondata[pad].btn_h = 0;
                 buttondata[pad].btn_d = 0;
