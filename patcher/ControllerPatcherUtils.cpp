@@ -617,9 +617,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkAndSetMouseMode(
         if((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) && ((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) != (isInKeyboardData(last_data,HID_KEYBOARD_BUTTON_F1) > 0))){
             if(gHID_Mouse_Mode == HID_MOUSE_MODE_AIM){
                 gHID_Mouse_Mode = HID_MOUSE_MODE_TOUCH;
-                if(HID_DEBUG) log_printf("ControllerPatcherUtils::checkAndSetMouseMode(line %d): Mouse mode changed! to touch \n",__LINE__);
+                if(HID_DEBUG){ log_printf("ControllerPatcherUtils::checkAndSetMouseMode(line %d): Mouse mode changed! to touch \n",__LINE__); }
             }else if(gHID_Mouse_Mode == HID_MOUSE_MODE_TOUCH){
-                if(HID_DEBUG) log_printf("ControllerPatcherUtils::checkAndSetMouseMode(line %d): Mouse mode changed! to aim \n",__LINE__);
+                if(HID_DEBUG){ log_printf("ControllerPatcherUtils::checkAndSetMouseMode(line %d): Mouse mode changed! to aim \n",__LINE__); }
                 gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
             }
         }

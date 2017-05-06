@@ -44,7 +44,7 @@ UDPClient::~UDPClient(){
     if (this->sockfd != -1){
         socketclose(sockfd);
     }
-    if(HID_DEBUG) log_printf("UDPClient::~UDPClient(line %d): Thread has been closed\n",__LINE__);
+    if(HID_DEBUG){ log_printf("UDPClient::~UDPClient(line %d): Thread has been closed\n",__LINE__); }
 }
 
 bool UDPClient::sendData(char * data,s32 length){

@@ -114,11 +114,11 @@ void ControllerPatcherHID::myHIDReadCallback(u32 handle, s32 error, unsigned cha
 s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, u32 attach){
     if(attach){
         log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): vid %04x pid %04x connected\n",__LINE__, SWAP16(p_device->vid),SWAP16(p_device->pid));
-        if(HID_DEBUG) log_printf("interface index  %02x\n", p_device->interface_index);
-        if(HID_DEBUG) log_printf("sub class        %02x\n", p_device->sub_class);
-        if(HID_DEBUG) log_printf("protocol         %02x\n", p_device->protocol);
-        if(HID_DEBUG) log_printf("max packet in    %02x\n", p_device->max_packet_size_rx);
-        if(HID_DEBUG) log_printf("max packet out   %02x\n", p_device->max_packet_size_tx);
+        if(HID_DEBUG){  log_printf("interface index  %02x\n", p_device->interface_index);
+                        log_printf("sub class        %02x\n", p_device->sub_class);
+                        log_printf("protocol         %02x\n", p_device->protocol);
+                        log_printf("max packet in    %02x\n", p_device->max_packet_size_rx);
+                        log_printf("max packet out   %02x\n", p_device->max_packet_size_tx); }
     }
     if(!attach){
         log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): vid %04x pid %04x disconnected\n",__LINE__, SWAP16(p_device->vid),SWAP16(p_device->pid));
@@ -222,7 +222,7 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 DCInvalidateRange(&gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i],sizeof(HID_Data));
             }
 
-            if(HID_DEBUG) log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): Device successfully attached\n",__LINE__);
+            if(HID_DEBUG){ log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): Device successfully attached\n",__LINE__); }
 
             if(slotdata->hidmask == gHID_LIST_GC){ // GC PAD
                 //The GC Adapter has all ports in one device. Set them all.
@@ -311,7 +311,7 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 free(user_data);
                 user_data = NULL;
             }else{
-                if(founddata) log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): user_data null. You may have a memory leak.\n",__LINE__);
+                if(founddata){ log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): user_data null. You may have a memory leak.\n",__LINE__); }
                 return HID_DEVICE_DETACH;
             }
             if(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1] == 0){
@@ -327,9 +327,9 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                     gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
                 }
             }else{
-                if(HID_DEBUG)log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): We still have pad for deviceslot %d connected.\n",__LINE__,slotdata->deviceslot);
+                if(HID_DEBUG){log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): We still have pad for deviceslot %d connected.\n",__LINE__,slotdata->deviceslot); }
             }
-            if(HID_DEBUG)log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): Device successfully detached\n",__LINE__);
+            if(HID_DEBUG){log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): Device successfully detached\n",__LINE__); }
         }
     }else{
         log_printf("ControllerPatcherHID::AttachDetachCallback(line %d): HID-Device currently not supported! You can add support through config files\n",__LINE__);

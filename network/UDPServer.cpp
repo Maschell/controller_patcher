@@ -56,7 +56,7 @@ UDPServer::~UDPServer(){
             this->sockfd = -1;
         }
     }
-    if(HID_DEBUG) log_printf("UDPServer::~UDPServer(line %d): Thread has been closed\n",__LINE__);
+    if(HID_DEBUG){ log_printf("UDPServer::~UDPServer(line %d): Thread has been closed\n",__LINE__); }
 
 
 }
@@ -162,5 +162,5 @@ void UDPServer::DoUDPThreadInternal(){
             }
         }
     }
-    if(HID_DEBUG) log_printf("UDPServer::DoUDPThreadInternal(line %d): UDPServer Thread ended\n",__LINE__);
+    if(HID_DEBUG){ log_printf("UDPServer::DoUDPThreadInternal(line %d): UDPServer Thread ended\n",__LINE__); }
 }

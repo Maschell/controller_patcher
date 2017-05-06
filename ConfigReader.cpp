@@ -34,14 +34,14 @@ ConfigReader::ConfigReader(){
 void ConfigReader::ReadAllConfigs(){
     std::vector<std::string> fileList = ScanFolder();
     if(fileList.size() > 0){
-        if(HID_DEBUG) log_printf("ConfigReader::ConfigReader(line %d): Found %d config files\n",__LINE__,fileList.size());
+        if(HID_DEBUG){ log_printf("ConfigReader::ConfigReader(line %d): Found %d config files\n",__LINE__,fileList.size()); }
         processFileList(fileList);
     }
 }
 
 
 ConfigReader::~ConfigReader(){
-    if(HID_DEBUG) log_printf("ConfigReader::~ConfigReader(line %d): ~ConfigReader\n",__LINE__);
+    if(HID_DEBUG){ log_printf("ConfigReader::~ConfigReader(line %d): ~ConfigReader\n",__LINE__); }
     freeFSHandles();
 }
 
@@ -59,7 +59,7 @@ void ConfigReader::freeFSHandles(){
 
 // Mounting the sdcard without any external lib to be portable
 s32 ConfigReader::InitSDCard(){
-    if(HID_DEBUG) log_printf("ConfigReader::InitSDCard(line %d): InitSDCard\n",__LINE__);
+    if(HID_DEBUG){ log_printf("ConfigReader::InitSDCard(line %d): InitSDCard\n",__LINE__); }
 
     char mountSrc[FS_MOUNT_SOURCE_SIZE];
     char mountPath[FS_MAX_MOUNTPATH_SIZE];
@@ -102,7 +102,7 @@ s32 ConfigReader::InitSDCard(){
 std::vector<std::string> ConfigReader::ScanFolder(){
     std::string path = CONTROLLER_PATCHER_PATH;
     s32 dirhandle = 0;
-    if(HID_DEBUG) log_printf("ConfigReader::ScanFolder(line %d): Opening %s\n",__LINE__,path.c_str());
+    if(HID_DEBUG){ log_printf("ConfigReader::ScanFolder(line %d): Opening %s\n",__LINE__,path.c_str()); }
     std::vector<std::string> config_files;
     if (this->pClient && this->pCmd){
         s32 status = 0;
@@ -113,7 +113,7 @@ std::vector<std::string> ConfigReader::ScanFolder(){
                 if((dir_entry.stat.flag&FS_STAT_FLAG_IS_DIRECTORY) != FS_STAT_FLAG_IS_DIRECTORY){
                     if(CPStringTools::EndsWith(std::string(dir_entry.name),".ini")){
                         config_files.push_back(full_path);
-                        if(HID_DEBUG) log_printf("ConfigReader::ScanFolder(line %d): %s \n",__LINE__,full_path.c_str());
+                        if(HID_DEBUG){ log_printf("ConfigReader::ScanFolder(line %d): %s \n",__LINE__,full_path.c_str()); }
                     }
                 }
             }
