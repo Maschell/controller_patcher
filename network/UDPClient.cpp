@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "UDPClient.hpp"
-#include <malloc.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "utils/logger.h"
+
 #define MAX_UDP_SIZE 0x578
 
 UDPClient * UDPClient::instance = NULL;

@@ -14,15 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+#include "./ConfigParser.hpp"
 #include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "../ConfigReader.hpp"
-#include "../utils/CPStringTools.hpp"
-#include "./ConfigParser.hpp"
-#include "./ConfigValues.hpp"
 
 ConfigParser::ConfigParser(std::string configData){
     this->content = configData;

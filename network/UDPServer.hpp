@@ -17,9 +17,7 @@
 #ifndef _UDPSERVER_WINDOW_H_
 #define _UDPSERVER_WINDOW_H_
 
-#include "../utils/ControllerPatcherThread.hpp"
-#include "dynamic_libs/socket_functions.h"
-#include "utils/logger.h"
+#include "../ControllerPatcher.hpp"
 
 #define DEFAULT_UDP_PORT    8113
 

@@ -14,12 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+#include "ControllerPatcherUtils.hpp"
 #include <math.h>
 #include <string.h>
-#include "ControllerPatcherUtils.hpp"
-#include "../utils/PadConst.hpp"
-#include "utils/logger.h"
 
+#include "utils/logger.h"
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDataByHandle(s32 handle, my_cb_user ** data){
     for(s32 i = 0;i< gHIDMaxDevices;i++){

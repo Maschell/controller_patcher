@@ -1,10 +1,9 @@
+#include "CPStringTools.hpp"
 #include <string>
 #include <vector>
 #include <stdio.h>
 #include <string.h>
-#include <gctypes.h>
-#include "CPStringTools.hpp"
-#include "PadConst.hpp"
+
 #include <stdarg.h>
 #include <stdlib.h>
 

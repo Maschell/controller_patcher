@@ -25,11 +25,8 @@
 #include <gctypes.h>
 
 #include "../ControllerPatcher.hpp"
-#include "../ConfigReader.hpp"
-#include "../utils/PadConst.hpp"
 
 #include "utils/logger.h"
-#include "../utils/CPRetainVars.hpp"
 
 enum PARSE_TYPE{
     PARSE_CONTROLLER,

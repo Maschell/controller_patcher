@@ -17,9 +17,10 @@
 #ifndef _TCPSERVER_WINDOW_H_
 #define _TCPSERVER_WINDOW_H_
 
-#include "../utils/ControllerPatcherThread.hpp"
+#include "../ControllerPatcher.hpp"
+
 #include "dynamic_libs/socket_functions.h"
-#include "utils/logger.h"
+#include "dynamic_libs/os_functions.h"
 
 #define WIIU_CP_TCP_HANDSHAKE               WIIU_CP_TCP_HANDSHAKE_VERSION_3
 

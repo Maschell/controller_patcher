@@ -1,6 +1,8 @@
 #ifndef _CONTROLLERPATCHERNET_H_
 #define _CONTROLLERPATCHERNET_H_
 
+#include<gctypes.h>
+
 class ControllerPatcherNet{
     friend class TCPServer;
     friend class UDPServer;

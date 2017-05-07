@@ -2,6 +2,7 @@
 #define _CPSTRING_TOOLS_H_
 #include <string>
 #include <vector>
+#include <gctypes.h>
 
 class CPStringTools{
     public:

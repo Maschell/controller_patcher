@@ -28,11 +28,11 @@
 #define _CONTROLLER_PATCHER_UTIL_H_
 
 #include <gctypes.h>
-#include "../ControllerPatcher.hpp"
-#include "./ControllerPatcherHID.hpp"
-#include "../utils/CPRetainVars.hpp"
+
 #include "dynamic_libs/vpad_functions.h"
 #include "dynamic_libs/padscore_functions.h"
+
+#include "../ControllerPatcher.hpp"
 
 class ControllerPatcherUtils{
     //give the other classes access to the private functions.

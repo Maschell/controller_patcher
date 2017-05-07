@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+#include "./ConfigValues.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "./ConfigValues.hpp"
-#include "../utils/CPRetainVars.hpp"
+
 #include "utils/logger.h"
 
 ConfigValues *ConfigValues::instance = NULL;

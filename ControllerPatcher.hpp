@@ -28,28 +28,28 @@
 #define _CONTROLLER_PATCHER_H_
 
 #include <gctypes.h>
+#include <string>
 
-#include "./patcher/ControllerPatcherHID.hpp"
 
 #include "./patcher/ControllerPatcherDefs.h"
-#include "./utils/PadConst.hpp"
-
-#include "./ConfigReader.hpp"
-#include "./config/ConfigValues.hpp"
-#include "network/TCPServer.hpp"
-#include "network/UDPServer.hpp"
-#include "network/UDPClient.hpp"
-
-#include "dynamic_libs/sys_functions.h"
-#include "dynamic_libs/syshid_functions.h"
-#include "dynamic_libs/socket_functions.h"
-#include "dynamic_libs/padscore_functions.h"
-#include "dynamic_libs/vpad_functions.h"
-#include "dynamic_libs/padscore_functions.h"
-
+#include "./utils/ControllerPatcherThread.hpp"
 #include "./utils/CPRetainVars.hpp"
-#include "utils/logger.h"
+#include "./utils/PadConst.hpp"
 #include "./utils/CPStringTools.hpp"
+
+#include "./patcher/ControllerPatcherHID.hpp"
+#include "./patcher/ControllerPatcherUtils.hpp"
+
+#include "./config/ConfigValues.hpp"
+#include "./config/ConfigParser.hpp"
+
+#include "./network/ControllerPatcherNet.hpp"
+#include "./network/TCPServer.hpp"
+#include "./network/UDPServer.hpp"
+#include "./network/UDPClient.hpp"
+#include "./ConfigReader.hpp"
+
+#include "dynamic_libs/vpad_functions.h"
 
 
 #define HID_DEBUG 0
@@ -238,7 +238,7 @@ class ControllerPatcher{
         static void destroyConfigHelper();
 
         static CONTROLLER_PATCHER_RESULT_OR_ERROR doSamplingForDeviceSlot(u16 device_slot);
-        
+
         static CONTROLLER_PATCHER_RESULT_OR_ERROR setRumbleActivated(bool value);
 
         static bool isRumbleActivated();

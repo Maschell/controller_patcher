@@ -17,19 +17,11 @@
 #ifndef _ConfigReader_H_
 #define _ConfigReader_H_
 
+#include <gctypes.h>
 #include <string>
 #include <vector>
-#include <map>
-
-#include <stdio.h>
-#include <gctypes.h>
 
 #include "./ControllerPatcher.hpp"
-#include "./utils/PadConst.hpp"
-#include "./utils/CPRetainVars.hpp"
-
-#include "dynamic_libs/fs_functions.h"
-#include "utils/logger.h"
 
 #define CONTROLLER_PATCHER_PATH "/vol/external01/wiiu/controller";
 

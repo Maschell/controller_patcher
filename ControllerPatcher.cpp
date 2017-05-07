@@ -14,13 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
+#include "ControllerPatcher.hpp"
 #include <malloc.h>
 #include <stdlib.h>
-#include <stdio.h>
+
 #include <string.h>
+#include <stdio.h>
 #include <vector>
-#include "ControllerPatcher.hpp"
+
+#include "utils/logger.h"
+
+#include "dynamic_libs/sys_functions.h"
+#include "dynamic_libs/syshid_functions.h"
+#include "dynamic_libs/socket_functions.h"
+#include "dynamic_libs/padscore_functions.h"
 
 // This stores the holded buttons for the gamepad after the button remapping.
 static u32 buttonRemapping_lastButtonsHold = 0;

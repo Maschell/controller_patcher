@@ -27,12 +27,12 @@
 #ifndef _CONTROLLER_PATCHER_HID_H_
 #define _CONTROLLER_PATCHER_HID_H_
 
-#include <gctypes.h>
 #include <vector>
+
 #include "dynamic_libs/syshid_functions.h"
 #include "dynamic_libs/vpad_functions.h"
-#include "./ControllerPatcherUtils.hpp"
-#include "./ControllerPatcherDefs.h"
+
+#include "../ControllerPatcher.hpp"
 
 #define SWAP16(x) ((x>>8) | ((x&0xFF)<<8))
 #define SWAP8(x) ((x>>4) | ((x&0xF)<<4))

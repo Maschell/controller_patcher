@@ -15,9 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include <gctypes.h>
-#include "../patcher/ControllerPatcherDefs.h"
-#include "../network/TCPServer.hpp"
-#include "../utils/CPRetainVars.hpp"
+#include "../ControllerPatcher.hpp"
 
 ControllerMapping gControllerMapping __attribute__((section(".data")));
 

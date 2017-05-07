@@ -15,14 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "TCPServer.hpp"
-#include "UDPClient.hpp"
 #include <malloc.h>
 #include <stdio.h>
-#include <sys/time.h>
 #include <string.h>
-#include "../ControllerPatcher.hpp"
-#include "./ControllerPatcherNet.hpp"
-#include "../utils/CPRetainVars.hpp"
+
+#include "utils/logger.h"
 
 #define wiiu_errno (*__gh_errno_ptr())
 

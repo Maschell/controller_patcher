@@ -14,14 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+#include "./ConfigReader.hpp"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <map>
 
-#include "ConfigReader.hpp"
-#include "config/ConfigParser.hpp"
-#include "config/ConfigValues.hpp"
-#include "utils/CPStringTools.hpp"
+#include "dynamic_libs/fs_functions.h"
+#include "utils/logger.h"
 
 s32 ConfigReader::numberValidFiles = 0;
 ConfigReader *ConfigReader::instance = NULL;

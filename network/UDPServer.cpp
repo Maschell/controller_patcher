@@ -18,7 +18,10 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
-#include "../ControllerPatcher.hpp"
+
+#include "dynamic_libs/socket_functions.h"
+#include "utils/logger.h"
+
 #define MAX_UDP_SIZE 0x578
 #define wiiu_errno (*__gh_errno_ptr())
 

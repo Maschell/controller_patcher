@@ -22,10 +22,8 @@
 #include <map>
 #include <gctypes.h>
 
-#include "../utils/PadConst.hpp"
 #include "../ControllerPatcher.hpp"
 
-#include "../utils/CPStringTools.hpp"
 #include "utils/logger.h"
 
 class ConfigValues
