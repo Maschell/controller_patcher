@@ -238,6 +238,10 @@ class ControllerPatcher{
         static void destroyConfigHelper();
 
         static CONTROLLER_PATCHER_RESULT_OR_ERROR doSamplingForDeviceSlot(u16 device_slot);
+        
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setRumbleActivated(bool value);
+
+        static bool isRumbleActivated();
 };
 
 #endif /* _CONTROLLER_PATCHER_H_ */

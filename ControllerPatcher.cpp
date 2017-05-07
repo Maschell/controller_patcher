@@ -1049,3 +1049,13 @@ void ControllerPatcher::destroyConfigHelper(){
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::doSamplingForDeviceSlot(u16 device_slot){
     return ControllerPatcherUtils::doSampling(device_slot,0,true);
 }
+
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumbleActivated(bool value){
+    gGlobalRumbleActivated = value;
+    return CONTROLLER_PATCHER_ERROR_NONE;
+}
+
+bool ControllerPatcher::isRumbleActivated(){
+    return gGlobalRumbleActivated;
+}
+

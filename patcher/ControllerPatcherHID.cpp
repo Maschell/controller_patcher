@@ -101,7 +101,7 @@ void ControllerPatcherHID::myHIDReadCallback(u32 handle, s32 error, unsigned cha
 	    HIDReadCallback(handle,buf,bytes_transfered,usr);
 
         if(usr->slotdata.hidmask == gHID_LIST_DS4){
-	        usleep(1000*2); //DS4 is way tooo fast. sleeping to reduce lag. (need to check the other pads)
+	        os_usleep(1000*2); //DS4 is way tooo fast. sleeping to reduce lag. (need to check the other pads)
 	    }
         HIDRead(handle, usr->buf, bytes_transfered, myHIDReadCallback, usr);
 	}
@@ -605,6 +605,8 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(u32 hidmask,
 
 void ControllerPatcherHID::HIDGCRumble(u32 handle,my_cb_user *usr){
     if(usr == NULL) return;
+    if(!ControllerPatcher::isRumbleActivated()) return;
+
     s32 rumblechanged = 0;
 
     for(s32 i = 0;i<HID_GC_PAD_COUNT;i++){
@@ -625,6 +627,7 @@ void ControllerPatcherHID::HIDGCRumble(u32 handle,my_cb_user *usr){
 
 void ControllerPatcherHID::HIDRumble(u32 handle,my_cb_user *usr,u32 pad){
     if(usr == NULL || pad > HID_MAX_PADS_COUNT) return;
+    if(!ControllerPatcher::isRumbleActivated()) return;
 
     s32 rumblechanged = 0;
     HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[pad]);

@@ -123,7 +123,7 @@ s32 TCPServer::RunTCP(){
 		ret = ControllerPatcherNet::checkbyte(clientfd);
 		if (ret < 0) {
             if(wiiu_errno != 6) return ret;
-            usleep(1000);
+            os_usleep(1000);
 			continue;
 		}
         //log_printf("got byte from tcp! %01X\n",ret);
@@ -280,7 +280,7 @@ s32 TCPServer::RunTCP(){
 
 void TCPServer::ErrorHandling(){
     CloseSockets();
-    usleep(1000*1000*2);
+    os_usleep(1000*1000*2);
 }
 
 void TCPServer::DoTCPThreadInternal(){
