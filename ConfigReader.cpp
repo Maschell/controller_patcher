@@ -64,7 +64,7 @@ void ConfigReader::freeFSHandles(){
     }
 }
 
-// Mounting the sdcard without any external lib to be portable
+// Mounting the sdcard without any external lib to be portable (Currently broken)
 s32 ConfigReader::InitSDCard(){
     if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): InitSDCard\n",__LINE__); }
 
@@ -81,28 +81,17 @@ s32 ConfigReader::InitSDCard(){
     memset(mountSrc, 0, FS_MOUNT_SOURCE_SIZE);
     memset(mountPath, 0, FS_MAX_MOUNTPATH_SIZE);
 
-    if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
-
     freeFSHandles();
-
-    if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
 
     this->pClient = malloc(sizeof(FSClient));
     this->pCmd = malloc(sizeof(FSCmdBlock));
 
-    if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
-
     s32 status = 0;
 
     if (this->pClient && this->pCmd){
-        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
-
         FSInit();
-        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
         FSInitCmdBlock((FSCmdBlock*)pCmd);
-        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
         FSAddClientEx((FSClient*)pClient,0, -1);
-        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
         if ((status = FSGetMountSource((FSClient*)this->pClient,(FSCmdBlock*)this->pCmd, FS_MOUNT_SOURCE_SD, (FSMountSource *)mountSrc, 0)) == FS_STATUS_OK)
         {
             if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
