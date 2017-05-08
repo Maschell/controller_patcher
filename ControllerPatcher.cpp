@@ -755,6 +755,92 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumble(UController_Type
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevicesEx(InputDataEx * output,s32 array_size){
+    s32 hid = gHIDCurrentDevice;
+    HID_Data * data_cur;
+    VPADStatus pad_buffer;
+    VPADStatus * buffer = &pad_buffer;
+    s32 result = CONTROLLER_PATCHER_ERROR_NONE;
+    for(s32 i = 0;i< gHIDMaxDevices;i++){
+        if(result > array_size){
+            break;
+        }
+        if((hid & (1 << i)) != 0){
+            memset(buffer,0,sizeof(*buffer));
+
+            s32 newhid = (1 << i);
+
+            s32 buttons_hold = 0;
+
+            for(s32 pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
+                InputButtonData * buttondata = &output[result].button_data;
+                InputStickData * stickdata = &output[result].stick_data;
+                u8 * status = &output[result].status;
+                buttons_hold = 0;
+                buttondata->hold = 0;
+                buttondata->trigger = 0;
+                buttondata->release = 0;
+
+                result++;
+                if(result > array_size){
+                    break;
+                }
+
+                s32 res;
+                if((res = ControllerPatcherHID::getHIDData(newhid,pad,&data_cur)) < 0){
+                        *status = 0;
+                        continue;
+                }
+                *status = 1;
+
+                res = ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_A);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_B);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_X);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_Y);
+
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_LEFT);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_RIGHT);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_DOWN);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_UP);
+
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_MINUS);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_L);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_R);
+
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_PLUS);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_ZL);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_ZR);
+
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_HOME);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_STICK_L);
+                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_STICK_R);
+
+                buttondata->hold |= buttons_hold;
+                buttondata->trigger |= (buttons_hold & (~(data_cur->last_buttons)));
+                buttondata->release |= ((data_cur->last_buttons) & (~buttons_hold));
+
+                buffer->leftStick.x = 0.0f;
+                buffer->leftStick.y = 0.0f;
+                buffer->rightStick.x = 0.0f;
+                buffer->rightStick.y = 0.0f;
+
+                ControllerPatcherUtils::convertAnalogSticks(data_cur,buffer);
+                ControllerPatcherUtils::normalizeStickValues(&(buffer->leftStick));
+                ControllerPatcherUtils::normalizeStickValues(&(buffer->rightStick));
+
+                stickdata->leftStickX = buffer->leftStick.x;
+                stickdata->leftStickY = buffer->leftStick.y;
+                stickdata->rightStickX = buffer->rightStick.x;
+                stickdata->rightStickY = buffer->rightStick.y;
+
+                data_cur->last_buttons = buttons_hold;
+            }
+        }
+    }
+
+    return array_size;
+}
+
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(InputData * output,s32 array_size){
     s32 hid = gHIDCurrentDevice;
     HID_Data * data_cur;

@@ -352,6 +352,7 @@ typedef struct _InputButtonData{
     u32 trigger; /**< Buttons that started pressing */
     u32 release; /**< Buttons that were button released */
 }InputButtonData;
+
 /**
  *  @brief Struct where the inputdata of a device for all HID_MAX_PADS_COUNT pads can be stored
  */
@@ -359,6 +360,20 @@ typedef struct _InputData{
     DeviceInfo device_info; /**< Infos about the device where the data is coming from */
     InputButtonData button_data[HID_MAX_PADS_COUNT];
 }InputData;
+
+typedef struct _InputStickData{
+    f32 leftStickX;
+    f32 leftStickY;
+    f32 rightStickX;
+    f32 rightStickY;
+}InputStickData;
+
+typedef struct _InputDataEx{
+    u8 status;
+    InputButtonData button_data;
+    InputStickData stick_data;
+}InputDataEx;
+
 /**
  *  @brief The enumeration of WiiU Controller types
  */

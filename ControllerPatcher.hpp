@@ -217,6 +217,7 @@ class ControllerPatcher{
             @return When the functions failed result < 0 is returned. If the result is == 0 the function was successful. If the result is > 0 the number of stored sets in the array is returned.
         **/
         static CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevices(InputData * output,s32 array_size);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevicesEx(InputDataEx * output,s32 array_size);
 
         /**
             Remaps the buttons in the given \p VPADStatus pointer. InitButtonMapping() needs to be called before calling this. The information about the remapping is stored in the config_controller array.

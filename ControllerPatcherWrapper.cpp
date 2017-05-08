@@ -27,8 +27,8 @@ extern "C" CONTROLLER_PATCHER_RESULT_OR_ERROR setControllerDataFromHID(VPADStatu
     ControllerPatcher::setControllerDataFromHID(data);
 }
 
-extern "C" CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevices(InputData * output,s32 array_size){
-    ControllerPatcher::gettingInputAllDevices(output,array_size);
+extern "C" CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevicesEx(InputDataEx * output,s32 array_size){
+    ControllerPatcher::gettingInputAllDevicesEx(output,array_size);
 }
 
 extern "C" void ControllerPatcherDeInit(void){

@@ -90,8 +90,11 @@ s32 ConfigReader::InitSDCard(){
 
     if (this->pClient && this->pCmd){
         FSInit();
+        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): FSInit done\n",__LINE__); }
         FSInitCmdBlock((FSCmdBlock*)pCmd);
-        FSAddClientEx((FSClient*)pClient,0, -1);
+        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): Init CMD Block done\n",__LINE__); }
+        status = FSAddClientEx((FSClient*)pClient,0, -1);
+        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): Added Client, result: %d\n",__LINE__,status); }
         if ((status = FSGetMountSource((FSClient*)this->pClient,(FSCmdBlock*)this->pCmd, FS_MOUNT_SOURCE_SD, (FSMountSource *)mountSrc, 0)) == FS_STATUS_OK)
         {
             if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
