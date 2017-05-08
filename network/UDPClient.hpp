@@ -17,11 +17,9 @@
 #ifndef _UDPCLIENT_WINDOW_H_
 #define _UDPCLIENT_WINDOW_H_
 
-#include <gctypes.h>
-
 #include "../ControllerPatcher.hpp"
 
-#include "dynamic_libs/socket_functions.h"
+#include "sys/socket.h"
 
 #define DEFAULT_UDP_CLIENT_PORT    8114
 

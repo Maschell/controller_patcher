@@ -1,7 +1,7 @@
 #ifndef _CONTROLLERPATCHERNET_H_
 #define _CONTROLLERPATCHERNET_H_
 
-#include<gctypes.h>
+#include "wiiu/types.h"
 
 class ControllerPatcherNet{
     friend class TCPServer;

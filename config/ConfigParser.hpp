@@ -22,11 +22,8 @@
 #include <map>
 
 #include <stdio.h>
-#include <gctypes.h>
 
 #include "../ControllerPatcher.hpp"
-
-#include "utils/logger.h"
 
 enum PARSE_TYPE{
     PARSE_CONTROLLER,

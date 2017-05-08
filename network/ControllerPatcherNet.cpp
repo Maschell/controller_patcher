@@ -1,6 +1,6 @@
 #include "ControllerPatcherNet.hpp"
-#include "dynamic_libs/os_functions.h"
-#include "dynamic_libs/socket_functions.h"
+#include "wiiu/os.h"
+#include "sys/socket.h"
 
 s32 ControllerPatcherNet::recvwait(s32 sock, void *buffer, s32 len) {
 	s32 ret;

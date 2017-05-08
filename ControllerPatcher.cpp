@@ -22,12 +22,12 @@
 #include <stdio.h>
 #include <vector>
 
-#include "utils/logger.h"
+#include "wiiu/sysapp.h"
+#include "wiiu/syshid.h"
+#include "sys/socket.h"
+#include "wiiu/kpad.h"
 
-#include "dynamic_libs/sys_functions.h"
-#include "dynamic_libs/syshid_functions.h"
-#include "dynamic_libs/socket_functions.h"
-#include "dynamic_libs/padscore_functions.h"
+#include "utils/CPRetainVars.hpp"
 
 // This stores the holded buttons for the gamepad after the button remapping.
 static u32 buttonRemapping_lastButtonsHold = 0;
@@ -36,13 +36,13 @@ static u32 buttonRemapping_lastButtonsHold = 0;
 
 // This arrays stores the last hold buttons of the Pro Controllers. One u32 for each channel of the controllers
 static u32 last_button_hold[4] = {0,0,0,0};
-// This arrays stores the VPADDATA that will be used to get the HID Data for the Pro Controllers. One for each channel.
-static VPADData myVPADBuffer[4];
+// This arrays stores the VPADStatus that will be used to get the HID Data for the Pro Controllers. One for each channel.
+static VPADStatus myVPADBuffer[4];
 
 void ControllerPatcher::InitButtonMapping(){
-    if(HID_DEBUG){ log_printf("ControllerPatcher::InitButtonMapping(line %d): Init called \n",__LINE__); }
+    if(HID_DEBUG){ printf("ControllerPatcher::InitButtonMapping(line %d): Init called \n",__LINE__); }
     if(!gButtonRemappingConfigDone){
-        if(HID_DEBUG){ log_printf("ControllerPatcher::InitButtonMapping(line %d): Remapping is running! \n",__LINE__); }
+        if(HID_DEBUG){ printf("ControllerPatcher::InitButtonMapping(line %d): Remapping is running! \n",__LINE__); }
         gButtonRemappingConfigDone = 1;
         memset(gGamePadValues,0,sizeof(gGamePadValues)); // Init / Invalid everything
 
@@ -105,12 +105,12 @@ void ControllerPatcher::ResetConfig(){
     gHIDRegisteredDevices = 0;
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     gGamePadSlot = slotdata.deviceslot;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register Gamepad-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(slotdata.hidmask),gGamePadSlot); }
+    if(HID_DEBUG){ printf("ControllerPatcher::ResetConfig(line %d): Register Gamepad-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(slotdata.hidmask),gGamePadSlot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     gMouseSlot = slotdata.deviceslot;
     gHID_LIST_MOUSE = slotdata.hidmask;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register Mouse-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_MOUSE),gMouseSlot); }
+    if(HID_DEBUG){ printf("ControllerPatcher::ResetConfig(line %d): Register Mouse-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_MOUSE),gMouseSlot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 keyboard_slot = slotdata.deviceslot;
@@ -118,36 +118,36 @@ void ControllerPatcher::ResetConfig(){
     gHID_LIST_KEYBOARD = keyboard_hid;
     gHID_SLOT_KEYBOARD = keyboard_slot;
 
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register Keyboard-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_KEYBOARD),gHID_SLOT_KEYBOARD); }
+    if(HID_DEBUG){ printf("ControllerPatcher::ResetConfig(line %d): Register Keyboard-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_KEYBOARD),gHID_SLOT_KEYBOARD); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 gc_slot = slotdata.deviceslot;
     u32 gc_hid = slotdata.hidmask;
     gHID_LIST_GC = gc_hid;
     gHID_SLOT_GC = gc_slot;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register GC-Adapter-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_GC),gHID_SLOT_GC); }
+    if(HID_DEBUG){ printf("ControllerPatcher::ResetConfig(line %d): Register GC-Adapter-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_GC),gHID_SLOT_GC); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 ds3_slot = slotdata.deviceslot;
     u32 ds3_hid = slotdata.hidmask;
     gHID_LIST_DS3 = ds3_hid;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register DS3-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_DS3),ds3_slot); }
+    if(HID_DEBUG){ printf("ControllerPatcher::ResetConfig(line %d): Register DS3-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_DS3),ds3_slot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 ds4_slot = slotdata.deviceslot;
     u32 ds4_hid = slotdata.hidmask;
     gHID_LIST_DS4 = ds4_hid;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register DS4-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(ds4_hid),ds4_slot); }
+    if(HID_DEBUG){ printf("ControllerPatcher::ResetConfig(line %d): Register DS4-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(ds4_hid),ds4_slot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 xinput_slot = slotdata.deviceslot;
     u32 xinput_hid = slotdata.hidmask;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register XInput-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(xinput_hid),xinput_slot); }
+    if(HID_DEBUG){ printf("ControllerPatcher::ResetConfig(line %d): Register XInput-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(xinput_hid),xinput_slot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 switch_pro_slot = slotdata.deviceslot;
     gHID_LIST_SWITCH_PRO = slotdata.hidmask;
-    log_printf("ControllerPatcher::ResetConfig(line %d): Register Switch-Pro-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_SWITCH_PRO),switch_pro_slot);
+    printf("ControllerPatcher::ResetConfig(line %d): Register Switch-Pro-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_SWITCH_PRO),switch_pro_slot);
 
 
     config_controller_hidmask[gc_slot] =                                                            gHID_LIST_GC;
@@ -471,11 +471,12 @@ void ControllerPatcher::ResetConfig(){
 }
 
 bool ControllerPatcher::Init(){
+    /*
     InitOSFunctionPointers();
     InitSocketFunctionPointers();
     InitSysHIDFunctionPointers();
     InitVPadFunctionPointers();
-    InitPadScoreFunctionPointers();
+    InitPadScoreFunctionPointers();*/
 
     gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead + 0x1F0);
     if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK){
@@ -486,39 +487,40 @@ bool ControllerPatcher::Init(){
             gSamplingCallback = NULL;
         }
     }
-    log_printf("ControllerPatcher::Init(line %d): Found the gSamplingCallback at %08X \n",__LINE__,gSamplingCallback);
+    printf("ControllerPatcher::Init(line %d): Found the gSamplingCallback at %08X \n",__LINE__,gSamplingCallback);
 
-    if(HID_DEBUG){ log_printf("ControllerPatcher::Init(line %d): Init called! \n",__LINE__); }
+    if(HID_DEBUG){ printf("ControllerPatcher::Init(line %d): Init called! \n",__LINE__); }
 
-    if(syshid_handle == 0){
-         log_printf("ControllerPatcher::Init(line %d): Failed to load the HID API \n",__LINE__);
+    /* if(syshid_handle == 0){
+         printf("ControllerPatcher::Init(line %d): Failed to load the HID API \n",__LINE__);
          return false;
-    }
+    }*/
 
     if(gConfig_done == HID_INIT_NOT_DONE){
-        if(HID_DEBUG){ log_printf("ControllerPatcher::Init(line %d): First time calling the Init\n",__LINE__); }
+        if(HID_DEBUG){ printf("ControllerPatcher::Init(line %d): First time calling the Init\n",__LINE__); }
         gConfig_done = HID_INIT_DONE;
         ControllerPatcher::ResetConfig();
     }else{
-        if(HID_DEBUG){ log_printf("ControllerPatcher::Init(line %d): ControllerPatcher::Init(): Config already done!\n",__LINE__); }
+        if(HID_DEBUG){ printf("ControllerPatcher::Init(line %d): ControllerPatcher::Init(): Config already done!\n",__LINE__); }
     }
 
-    if(gConfig_done != HID_SDCARD_READ){
-        log_printf("ControllerPatcher::Init(line %d): Reading config files from SD Card\n",__LINE__);
+    //Broken
+    /*if(gConfig_done != HID_SDCARD_READ){
+        printf("ControllerPatcher::Init(line %d): Reading config files from SD Card\n",__LINE__);
         ConfigReader* reader = ConfigReader::getInstance();
         s32 status = 0;
         if((status = reader->InitSDCard()) == 0){
-            if(HID_DEBUG){ log_printf("ControllerPatcher::Init(line %d):  SD Card mounted for controller config!\n",__LINE__); }
+            if(HID_DEBUG){ printf("ControllerPatcher::Init(line %d):  SD Card mounted for controller config!\n",__LINE__); }
              reader->ReadAllConfigs();
-            log_printf("ControllerPatcher::Init(line %d): Done with reading config files from SD Card\n",__LINE__);
+            printf("ControllerPatcher::Init(line %d): Done with reading config files from SD Card\n",__LINE__);
             gConfig_done = HID_SDCARD_READ;
         }else{
-            log_printf("ControllerPatcher::Init(line %d): SD mounting failed! %d\n",__LINE__,status);
+            printf("ControllerPatcher::Init(line %d): SD mounting failed! %d\n",__LINE__,status);
         }
         ConfigReader::destroyInstance();
-    }
+    }*/
 
-    log_printf("ControllerPatcher::Init(line %d): Initializing the data for button remapping\n",__LINE__);
+    printf("ControllerPatcher::Init(line %d): Initializing the data for button remapping\n",__LINE__);
     InitButtonMapping();
 
     if(!gHIDAttached){
@@ -540,7 +542,7 @@ void ControllerPatcher::stopNetworkServer(){
 }
 
 void ControllerPatcher::DeInit(){
-    if(HID_DEBUG){ log_printf("ControllerPatcher::DeInit(line %d) called! \n",__LINE__); }
+    if(HID_DEBUG){ printf("ControllerPatcher::DeInit(line %d) called! \n",__LINE__); }
 
     if(gHIDAttached) HIDDelClient(&gHIDClient);
 
@@ -601,21 +603,21 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::disableWiiUEnergySetting()
     s32 res;
     if(IMIsDimEnabled(&res) == 0){
         if(res == 1){
-            if(HID_DEBUG){ log_print("ControllerPatcher::disableWiiUEnergySetting(): Dim was orignally enabled!\n"); }
+            if(HID_DEBUG){ printf("ControllerPatcher::disableWiiUEnergySetting(): Dim was orignally enabled!\n"); }
             gOriginalDimState = 1;
         }
     }
 
     if(IMIsAPDEnabled(&res) == 0){
         if(res == 1){
-            if(HID_DEBUG){ log_print("ControllerPatcher::disableWiiUEnergySetting(): Auto power down was orignally enabled!\n"); }
+            if(HID_DEBUG){ printf("ControllerPatcher::disableWiiUEnergySetting(): Auto power down was orignally enabled!\n"); }
             gOriginalAPDState = 1;
         }
     }
 
     IMDisableDim();
     IMDisableAPD();
-    log_print("ControllerPatcher::disableWiiUEnergySetting(): Disable Energy savers\n");
+    printf("ControllerPatcher::disableWiiUEnergySetting(): Disable Energy savers\n");
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
@@ -623,11 +625,11 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::restoreWiiUEnergySetting()
 
     //Check if we need to enable Auto Power down again on exiting
     if(gOriginalAPDState == 1){
-        log_print("ControllerPatcher::restoreWiiUEnergySetting(): Auto shutdown was on before using HID to VPAD. Setting it to on again.\n");
+        printf("ControllerPatcher::restoreWiiUEnergySetting(): Auto shutdown was on before using HID to VPAD. Setting it to on again.\n");
         IMEnableAPD();
     }
     if(gOriginalDimState == 1){
-        log_print("ControllerPatcher::restoreWiiUEnergySetting(): Burn-in reduction was on before using HID to VPAD. Setting it to on again.\n");
+        printf("ControllerPatcher::restoreWiiUEnergySetting(): Burn-in reduction was on before using HID to VPAD. Setting it to on again.\n");
         IMEnableDim();
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
@@ -756,8 +758,8 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumble(UController_Type
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(InputData * output,s32 array_size){
     s32 hid = gHIDCurrentDevice;
     HID_Data * data_cur;
-    VPADData pad_buffer;
-    VPADData * buffer = &pad_buffer;
+    VPADStatus pad_buffer;
+    VPADStatus * buffer = &pad_buffer;
     s32 result = CONTROLLER_PATCHER_ERROR_NONE;
     for(s32 i = 0;i< gHIDMaxDevices;i++){
         if((hid & (1 << i)) != 0){
@@ -786,9 +788,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
 
             for(s32 pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
                 buttons_hold = 0;
-                buttondata[pad].btn_h = 0;
-                buttondata[pad].btn_d = 0;
-                buttondata[pad].btn_r = 0;
+                buttondata[pad].hold = 0;
+                buttondata[pad].trigger = 0;
+                buttondata[pad].release = 0;
                 s32 res;
 
                 if((res = ControllerPatcherHID::getHIDData(deviceinfo->slotdata.hidmask,pad,&data_cur)) < 0){
@@ -817,9 +819,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
                 ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_STICK_L);
                 ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_STICK_R);
 
-                buttondata[pad].btn_h |= buttons_hold;
-                buttondata[pad].btn_d |= (buttons_hold & (~(data_cur->last_buttons)));
-                buttondata[pad].btn_r |= ((data_cur->last_buttons) & (~buttons_hold));
+                buttondata[pad].hold |= buttons_hold;
+                buttondata[pad].trigger |= (buttons_hold & (~(data_cur->last_buttons)));
+                buttondata[pad].release |= ((data_cur->last_buttons) & (~buttons_hold));
 
                 data_cur->last_buttons = buttons_hold;
             }
@@ -839,7 +841,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
     if(chan < 0 || chan > 3) return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;
     //if(gControllerMapping.proController[chan].enabled == 0) return CONTROLLER_PATCHER_ERROR_MAPPING_DISABLED;
 
-    VPADData * vpad_buffer = &myVPADBuffer[chan];
+    VPADStatus * vpad_buffer = &myVPADBuffer[chan];
     memset(vpad_buffer,0,sizeof(*vpad_buffer));
 
     std::vector<HID_Data *> data_list;
@@ -856,7 +858,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
 
         s32 res;
         if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
-            log_printf("ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) = %d\n",res);
+            printf("ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) = %d\n",res);
             continue;
         }
 
@@ -866,7 +868,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
         HID_Data * data_cur;
 
         if((res = ControllerPatcherHID::getHIDData(hidmask,pad,&data_cur)) < 0) {
-            //log_printf("ControllerPatcherHID::getHIDData(hidmask,pad,&data_cur)) = %d\n",res);
+            //printf("ControllerPatcherHID::getHIDData(hidmask,pad,&data_cur)) = %d\n",res);
             continue;
         }
         data_list.push_back(data_cur);
@@ -896,7 +898,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(VPADData * buffer){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(VPADStatus * buffer){
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     //if(gControllerMapping.gamepad.enabled == 0) return CONTROLLER_PATCHER_ERROR_MAPPING_DISABLED;
 
@@ -948,52 +950,52 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(V
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::printVPADButtons(VPADData * buffer){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::printVPADButtons(VPADStatus * buffer){
     return CONTROLLER_PATCHER_ERROR_NONE;
     /* BROKEN on transitions.*/
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
-    if(buffer->btns_d != 0x00000000){
+    if(buffer->trigger != 0x00000000){
         char output[250];
 
         output[0] = 0; //null terminate it. just in case.
 
-        if((buffer->btns_d & VPAD_BUTTON_A)                 ==  VPAD_BUTTON_A)                  strcat(output,"A        ");
-        if((buffer->btns_d & VPAD_BUTTON_B)                 ==  VPAD_BUTTON_B)                  strcat(output,"B        ");
-        if((buffer->btns_d & VPAD_BUTTON_X)                 ==  VPAD_BUTTON_X)                  strcat(output,"X        ");
-        if((buffer->btns_d & VPAD_BUTTON_Y)                 ==  VPAD_BUTTON_Y)                  strcat(output,"Y        ");
-        if((buffer->btns_d & VPAD_BUTTON_L)                 ==  VPAD_BUTTON_L)                  strcat(output,"L        ");
-        if((buffer->btns_d & VPAD_BUTTON_R)                 ==  VPAD_BUTTON_R)                  strcat(output,"R        ");
-        if((buffer->btns_d & VPAD_BUTTON_ZR)                ==  VPAD_BUTTON_ZR)                 strcat(output,"ZR       ");
-        if((buffer->btns_d & VPAD_BUTTON_ZL)                ==  VPAD_BUTTON_ZL)                 strcat(output,"ZL       ");
-        if((buffer->btns_d & VPAD_BUTTON_LEFT)              ==  VPAD_BUTTON_LEFT)               strcat(output,"Left     ");
-        if((buffer->btns_d & VPAD_BUTTON_RIGHT)             ==  VPAD_BUTTON_RIGHT)              strcat(output,"Right    ");
-        if((buffer->btns_d & VPAD_BUTTON_UP)                ==  VPAD_BUTTON_UP)                 strcat(output,"Up       ");
-        if((buffer->btns_d & VPAD_BUTTON_DOWN)              ==  VPAD_BUTTON_DOWN)               strcat(output,"Down     ");
-        if((buffer->btns_d & VPAD_BUTTON_PLUS)              ==  VPAD_BUTTON_PLUS)               strcat(output,"+        ");
-        if((buffer->btns_d & VPAD_BUTTON_MINUS)             ==  VPAD_BUTTON_MINUS)              strcat(output,"-        ");
-        if((buffer->btns_d & VPAD_BUTTON_TV)                ==  VPAD_BUTTON_TV)                 strcat(output,"TV       ");
-        if((buffer->btns_d & VPAD_BUTTON_HOME)              ==  VPAD_BUTTON_HOME)               strcat(output,"HOME     ");
-        if((buffer->btns_d & VPAD_BUTTON_STICK_L)           ==  VPAD_BUTTON_STICK_L)            strcat(output,"SL       ");
-        if((buffer->btns_d & VPAD_BUTTON_STICK_R)           ==  VPAD_BUTTON_STICK_R)            strcat(output,"SR       ");
-        if((buffer->btns_d & VPAD_STICK_R_EMULATION_LEFT)   ==  VPAD_STICK_R_EMULATION_LEFT)    strcat(output,"RE_Left  ");
-        if((buffer->btns_d & VPAD_STICK_R_EMULATION_RIGHT)  ==  VPAD_STICK_R_EMULATION_RIGHT)   strcat(output,"RE_Right ");
-        if((buffer->btns_d & VPAD_STICK_R_EMULATION_UP)     ==  VPAD_STICK_R_EMULATION_UP)      strcat(output,"RE_Up    ");
-        if((buffer->btns_d & VPAD_STICK_R_EMULATION_DOWN)   ==  VPAD_STICK_R_EMULATION_DOWN)    strcat(output,"RE_Down  ");
-        if((buffer->btns_d & VPAD_STICK_L_EMULATION_LEFT)   ==  VPAD_STICK_L_EMULATION_LEFT)    strcat(output,"LE_Left  ");
-        if((buffer->btns_d & VPAD_STICK_L_EMULATION_RIGHT)  ==  VPAD_STICK_L_EMULATION_RIGHT)   strcat(output,"LE_Right ");
-        if((buffer->btns_d & VPAD_STICK_L_EMULATION_UP)     ==  VPAD_STICK_L_EMULATION_UP)      strcat(output,"LE_Up    ");
-        if((buffer->btns_d & VPAD_STICK_L_EMULATION_DOWN)   ==  VPAD_STICK_L_EMULATION_DOWN)    strcat(output,"LE_Down  ");
+        if((buffer->trigger & VPAD_BUTTON_A)                 ==  VPAD_BUTTON_A)                  strcat(output,"A        ");
+        if((buffer->trigger & VPAD_BUTTON_B)                 ==  VPAD_BUTTON_B)                  strcat(output,"B        ");
+        if((buffer->trigger & VPAD_BUTTON_X)                 ==  VPAD_BUTTON_X)                  strcat(output,"X        ");
+        if((buffer->trigger & VPAD_BUTTON_Y)                 ==  VPAD_BUTTON_Y)                  strcat(output,"Y        ");
+        if((buffer->trigger & VPAD_BUTTON_L)                 ==  VPAD_BUTTON_L)                  strcat(output,"L        ");
+        if((buffer->trigger & VPAD_BUTTON_R)                 ==  VPAD_BUTTON_R)                  strcat(output,"R        ");
+        if((buffer->trigger & VPAD_BUTTON_ZR)                ==  VPAD_BUTTON_ZR)                 strcat(output,"ZR       ");
+        if((buffer->trigger & VPAD_BUTTON_ZL)                ==  VPAD_BUTTON_ZL)                 strcat(output,"ZL       ");
+        if((buffer->trigger & VPAD_BUTTON_LEFT)              ==  VPAD_BUTTON_LEFT)               strcat(output,"Left     ");
+        if((buffer->trigger & VPAD_BUTTON_RIGHT)             ==  VPAD_BUTTON_RIGHT)              strcat(output,"Right    ");
+        if((buffer->trigger & VPAD_BUTTON_UP)                ==  VPAD_BUTTON_UP)                 strcat(output,"Up       ");
+        if((buffer->trigger & VPAD_BUTTON_DOWN)              ==  VPAD_BUTTON_DOWN)               strcat(output,"Down     ");
+        if((buffer->trigger & VPAD_BUTTON_PLUS)              ==  VPAD_BUTTON_PLUS)               strcat(output,"+        ");
+        if((buffer->trigger & VPAD_BUTTON_MINUS)             ==  VPAD_BUTTON_MINUS)              strcat(output,"-        ");
+        if((buffer->trigger & VPAD_BUTTON_TV)                ==  VPAD_BUTTON_TV)                 strcat(output,"TV       ");
+        if((buffer->trigger & VPAD_BUTTON_HOME)              ==  VPAD_BUTTON_HOME)               strcat(output,"HOME     ");
+        if((buffer->trigger & VPAD_BUTTON_STICK_L)           ==  VPAD_BUTTON_STICK_L)            strcat(output,"SL       ");
+        if((buffer->trigger & VPAD_BUTTON_STICK_R)           ==  VPAD_BUTTON_STICK_R)            strcat(output,"SR       ");
+        if((buffer->trigger & VPAD_STICK_R_EMULATION_LEFT)   ==  VPAD_STICK_R_EMULATION_LEFT)    strcat(output,"RE_Left  ");
+        if((buffer->trigger & VPAD_STICK_R_EMULATION_RIGHT)  ==  VPAD_STICK_R_EMULATION_RIGHT)   strcat(output,"RE_Right ");
+        if((buffer->trigger & VPAD_STICK_R_EMULATION_UP)     ==  VPAD_STICK_R_EMULATION_UP)      strcat(output,"RE_Up    ");
+        if((buffer->trigger & VPAD_STICK_R_EMULATION_DOWN)   ==  VPAD_STICK_R_EMULATION_DOWN)    strcat(output,"RE_Down  ");
+        if((buffer->trigger & VPAD_STICK_L_EMULATION_LEFT)   ==  VPAD_STICK_L_EMULATION_LEFT)    strcat(output,"LE_Left  ");
+        if((buffer->trigger & VPAD_STICK_L_EMULATION_RIGHT)  ==  VPAD_STICK_L_EMULATION_RIGHT)   strcat(output,"LE_Right ");
+        if((buffer->trigger & VPAD_STICK_L_EMULATION_UP)     ==  VPAD_STICK_L_EMULATION_UP)      strcat(output,"LE_Up    ");
+        if((buffer->trigger & VPAD_STICK_L_EMULATION_DOWN)   ==  VPAD_STICK_L_EMULATION_DOWN)    strcat(output,"LE_Down  ");
 
-        log_printf("%spressed Sticks: LX %f LY %f RX %f RY %f\n",output,buffer->lstick.x,buffer->lstick.y,buffer->rstick.x,buffer->rstick.y);
+        printf("%spressed Sticks: LX %f LY %f RX %f RY %f\n",output,buffer->leftStick.x,buffer->leftStick.y,buffer->rightStick.x,buffer->rightStick.y);
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::buttonRemapping(VPADData * buffer,s32 buffer_count){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::buttonRemapping(VPADStatus * buffer,s32 buffer_count){
     if(!gButtonRemappingConfigDone) return CONTROLLER_PATCHER_ERROR_CONFIG_NOT_DONE;
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     for(s32 i = 0;i < buffer_count;i++){
-        VPADData new_data;
+        VPADStatus new_data;
         memset(&new_data,0,sizeof(new_data));
 
         ControllerPatcherUtils::setButtonRemappingData(&buffer[i],&new_data,VPAD_BUTTON_A,                  CONTRPS_VPAD_BUTTON_A);
@@ -1037,9 +1039,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::buttonRemapping(VPADData *
         ControllerPatcherUtils::setButtonData(&buffer[i],&new_data,VPAD_STICK_R_EMULATION_UP,               VPAD_STICK_R_EMULATION_UP);
         ControllerPatcherUtils::setButtonData(&buffer[i],&new_data,VPAD_STICK_R_EMULATION_DOWN,             VPAD_STICK_R_EMULATION_DOWN);
 
-        buffer[i].btns_h = new_data.btns_h;
-        buffer[i].btns_d = new_data.btns_d;
-        buffer[i].btns_r = new_data.btns_r;
+        buffer[i].hold = new_data.hold;
+        buffer[i].trigger = new_data.trigger;
+        buffer[i].release = new_data.release;
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
 }

@@ -27,7 +27,7 @@
 #ifndef _CONTROLLER_PATCHER_DEFS_H_
 #define _CONTROLLER_PATCHER_DEFS_H_
 
-#include <gctypes.h>
+#include <wiiu/types.h>
 
 #define FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK 0x9421FFB8
 
@@ -253,11 +253,11 @@ typedef struct _HID_Mouse_Data {
 /**
  *  @brief The enumeration of device types
  */
-enum DEVICE_TYPE
+typedef enum DEVICE_TYPE_
 {
     DEVICE_TYPE_CONTROLLER  = 0, /**< Normal Controller */
     DEVICE_TYPE_MOUSE = 1,       /**< Mouse */
-};
+}DEVICE_TYPE;
 
 /**
  *  @brief Stores all data of the HID Device for accessing
@@ -310,12 +310,12 @@ typedef struct _DeviceInfo{
 /**
  *  @brief The enumeration of Controller-Mapping types
  */
-enum ControllerMapping_Type_Defines{
+typedef enum ControllerMapping_Type_Defines_{
     CM_Type_Controller = 0, /**< Device with single input */
     CM_Type_RealController = 1, /**< Real Pro Controller */
     CM_Type_Mouse = 2, /**< Mouse */
     CM_Type_Keyboard = 3, /**< Keyboard */
-};
+} ControllerMapping_Type_Defines;
 
 /**
  *  @brief Infos of a mapped controller
@@ -348,11 +348,10 @@ typedef struct _ControllerMapping{
  *  @brief Pressed/Released/Down Button data.
  */
 typedef struct _InputButtonData{
-    u32 btn_h; /**< Buttons beeing hold */
-    u32 btn_d; /**< Buttons that started pressing */
-    u32 btn_r; /**< Buttons that were button released */
+    u32 hold; /**< Buttons beeing hold */
+    u32 trigger; /**< Buttons that started pressing */
+    u32 release; /**< Buttons that were button released */
 }InputButtonData;
-
 /**
  *  @brief Struct where the inputdata of a device for all HID_MAX_PADS_COUNT pads can be stored
  */
@@ -360,7 +359,6 @@ typedef struct _InputData{
     DeviceInfo device_info; /**< Infos about the device where the data is coming from */
     InputButtonData button_data[HID_MAX_PADS_COUNT];
 }InputData;
-
 /**
  *  @brief The enumeration of WiiU Controller types
  */

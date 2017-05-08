@@ -7,6 +7,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+#include "wiiu/types.h"
+
 bool CPStringTools::EndsWith(const std::string& a, const std::string& b) {
     if (b.size() > a.size()) return false;
     return std::equal(a.begin() + a.size() - b.size(), a.end(), b.begin());
@@ -59,6 +61,7 @@ std::string CPStringTools::removeCharFromString(std::string& input,char toBeRemo
     }
     return output;
 }
+
 
 std::string CPStringTools::strfmt(const char * format, ...){
 	std::string str;

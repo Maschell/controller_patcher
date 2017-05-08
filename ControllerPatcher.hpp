@@ -27,9 +27,7 @@
 #ifndef _CONTROLLER_PATCHER_H_
 #define _CONTROLLER_PATCHER_H_
 
-#include <gctypes.h>
 #include <string>
-
 
 #include "./patcher/ControllerPatcherDefs.h"
 #include "./utils/ControllerPatcherThread.hpp"
@@ -49,8 +47,14 @@
 #include "./network/UDPClient.hpp"
 #include "./ConfigReader.hpp"
 
-#include "dynamic_libs/vpad_functions.h"
+#include "wiiu/vpad.h"
 
+#define BUS_SPEED                       248625000
+#define SECS_TO_TICKS(sec)              (((unsigned long long)(sec)) * (BUS_SPEED/4))
+#define MILLISECS_TO_TICKS(msec)        (SECS_TO_TICKS(msec) / 1000)
+#define MICROSECS_TO_TICKS(usec)        (SECS_TO_TICKS(usec) / 1000000)
+
+#define wiiu_os_usleep(usecs)           OSSleepTicks(MICROSECS_TO_TICKS(usecs))
 
 #define HID_DEBUG 0
 
@@ -106,7 +110,7 @@ class ControllerPatcher{
 
 
         /**
-            Sets the data in a given VPADData from HID Devices. The information about which HID Device will be used is stored in the gControllerMapping array in slot 0.
+            Sets the data in a given VPADStatus from HID Devices. The information about which HID Device will be used is stored in the gControllerMapping array in slot 0.
 
             @param buffer: A pointer to an KPADData struct where the result will be stored.
             @param chan:   Indicates the channel from which slot the information about the mapped HID Device will be used.
@@ -114,7 +118,7 @@ class ControllerPatcher{
             @return When the functions failed result < 0 is returned. If the result is == 0 the function was successful.
         **/
 
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setControllerDataFromHID(VPADData * buffer);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setControllerDataFromHID(VPADStatus * buffer);
 
          /*-----------------------------------------------------------------------------------------------------------------------------------
          * Useful functions
@@ -215,23 +219,23 @@ class ControllerPatcher{
         static CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevices(InputData * output,s32 array_size);
 
         /**
-            Remaps the buttons in the given \p VPADData pointer. InitButtonMapping() needs to be called before calling this. The information about the remapping is stored in the config_controller array.
+            Remaps the buttons in the given \p VPADStatus pointer. InitButtonMapping() needs to be called before calling this. The information about the remapping is stored in the config_controller array.
             One easy way to set it is using the a config file on the SD Card.
 
             @param buffer: A pointer to the buffer where the input will be read from and the result will be stored.
 
             @return When the functions failed result < 0 is returned. If the result is == 0 the function was successful.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR buttonRemapping(VPADData * buffer, s32 buffer_count);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR buttonRemapping(VPADStatus * buffer, s32 buffer_count);
 
         /**
-            Prints the current pressed down buttons of the given \p VPADData pointer. Uses the utils/logger.c UDP logger..
+            Prints the current pressed down buttons of the given \p VPADStatus pointer. Uses the utils/logger.c UDP logger..
 
             @param buffer: A pointer to the buffer where the input will be read from.
 
             @return When the functions failed result < 0 is returned. If the result is == 0 the function was successful.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR printVPADButtons(VPADData * buffer);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR printVPADButtons(VPADStatus * buffer);
 
         static std::string getIdentifierByVIDPID(u16 vid,u16 pid);
 

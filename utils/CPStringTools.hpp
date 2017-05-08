@@ -2,14 +2,15 @@
 #define _CPSTRING_TOOLS_H_
 #include <string>
 #include <vector>
-#include <gctypes.h>
+
+#include "wiiu/types.h"
 
 class CPStringTools{
     public:
         static bool EndsWith(const std::string& a, const std::string& b);
         static std::vector<std::string> StringSplit(const std::string & inValue, const std::string & splitter);
         static std::string removeCharFromString(std::string& input,char toBeRemoved);
-        static const char *byte_to_binary(s32 x);
+        static const char * byte_to_binary(s32 test);
         static std::string strfmt(const char * format, ...);
 };
 

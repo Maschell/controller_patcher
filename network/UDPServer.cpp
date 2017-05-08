@@ -19,8 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "dynamic_libs/socket_functions.h"
-#include "utils/logger.h"
+#include "sys/socket.h"
 
 #define MAX_UDP_SIZE 0x578
 #define wiiu_errno (*__gh_errno_ptr())
@@ -59,7 +58,7 @@ UDPServer::~UDPServer(){
             this->sockfd = -1;
         }
     }
-    if(HID_DEBUG){ log_printf("UDPServer::~UDPServer(line %d): Thread has been closed\n",__LINE__); }
+    if(HID_DEBUG){ printf("UDPServer::~UDPServer(line %d): Thread has been closed\n",__LINE__); }
 
 
 }
@@ -72,7 +71,7 @@ void UDPServer::StartUDPThread(UDPServer * server){
        OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
        OSGetTitleID() == 0x00050000101a3c00){  //The Binding of Isaac: Rebirth USA
         priority = 10;
-        log_printf("UDPServer::StartUDPThread(line %d): This game needs higher thread priority. We set it to %d\n",__LINE__,priority);
+        printf("UDPServer::StartUDPThread(line %d): This game needs higher thread priority. We set it to %d\n",__LINE__,priority);
     }
     UDPServer::pThread = ControllerPatcherThread::create(UDPServer::DoUDPThread, (void*)server, ControllerPatcherThread::eAttributeAffCore2,priority);
     UDPServer::pThread->resumeThread();
@@ -80,7 +79,7 @@ void UDPServer::StartUDPThread(UDPServer * server){
 
 bool UDPServer::cpyIncrementBufferOffset(void * target, void * source, s32 * offset, s32 typesize, s32 maximum){
     if(((int)*offset + typesize) > maximum){
-        log_printf("UDPServer::cpyIncrementBufferOffset(line %d): Transfer error. Excepted %04X bytes, but only got %04X\n",__LINE__,(*offset + typesize),maximum);
+        printf("UDPServer::cpyIncrementBufferOffset(line %d): Transfer error. Excepted %04X bytes, but only got %04X\n",__LINE__,(*offset + typesize),maximum);
         return false;
     }
     memcpy(target,(void*)((u32)source+(*offset)),typesize);
@@ -105,7 +104,7 @@ void UDPServer::DoUDPThreadInternal(){
         n = recv(sockfd,buffer,MAX_UDP_SIZE,0);
         if (n < 0){
             s32 errno_ = wiiu_errno;
-            os_usleep(2000);
+            wiiu_os_usleep(2000);
             if(errno_ != 11 && errno_ != 9){
                 break;
             }
@@ -135,19 +134,19 @@ void UDPServer::DoUDPThreadInternal(){
                         if(!cpyIncrementBufferOffset((void *)&datasize,     (void *)buffer,&bufferoffset,sizeof(datasize),  n))continue;
                         u8 * databuffer = (u8*) malloc(datasize * sizeof(u8));
                         if(!databuffer){
-                            log_printf("UDPServer::DoUDPThreadInternal(line %d): Allocating memory failed\n",__LINE__);
+                            printf("UDPServer::DoUDPThreadInternal(line %d): Allocating memory failed\n",__LINE__);
                             continue;
                         }
 
                         if(!cpyIncrementBufferOffset((void *)databuffer,    (void *)buffer,&bufferoffset,datasize,          n))continue;
-                        //log_printf("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
+                        //printf("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
 
                         user.pad_slot = padslot;
                         user.slotdata.deviceslot =  deviceSlot;
                         user.slotdata.hidmask = hid;
 
                         if(gNetworkController[deviceSlot][padslot][0] == 0){
-                            log_printf("UDPServer::DoUDPThreadInternal(line %d): Ehm. Pad is not connected. STOP SENDING DATA ;) \n",__LINE__);
+                            printf("UDPServer::DoUDPThreadInternal(line %d): Ehm. Pad is not connected. STOP SENDING DATA ;) \n",__LINE__);
                         }else{
                             ControllerPatcherHID::externHIDReadCallback(handle,databuffer,datasize,&user);
                         }
@@ -165,5 +164,5 @@ void UDPServer::DoUDPThreadInternal(){
             }
         }
     }
-    if(HID_DEBUG){ log_printf("UDPServer::DoUDPThreadInternal(line %d): UDPServer Thread ended\n",__LINE__); }
+    if(HID_DEBUG){ printf("UDPServer::DoUDPThreadInternal(line %d): UDPServer Thread ended\n",__LINE__); }
 }

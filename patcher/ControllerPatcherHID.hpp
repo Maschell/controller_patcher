@@ -29,8 +29,8 @@
 
 #include <vector>
 
-#include "dynamic_libs/syshid_functions.h"
-#include "dynamic_libs/vpad_functions.h"
+#include "wiiu/syshid.h"
+#include "wiiu/vpad.h"
 
 #include "../ControllerPatcher.hpp"
 
@@ -45,7 +45,7 @@ class ControllerPatcherHID{
         static void externHIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr);
 
     private:
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setVPADControllerData(VPADData * buffer,std::vector<HID_Data *>& data);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setVPADControllerData(VPADStatus * buffer,std::vector<HID_Data *>& data);
         static std::vector<HID_Data *> getHIDDataAll();
         static CONTROLLER_PATCHER_RESULT_OR_ERROR getHIDData(u32 hidmask, s32 pad,  HID_Data ** data);
 

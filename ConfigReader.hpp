@@ -17,7 +17,8 @@
 #ifndef _ConfigReader_H_
 #define _ConfigReader_H_
 
-#include <gctypes.h>
+#include <wiiu/types.h>
+
 #include <string>
 #include <vector>
 

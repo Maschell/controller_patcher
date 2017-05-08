@@ -17,8 +17,8 @@
 #ifndef CP_RETAINS_VARS_H_
 #define CP_RETAINS_VARS_H_
 
-#include "dynamic_libs/syshid_functions.h"
-#include "dynamic_libs/padscore_functions.h"
+#include "wiiu/syshid.h"
+#include "wiiu/kpad.h"
 #include "../patcher/ControllerPatcherDefs.h"
 
 extern ControllerMapping gControllerMapping;

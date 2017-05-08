@@ -18,7 +18,6 @@
 #ifndef _PAD_CONST_H_
 #define _PAD_CONST_H_
 
-#include <gctypes.h>
 #include <string>
 #include "../patcher/ControllerPatcherDefs.h"
 
