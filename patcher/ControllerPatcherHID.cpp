@@ -160,6 +160,7 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             usr->slotdata = device_info.slotdata;
             usr->transfersize = p_device->max_packet_size_rx;
             usr->handle = p_device->handle;
+            usr->vidpid = device_info.vidpid;
             gHIDAttached |= slotdata->hidmask;
             gHIDCurrentDevice |= slotdata->hidmask;
             s32 pads_per_device = 1;
@@ -218,6 +219,15 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
 
                 DCFlushRange(&gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i],sizeof(HID_Data));
                 DCInvalidateRange(&gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i],sizeof(HID_Data));
+            }
+
+            for(s32 j = 0;j < pads_per_device; j++){
+                for(s32 i = 0;i < gHIDMaxDevices; i++){
+                    if(connectionOrderHelper[i] == NULL){
+                        connectionOrderHelper[i] = usr;
+                        break;
+                    }
+                }
             }
 
             if(HID_DEBUG){ printf("ControllerPatcherHID::AttachDetachCallback(line %d): Device successfully attached\n",__LINE__); }
@@ -299,6 +309,15 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             }
 
             if(user_data){
+                for(s32 j = 0;j < user_data->pads_per_device; j++){
+                    for(s32 i = 0;i < gHIDMaxDevices; i++){
+                        if(connectionOrderHelper[i] == user_data){
+                            connectionOrderHelper[i] = NULL;
+                            break;
+                        }
+                    }
+                }
+
                 config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1] &= ~ (1 << user_data->pad_slot);
                 DCFlushRange(&config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1],sizeof(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1]));
                 DCInvalidateRange(&config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1],sizeof(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1]));

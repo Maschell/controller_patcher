@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
  #include "controller_patcher/ControllerPatcher.hpp"
-#include "controller_patcher/ControllerPatcherWrapper.h"
+ #include "controller_patcher/ControllerPatcherWrapper.h"
+
 extern "C" void ControllerPatcherInit(void){
     ControllerPatcher::Init();
     ControllerPatcher::disableControllerMapping();
@@ -23,12 +24,13 @@ extern "C" void ControllerPatcherInit(void){
     ControllerPatcher::disableWiiUEnergySetting();
 }
 
+
 extern "C" CONTROLLER_PATCHER_RESULT_OR_ERROR setControllerDataFromHID(VPADStatus * data){
     ControllerPatcher::setControllerDataFromHID(data);
 }
 
-extern "C" CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevicesEx(InputDataEx * output,s32 array_size){
-    ControllerPatcher::gettingInputAllDevicesEx(output,array_size);
+extern "C" CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevices(InputData * output,s32 array_size){
+    ControllerPatcher::gettingInputAllDevices(output,array_size);
 }
 
 extern "C" void ControllerPatcherDeInit(void){

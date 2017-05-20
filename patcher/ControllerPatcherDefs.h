@@ -224,6 +224,14 @@ typedef struct _HIDSlotData{
 }HIDSlotData;
 
 /**
+ *  @brief Stores a VID and PID
+ */
+typedef struct _DeviceVIDPIDInfo{
+	u16 vid; /**< Vendor ID of this device */
+	u16 pid; /**< Product ID of this device */
+}DeviceVIDPIDInfo;
+
+/**
  *  @brief Struct where the data for the callback funtion is stored
  */
 typedef struct _my_cb_user{
@@ -235,6 +243,7 @@ typedef struct _my_cb_user{
 	u8 pad_slot; /**< number of the pad that will be used */
 	u8 rumblestatus[HID_MAX_PADS_COUNT]; /**< Current status of the device rumble */
 	u8 forceRumbleInTicks[HID_MAX_PADS_COUNT];
+	DeviceVIDPIDInfo vidpid; /**< The VID/PID of the device */
 }my_cb_user;
 
 /**
@@ -288,15 +297,6 @@ typedef struct _HID_Data {
 typedef struct _HID_DEVICE_DATA {
     HID_Data pad_data[HID_MAX_PADS_COUNT];
 } HID_DEVICE_DATA;
-
-
-/**
- *  @brief Stores a VID and PID
- */
-typedef struct _DeviceVIDPIDInfo{
-	u16 vid; /**< Vendor ID of this device */
-	u16 pid; /**< Product ID of this device */
-}DeviceVIDPIDInfo;
 
 /**
  *  @brief Infos of the device
@@ -353,14 +353,6 @@ typedef struct _InputButtonData{
     u32 release; /**< Buttons that were button released */
 }InputButtonData;
 
-/**
- *  @brief Struct where the inputdata of a device for all HID_MAX_PADS_COUNT pads can be stored
- */
-typedef struct _InputData{
-    DeviceInfo device_info; /**< Infos about the device where the data is coming from */
-    InputButtonData button_data[HID_MAX_PADS_COUNT];
-}InputData;
-
 typedef struct _InputStickData{
     f32 leftStickX;
     f32 leftStickY;
@@ -368,11 +360,15 @@ typedef struct _InputStickData{
     f32 rightStickY;
 }InputStickData;
 
-typedef struct _InputDataEx{
+/**
+ *  @brief Struct where the inputdata of a device for all HID_MAX_PADS_COUNT pads can be stored
+ */
+typedef struct _InputData{
+    DeviceInfo device_info; /**< Infos about the device where the data is coming from */
     u8 status;
     InputButtonData button_data;
     InputStickData stick_data;
-}InputDataEx;
+}InputData;
 
 /**
  *  @brief The enumeration of WiiU Controller types

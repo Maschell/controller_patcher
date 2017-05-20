@@ -78,8 +78,8 @@ void ControllerPatcher::InitButtonMapping(){
 }
 
 void ControllerPatcher::ResetConfig(){
-    memset(&gControllerMapping,0,sizeof(gControllerMapping));
-    disableControllerMapping();
+    memset(connectionOrderHelper,0,sizeof(connectionOrderHelper));
+    memset(&gControllerMapping,0,sizeof(gControllerMapping)); // Init / Invalid everything
     memset(config_controller,CONTROLLER_PATCHER_INVALIDVALUE,sizeof(config_controller)); // Init / Invalid everything
     memset(config_controller_hidmask,0,sizeof(config_controller_hidmask)); // Init / Invalid everything
     memset(gNetworkController,0,sizeof(gNetworkController)); // Init / Invalid everything
@@ -564,6 +564,7 @@ void ControllerPatcher::DeInit(){
     memset(config_controller,0,sizeof(config_controller));
     memset(config_controller_hidmask,0,sizeof(config_controller_hidmask));
     memset(gNetworkController,0,sizeof(gNetworkController));
+    memset(connectionOrderHelper,0,sizeof(connectionOrderHelper));
 
     memset(gWPADConnectCallback,0,sizeof(gWPADConnectCallback));
     memset(gKPADConnectCallback,0,sizeof(gKPADConnectCallback));
@@ -762,44 +763,40 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumble(UController_Type
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevicesEx(InputDataEx * output,s32 array_size){
-    s32 hid = gHIDCurrentDevice;
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(InputData * output,s32 array_size){
     HID_Data * data_cur;
     VPADStatus pad_buffer;
     VPADStatus * buffer = &pad_buffer;
     s32 result = CONTROLLER_PATCHER_ERROR_NONE;
-    for(s32 i = 0;i< gHIDMaxDevices;i++){
-        if(result > array_size){
-            break;
-        }
-        if((hid & (1 << i)) != 0){
-            memset(buffer,0,sizeof(*buffer));
+    std::map<my_cb_user *,s32> pad_count;
+    //printf("fill in data\n");
+    for(s32 i = 0;i < gHIDMaxDevices;i++){
+        u8 * status = &output[result].status;
+        *status = 0;
+        if(connectionOrderHelper[i] != NULL){
+            *status = 1;
 
-            s32 newhid = (1 << i);
+            my_cb_user *  usr = connectionOrderHelper[i];
+            pad_count[usr] = pad_count[usr] +1;
+            s32 hid = usr->slotdata.hidmask;
+            //printf("result[%d] usr: %08X\n",result,usr);
+
+            s32 realpad = pad_count[usr] - 1;
+
+            output[result].device_info.pad_count = usr->pads_per_device;
+            output[result].device_info.slotdata = usr->slotdata;
+            output[result].device_info.vidpid = usr->vidpid;
+
+            InputButtonData * buttondata = &output[result].button_data;
+            InputStickData * stickdata = &output[result].stick_data;
 
             s32 buttons_hold = 0;
+            buttondata->hold = 0;
+            buttondata->trigger = 0;
+            buttondata->release = 0;
 
-            for(s32 pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
-                InputButtonData * buttondata = &output[result].button_data;
-                InputStickData * stickdata = &output[result].stick_data;
-                u8 * status = &output[result].status;
-                buttons_hold = 0;
-                buttondata->hold = 0;
-                buttondata->trigger = 0;
-                buttondata->release = 0;
-
-                result++;
-                if(result > array_size){
-                    break;
-                }
-
-                s32 res;
-                if((res = ControllerPatcherHID::getHIDData(newhid,pad,&data_cur)) < 0){
-                        *status = 0;
-                        continue;
-                }
-                *status = 1;
-
+            s32 res;
+            if((res = ControllerPatcherHID::getHIDData(hid,realpad,&data_cur)) == 0){
                 res = ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_A);
                 ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_B);
                 ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_X);
@@ -840,89 +837,15 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevicesEx(I
                 stickdata->rightStickX = buffer->rightStick.x;
                 stickdata->rightStickY = buffer->rightStick.y;
 
+                //printf("result[%d] buttons %08X\n",result,buttons_hold);
+
                 data_cur->last_buttons = buttons_hold;
             }
         }
-    }
 
-    return array_size;
-}
-
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(InputData * output,s32 array_size){
-    s32 hid = gHIDCurrentDevice;
-    HID_Data * data_cur;
-    VPADStatus pad_buffer;
-    VPADStatus * buffer = &pad_buffer;
-    s32 result = CONTROLLER_PATCHER_ERROR_NONE;
-    for(s32 i = 0;i< gHIDMaxDevices;i++){
-        if((hid & (1 << i)) != 0){
-            memset(buffer,0,sizeof(*buffer));
-
-            s32 newhid = (1 << i);
-            s32 deviceslot = ControllerPatcherUtils::getDeviceSlot(newhid);
-            if(deviceslot < 0) continue;
-            DeviceInfo * deviceinfo = &(output[result].device_info);
-            InputButtonData * buttondata = output[result].button_data;
-
-            deviceinfo->slotdata.deviceslot = deviceslot;
-            deviceinfo->slotdata.hidmask = newhid;
-
-            deviceinfo->vidpid.vid = config_controller[deviceslot][CONTRPS_VID][0] * 0x100 + config_controller[deviceslot][CONTRPS_VID][1];
-            deviceinfo->vidpid.pid = config_controller[deviceslot][CONTRPS_PID][0] * 0x100 + config_controller[deviceslot][CONTRPS_PID][1];
-
-            /* not needed
-            if(config_controller[deviceslot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE){
-                deviceinfo->pad_count = config_controller[deviceslot][CONTRPS_PAD_COUNT][1];
-            }else{
-                deviceinfo->pad_count = HID_MAX_PADS_COUNT;
-            }*/
-
-            s32 buttons_hold = 0;
-
-            for(s32 pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
-                buttons_hold = 0;
-                buttondata[pad].hold = 0;
-                buttondata[pad].trigger = 0;
-                buttondata[pad].release = 0;
-                s32 res;
-
-                if((res = ControllerPatcherHID::getHIDData(deviceinfo->slotdata.hidmask,pad,&data_cur)) < 0){
-                        continue;
-                }
-
-                res = ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_A);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_B);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_X);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_Y);
-
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_LEFT);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_RIGHT);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_DOWN);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_UP);
-
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_MINUS);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_L);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_R);
-
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_PLUS);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_ZL);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_ZR);
-
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_HOME);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_STICK_L);
-                ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_STICK_R);
-
-                buttondata[pad].hold |= buttons_hold;
-                buttondata[pad].trigger |= (buttons_hold & (~(data_cur->last_buttons)));
-                buttondata[pad].release |= ((data_cur->last_buttons) & (~buttons_hold));
-
-                data_cur->last_buttons = buttons_hold;
-            }
-            result++;
-
-            if(result >= array_size){
-                break;
-            }
+        result++;
+        if(result >= array_size){
+            break;
         }
     }
 

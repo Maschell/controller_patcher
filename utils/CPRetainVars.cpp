@@ -64,6 +64,8 @@ u8 gCallbackCooldown __attribute__((section(".data"))) = 0;
 
 u8 gGlobalRumbleActivated __attribute__((section(".data"))) = 0;
 
+my_cb_user * connectionOrderHelper[gHIDMaxDevices]  __attribute__((section(".data")));
+
 u32 gUDPClientip __attribute__((section(".data"))) = 0;
 ControllerMappingPADInfo* gProPadInfo[4] __attribute__((section(".data"))) = {&gControllerMapping.proController[0].pad_infos[0],
                                                                                &gControllerMapping.proController[1].pad_infos[0],

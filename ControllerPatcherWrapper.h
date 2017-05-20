@@ -14,7 +14,7 @@ extern "C" {
 void ControllerPatcherInit(void);
 void ControllerPatcherDeInit(void);
 CONTROLLER_PATCHER_RESULT_OR_ERROR setControllerDataFromHID(VPADStatus * data);
-CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevicesEx(InputDataEx * output,s32 array_size);
+CONTROLLER_PATCHER_RESULT_OR_ERROR gettingInputAllDevices(InputData * output,s32 array_size);
 
 #ifdef __cplusplus
 }
