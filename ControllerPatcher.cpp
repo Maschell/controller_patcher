@@ -512,7 +512,7 @@ bool ControllerPatcher::Init(){
     }
 
     //Broken
-    /*if(gConfig_done != HID_SDCARD_READ){
+    if(gConfig_done != HID_SDCARD_READ){
         printf("ControllerPatcher::Init(line %d): Reading config files from SD Card\n",__LINE__);
         ConfigReader* reader = ConfigReader::getInstance();
         s32 status = 0;
@@ -525,7 +525,7 @@ bool ControllerPatcher::Init(){
             printf("ControllerPatcher::Init(line %d): SD mounting failed! %d\n",__LINE__,status);
         }
         ConfigReader::destroyInstance();
-    }*/
+    }
 
     printf("ControllerPatcher::Init(line %d): Initializing the data for button remapping\n",__LINE__);
     InitButtonMapping();

@@ -22,6 +22,7 @@
 #include <map>
 
 #include "wiiu/fs.h"
+#include "wiiu/controller_patcher/utils/FSHelper.h"
 
 #define FS_MOUNT_SOURCE_SIZE            0x300
 #define FS_MAX_MOUNTPATH_SIZE           12
@@ -64,58 +65,37 @@ void ConfigReader::freeFSHandles(){
     }
 }
 
+
 // Mounting the sdcard without any external lib to be portable (Currently broken)
 s32 ConfigReader::InitSDCard(){
     if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): InitSDCard\n",__LINE__); }
 
-    void *mountSrc = malloc(FS_MOUNT_SOURCE_SIZE);
-    if(!mountSrc)
-        return -3;
+    int result = -1;
 
-    char* mountPath = (char*) malloc(FS_MAX_MOUNTPATH_SIZE);
-    if(!mountPath) {
-        free(mountSrc);
-        return -4;
-    }
-
-    memset(mountSrc, 0, FS_MOUNT_SOURCE_SIZE);
-    memset(mountPath, 0, FS_MAX_MOUNTPATH_SIZE);
-
-    freeFSHandles();
-
+    // get command and client
     this->pClient = malloc(sizeof(FSClient));
     this->pCmd = malloc(sizeof(FSCmdBlock));
 
-    s32 status = 0;
-
-    if (this->pClient && this->pCmd){
-        FSInit();
-        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): FSInit done\n",__LINE__); }
-        FSInitCmdBlock((FSCmdBlock*)pCmd);
-        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): Init CMD Block done\n",__LINE__); }
-        status = FSAddClientEx((FSClient*)pClient,0, -1);
-        if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): Added Client, result: %d\n",__LINE__,status); }
-        if ((status = FSGetMountSource((FSClient*)this->pClient,(FSCmdBlock*)this->pCmd, FS_MOUNT_SOURCE_SD, (FSMountSource *)mountSrc, 0)) == FS_STATUS_OK)
-        {
-            if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
-            if ((status = FSMount((FSClient*)this->pClient,(FSCmdBlock*)this->pCmd, (FSMountSource*)mountSrc, mountPath, FS_MAX_MOUNTPATH_SIZE, 0x0400)) == FS_STATUS_OK)
-            {
-                if(HID_DEBUG){ printf("ConfigReader::InitSDCard(line %d): \n",__LINE__); }
-                free(mountSrc);free(mountPath);
-                return 0;
-            }else{
-                printf("ConfigReader::InitSDCard(line %d): error: FSMount failed %d\n",__LINE__,status);
-                free(mountSrc);free(mountPath);
-                return status;
-            }
-        }else{
-            printf("ConfigReader::InitSDCard(line %d): error: FSGetMountSource failed %d\n",__LINE__,status);
-            free(mountSrc);free(mountPath);
-            return status;
-        }
+    if(!pClient || !pCmd) {
+        // just in case free if not 0
+        if(pClient)
+            free(pClient);
+        if(pCmd)
+            free(pCmd);
+        return -2;
     }
-    free(mountSrc);free(mountPath);
-    return -1;
+
+    FSInit();
+    FSInitCmdBlock((FSCmdBlock*)pCmd);
+    FSAddClient((FSClient*)pClient, -1);
+
+    char *mountPath = NULL;
+
+    if((result = FS_Helper_MountFS(pClient, pCmd, &mountPath)) == 0) {
+        //free(mountPath);
+    }
+
+    return result;
 }
 
 std::vector<std::string> ConfigReader::ScanFolder(){
@@ -145,6 +125,7 @@ std::vector<std::string> ConfigReader::ScanFolder(){
 }
 
 void ConfigReader::processFileList(std::vector<std::string> path){
+
     for(std::vector<std::string>::iterator it = path.begin(); it != path.end(); ++it) {
         printf("ConfigReader::processFileList(line %d): Reading %s\n",__LINE__,it->c_str());
         std::string result = loadFileToString(*it);
@@ -158,42 +139,20 @@ std::string ConfigReader::loadFileToString(std::string path){
     FSFileHandle handle = 0;
     s32 status = 0;
     std::string strBuffer;
-    FSStat stats;
-    if((status = FSGetStat((FSClient*)this->pClient,(FSCmdBlock*)this->pCmd,path.c_str(),&stats,-1)) == FS_STATUS_OK){
-        uint8_t * file  = (uint8_t *) malloc((sizeof(uint8_t)*stats.size)+1);
-		if(!file){
-			printf("ConfigReader::loadFileToString(line %d): error: Failed to allocate space for reading the file\n",__LINE__);
-			return "";
-		}
-        file[stats.size] = '\0';
-        if((status = FSOpenFile((FSClient*)this->pClient,(FSCmdBlock*)this->pCmd,path.c_str(),"r",&handle,-1)) == FS_STATUS_OK){
-            s32 total_read = 0;
-			s32 ret2 = 0;
-			while ((ret2 = FSReadFile((FSClient*)pClient,(FSCmdBlock*)pCmd, file+total_read, 1, stats.size-total_read, handle, 0, -1)) > 0){
-				total_read += ret2;
-            }
+    char *  result = NULL;
+    if(FS_Helper_GetFile(this->pClient,this->pCmd,path.c_str(), &result) == 0){
+        if(result != NULL){
+            strBuffer = std::string((char *)result);
+            free(result);
+            result = NULL;
 
-        }else{
-            printf("ConfigReader::loadFileToString(line %d): error: (FSOpenFile) Couldn't open file (%s), error: %d",__LINE__,path.c_str(),status);
-            free(file);
-            file=NULL;
-            return "";
+            //! remove all windows crap signs
+            strBuffer = CPStringTools::removeCharFromString(strBuffer,'\r');
+            strBuffer = CPStringTools::removeCharFromString(strBuffer,' ');
+            strBuffer = CPStringTools::removeCharFromString(strBuffer,'\t');
         }
-
-        FSCloseFile((FSClient*)this->pClient,(FSCmdBlock*)this->pCmd,handle,-1);
-
-        strBuffer = std::string((char *)file);
-        free(file);
-        file = NULL;
-
-        //! remove all windows crap signs
-        strBuffer = CPStringTools::removeCharFromString(strBuffer,'\r');
-        strBuffer = CPStringTools::removeCharFromString(strBuffer,' ');
-        strBuffer = CPStringTools::removeCharFromString(strBuffer,'\t');
-
     }else{
-        printf("ConfigReader::loadFileToString(line %d): error: (GetStat) Couldn't open file (%s), error: %d",__LINE__,path.c_str(),status);
+        printf("ConfigReader::loadFileToString(line %d): Failed to load %s\n",__LINE__,path.c_str());
     }
-
     return strBuffer;
 }
