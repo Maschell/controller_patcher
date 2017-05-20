@@ -147,7 +147,7 @@ void ControllerPatcher::ResetConfig(){
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 switch_pro_slot = slotdata.deviceslot;
     gHID_LIST_SWITCH_PRO = slotdata.hidmask;
-    printf("ControllerPatcher::ResetConfig(line %d): Register Switch-Pro-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_SWITCH_PRO),switch_pro_slot);
+    if(HID_DEBUG){ printf("ControllerPatcher::ResetConfig(line %d): Register Switch-Pro-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_SWITCH_PRO),switch_pro_slot); }
 
 
     config_controller_hidmask[gc_slot] =                                                            gHID_LIST_GC;
@@ -478,10 +478,17 @@ bool ControllerPatcher::Init(){
     InitVPadFunctionPointers();
     InitPadScoreFunctionPointers();*/
 
-    gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead + 0x1F0);
+    OSDynLoadModule padscore_handle = 0;
+    OSDynLoad_Acquire("padscore.rpl", &padscore_handle);
+    void(*KPADRead_test)();
+    OSDynLoad_FindExport(padscore_handle, 0, "KPADRead", (void**)&KPADRead_test);
+    printf("ControllerPatcher::Init(line %d): Found the KPADRead at %08X \n",__LINE__,KPADRead_test);
+
+    gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead_test + 0x1F0);
     if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK){
+        gSamplingCallback = NULL;
         //In Firmware <= 5.1.2 the offset changes
-        gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead + 0x1F8);
+        gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead_test + 0x1F8);
         if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK){
             //Should never happen. I looked into the padscore.rpl of ALL firmwares.
             gSamplingCallback = NULL;

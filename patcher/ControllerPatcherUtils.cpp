@@ -908,7 +908,7 @@ ControllerMappingPAD * ControllerPatcherUtils::getControllerMappingByType(UContr
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::doSampling(u16 deviceslot,u8 padslot = 0,bool ignorePadSlot = false){
     if(gSamplingCallback != NULL){
         for(int i=0;i<4;i++){
-            ControllerMappingPADInfo * padinfo = gProPadInfo[i];
+            ControllerMappingPADInfo * padinfo = &gControllerMapping.proController[i].pad_infos[0];
             if(padinfo->active){
                 DeviceInfo device_info;
 
