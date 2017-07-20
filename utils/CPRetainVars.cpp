@@ -62,6 +62,7 @@ wpad_connect_callback_t gKPADConnectCallback[4] __attribute__((section(".data"))
 wpad_extension_callback_t gExtensionCallback[4] __attribute__((section(".data")));
 wpad_sampling_callback_t gSamplingCallback __attribute__((section(".data"))) = 0;
 u8 gCallbackCooldown __attribute__((section(".data"))) = 0;
+u8 gAppStatus __attribute__((section(".data"))) = 0;
 
 u8 gGlobalRumbleActivated __attribute__((section(".data"))) = 0;
 
