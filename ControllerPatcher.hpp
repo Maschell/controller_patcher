@@ -241,6 +241,8 @@ class ControllerPatcher{
 
         static CONTROLLER_PATCHER_RESULT_OR_ERROR setRumbleActivated(bool value);
 
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setNetworkControllerActivated(bool value);
+
         static bool isRumbleActivated();
 };
 

@@ -529,11 +529,14 @@ bool ControllerPatcher::Init(){
 }
 
 void ControllerPatcher::startNetworkServer(){
+    if(!gNetworkControllerActivated) return;
+    log_printf("ControllerPatcher::startNetworkServer(line %d) statedNetworkServer! \n",__LINE__);
     UDPServer::getInstance();
     TCPServer::getInstance();
 }
 
 void ControllerPatcher::stopNetworkServer(){
+    log_printf("ControllerPatcher::stopNetworkServer(line %d) called! \n",__LINE__);
     UDPServer::destroyInstance();
     UDPClient::destroyInstance();
     TCPServer::destroyInstance();
@@ -1059,6 +1062,11 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::doSamplingForDeviceSlot(u1
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumbleActivated(bool value){
     gGlobalRumbleActivated = value;
+    return CONTROLLER_PATCHER_ERROR_NONE;
+}
+
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setNetworkControllerActivated(bool value){
+    gNetworkControllerActivated = value;
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 

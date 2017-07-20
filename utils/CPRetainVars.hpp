@@ -68,6 +68,7 @@ extern wpad_sampling_callback_t gSamplingCallback;
 extern u8 gCallbackCooldown;
 extern u8 gGlobalRumbleActivated;
 extern u8 gAppStatus;
+extern u8 gNetworkControllerActivated;
 
 extern u32 gUDPClientip;
 extern ControllerMappingPADInfo* gProPadInfo[4];
