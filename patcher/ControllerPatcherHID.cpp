@@ -57,7 +57,9 @@ void ControllerPatcherHID::myHIDMouseReadCallback(u32 handle, s32 error, unsigne
         }
 
         HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[slot]);
-        HID_Mouse_Data * cur_mouse_data = &data_ptr->data_union.mouse.cur_mouse_data;
+        HID_Mouse_Data * cur_mouse_data = &data_ptr->mouse.cur_mouse_data;
+
+        u16 * ticksSinceChangePointer = &data_ptr->mouse.ticksSinceChange;
 
         data_ptr->type = DEVICE_TYPE_MOUSE;
         //log_printf("%02X %02X %02X %02X %02X bytes_transfered: %d\n",buf[0],buf[1],buf[2],buf[3],buf[4],bytes_transfered);
@@ -88,6 +90,7 @@ void ControllerPatcherHID::myHIDMouseReadCallback(u32 handle, s32 error, unsigne
         if(cur_mouse_data->Y > 720) cur_mouse_data->Y = 720;
 
         cur_mouse_data->valuedChanged = 1;
+        *ticksSinceChangePointer = 0;
 
         //log_printf("%02X %02X %02X %02X %02X %02X %02X %02X %d = X: %d Y: %d \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7],bytes_transfered,x_value,y_value);
 
@@ -348,8 +351,8 @@ void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 b
         //Copy the data for all 4 pads
         for(s32 i = 0;i<4;i++){
             data_ptr = &(gHID_Devices[gHID_SLOT_GC].pad_data[i]);
-            memcpy(&(data_ptr->data_union.controller.last_hid_data[0]),&(data_ptr->data_union.controller.cur_hid_data[0]),10); //save last data.
-            memcpy(&(data_ptr->data_union.controller.cur_hid_data[0]),&buf[(i*9)+1],9);                  //save new data.
+            memcpy(&(data_ptr->controller.last_hid_data[0]),&(data_ptr->controller.cur_hid_data[0]),10); //save last data.
+            memcpy(&(data_ptr->controller.cur_hid_data[0]),&buf[(i*9)+1],9);                  //save new data.
 
         }
 
@@ -466,8 +469,12 @@ void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 b
 
             HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[slot]);
 
-            memcpy(&(data_ptr->data_union.controller.last_hid_data[0]),&(data_ptr->data_union.controller.cur_hid_data[0]),dsize);    // save the last data.
-            memcpy(&(data_ptr->data_union.controller.cur_hid_data[0]),&buf[0],dsize);                                                // save the new data.
+            //s32 i = 0;
+            //log_printf("data %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
+            //log_printf("%02X %02X %02X %02X %02X %02X %02X %02X %02X\n",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
+
+            memcpy(&(data_ptr->controller.last_hid_data[0]),&(data_ptr->controller.cur_hid_data[0]),dsize);    // save the last data.
+            memcpy(&(data_ptr->controller.cur_hid_data[0]),&buf[0],dsize);                                                // save the new data.
 
             DCFlushRange(&gHID_Devices[usr->slotdata.deviceslot].pad_data[slot],sizeof(HID_Data));
 
@@ -491,7 +498,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
         data_cur = data[i];
 
         if(data_cur->slotdata.hidmask & gHID_LIST_MOUSE){  //Reset the input when we have no new inputs
-            HID_Mouse_Data * mouse_data = &data_cur->data_union.mouse.cur_mouse_data;
+            HID_Mouse_Data * mouse_data = &data_cur->mouse.cur_mouse_data;
             if(mouse_data->valuedChanged == 1){ //Fix for the mouse cursor
                 mouse_data->valuedChanged = 0;
             }else{
@@ -531,6 +538,8 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
         buffer->btns_r |= (last_realbuttons & (~buttons_hold));
 
         ControllerPatcherUtils::convertAnalogSticks(data_cur,buffer);
+
+        ControllerPatcherUtils::convertGyroAndAcc(data_cur,buffer);
 
         ControllerPatcherUtils::setEmulatedSticks(buffer,&last_emulate_stick);
 

@@ -402,6 +402,14 @@ void ControllerPatcher::ResetConfig(){
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_BUTTON_HOME],              HID_DS4_BUTTON_GUIDE[0],               HID_DS4_BUTTON_GUIDE[1]);
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_PAD_COUNT],                     CONTROLLER_PATCHER_VALUE_SET,          HID_DS4_PAD_COUNT);
 
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_ACC_X],                    HID_DS4_ACC[ACC_CONF_X_1BYTE],         HID_DS4_ACC[ACC_CONF_X_2BYTE]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_ACC_Y],                    HID_DS4_ACC[ACC_CONF_Y_1BYTE],         HID_DS4_ACC[ACC_CONF_Y_2BYTE]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_ACC_Z],                    HID_DS4_ACC[ACC_CONF_Z_1BYTE],         HID_DS4_ACC[ACC_CONF_Z_2BYTE]);
+
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_GYRO_X],                   HID_DS4_GYRO[GYRO_CONF_X_1BYTE],       HID_DS4_GYRO[GYRO_CONF_X_2BYTE]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_GYRO_Y],                   HID_DS4_GYRO[GYRO_CONF_Y_1BYTE],       HID_DS4_GYRO[GYRO_CONF_Y_2BYTE]);
+    ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_GYRO_Z],                   HID_DS4_GYRO[GYRO_CONF_Z_1BYTE],       HID_DS4_GYRO[GYRO_CONF_Z_2BYTE]);
+
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_BUTTON_L_STICK_X],          HID_DS4_STICK_L_X[STICK_CONF_BYTE],   HID_DS4_STICK_L_X[STICK_CONF_DEFAULT]);
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE], CONTROLLER_PATCHER_VALUE_SET,         HID_DS4_STICK_L_X[STICK_CONF_DEADZONE]);
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[ds4_slot][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX],   HID_DS4_STICK_L_X[STICK_CONF_MIN],    HID_DS4_STICK_L_X[STICK_CONF_MAX]);
@@ -735,18 +743,36 @@ HID_Mouse_Data * ControllerPatcher::getMouseData(){
         return NULL;
     }
 
-    HID_Mouse_Data * result = NULL;
-
     for(s32 i;i<HID_MAX_DEVICES_PER_SLOT;i++){
         ControllerMappingPADInfo * padinfo = &(CMPAD->pad_infos[i]);
-        if(!padinfo->active){
-            break;
+
+        if(!padinfo->active){ //?!?!?!
+            continue;
         }
-        if(padinfo->type == CM_Type_Mouse){
-            result = &(gHID_Devices[gMouseSlot].pad_data[padinfo->pad].data_union.mouse.cur_mouse_data);
+
+        if(padinfo->type == CM_Type_Mouse || (padinfo->vidpid.vid ==  0x054c && padinfo->vidpid.pid == 0x09CC)){
+            DeviceInfo device_info;
+            memset(&device_info,0,sizeof(device_info));
+            device_info.vidpid = padinfo->vidpid;
+
+            if(ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) < 0){
+                continue;
+            }
+
+            HID_Data * data = &gHID_Devices[device_info.slotdata.deviceslot].pad_data[padinfo->pad];
+
+            if(!data->mouse.isValid){ //is valid
+                continue;
+            }
+
+            if(data->mouse.ticksSinceChange < 60*5){ //Was moved in the last 5 seconds
+                data->mouse.ticksSinceChange++;
+                HID_Mouse_Data * mouse = &(data->mouse.cur_mouse_data);
+                return mouse;
+            }
         }
     }
-    return result;
+    return (HID_Mouse_Data *) 0x01;
 }
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumble(UController_Type type,u32 status){

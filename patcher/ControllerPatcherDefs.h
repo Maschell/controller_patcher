@@ -36,7 +36,8 @@
 #define HID_SDCARD_READ     2
 
 #define gHIDMaxDevices 32
-#define HID_MAX_DATA_LENGTH_PER_PAD             16
+#define HID_MAX_DATA_LENGTH_PER_PAD             40
+#define HID_EXTRA_DATA_LENGTH                   0x10
 #define HID_MAX_PADS_COUNT                      5
 #define HID_MAX_DEVICES_PER_SLOT                2
 
@@ -92,7 +93,33 @@ enum Controller_Stick_Defines
     STICK_CONF_ENUM_MAXVALUE    /**< Maxmimum enum value for iteration*/
 };
 
-#define STICK_CONF_MAGIC_VALUE 0xF0 // When you change the enum above, Dont forget to change the magic version!!!!
+enum Controller_Acc_Defines
+{
+    ACC_CONF_MAGIC_VERSION,   /**< Version of the acc configuration. Changes with every format*/
+    ACC_CONF_X_1BYTE,            /**< first Byte where the X is stored*/
+    ACC_CONF_X_2BYTE,            /**< second Byte where the X is stored*/
+    ACC_CONF_Y_1BYTE,            /**< first Byte where the Y is stored*/
+    ACC_CONF_Y_2BYTE,            /**< second Byte where the Y is stored*/
+    ACC_CONF_Z_1BYTE,            /**< first Byte where the Z is stored*/
+    ACC_CONF_Z_2BYTE,            /**< second Byte where the Z is stored*/
+    ACC_CONF_ENUM_MAXVALUE    /**< Maxmimum enum value for iteration*/
+};
+
+enum Controller_Gyro_Defines
+{
+    GYRO_CONF_MAGIC_VERSION,   /**< Version of the acc configuration. Changes with every format*/
+    GYRO_CONF_X_1BYTE,            /**< first Byte where the X is stored*/
+    GYRO_CONF_X_2BYTE,            /**< second Byte where the X is stored*/
+    GYRO_CONF_Y_1BYTE,            /**< first Byte where the Y is stored*/
+    GYRO_CONF_Y_2BYTE,            /**< second Byte where the Y is stored*/
+    GYRO_CONF_Z_1BYTE,            /**< first Byte where the Z is stored*/
+    GYRO_CONF_Z_2BYTE,            /**< second Byte where the Z is stored*/
+    GYRO_CONF_ENUM_MAXVALUE    /**< Maxmimum enum value for iteration*/
+};
+
+#define ACC_CONF_MAGIC_VALUE    0xF0 // When you change the enum above, Dont forget to change the magic version!!!!
+#define GYRO_CONF_MAGIC_VALUE   0xF0 // When you change the enum above, Dont forget to change the magic version!!!!
+#define STICK_CONF_MAGIC_VALUE  0xF0 // When you change the enum above, Dont forget to change the magic version!!!!
 
 //! most data has the format: byte,value (byte starting at 0)
 enum Controller_Patcher_Settings
@@ -163,6 +190,14 @@ enum Controller_Patcher_Settings
     CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT,   //! To invert: CONTROLLER_PATCHER_VALUE_SET, 0x01
     CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE, //! Deadzone
     CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX,   //! min,max
+
+    CONTRPS_VPAD_ACC_X,
+    CONTRPS_VPAD_ACC_Y,
+    CONTRPS_VPAD_ACC_Z,
+
+    CONTRPS_VPAD_GYRO_X,
+    CONTRPS_VPAD_GYRO_Y,
+    CONTRPS_VPAD_GYRO_Z,
 
     CONTRPS_VPAD_BUTTON_L_STICK_UP,
     CONTRPS_VPAD_BUTTON_L_STICK_DOWN,
@@ -266,16 +301,17 @@ typedef struct _HID_Data {
     u32 handle;         /**< The HID-handle this device is using */
     u8 rumbleActive;    /**< 1 when rumble is active */
     u32 last_buttons;   /**< The last pressed buttons, based on VPAD_BUTTON_XXX data */
-    union{
-        struct{
-            u8 cur_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];   /**< Array where the current controller data is stored */
-            u8 last_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];  /**< Array where the last  controller data is stored */
-        } controller; /**< Used when the device in a controller. Using u8 array where the raw data of the controller is placed. */
-        struct{
+    struct{
+        u8 cur_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];   /**< Array where the current controller data is stored */
+        u8 last_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];  /**< Array where the last  controller data is stored */
+    } controller; /**< Used when the device in a controller. Using u8 array where the raw data of the controller is placed. */
+    struct{
             HID_Mouse_Data cur_mouse_data;  /**< Struct where the current mouse data is stored */
             HID_Mouse_Data last_mouse_data; /**< Struct where the last mouse data is stored */
-        } mouse; /**< Used when the device in a mouse. Using a new struct to store the data. */
-    }data_union; /**< The data union where the current and last data is stored.*/
+            u16 ticksSinceChange;
+            u8 isValid;
+    } mouse;
+    u8 extraData[0x10];  /**< The device type*/
     DEVICE_TYPE type;  /**< The device type*/
     HIDSlotData slotdata;  /**< Information about the deviceslot and his mask*/
     my_cb_user * user_data; /**< Pointer to the user data the read callback is using*/
@@ -395,11 +431,17 @@ enum UController_Type{
 #define HID_DS3_VID                           0x054c
 #define HID_DS3_PID                           0x0268
 
+//#define HID_DS4_VID                           0x054c
+//#define HID_DS4_PID                           0x05c4
+
+//#define HID_NEW_DS4_VID                       0x054c
+//#define HID_NEW_DS4_PID                       0x09CC
+
 #define HID_DS4_VID                           0x054c
-#define HID_DS4_PID                           0x05c4
+#define HID_DS4_PID                           0x09CC
 
 #define HID_NEW_DS4_VID                       0x054c
-#define HID_NEW_DS4_PID                       0x09CC
+#define HID_NEW_DS4_PID                       0x09CD
 
 #define HID_XINPUT_VID                        0x7331
 #define HID_XINPUT_PID                        0x1337

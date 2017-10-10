@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "ControllerPatcherUtils.hpp"
+#include <stdio.h>
+#include <math.h>
 #include <math.h>
 #include <string.h>
 
@@ -45,7 +47,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_
 
     do{
         if(data->type == DEVICE_TYPE_MOUSE){
-            HID_Mouse_Data *  ms_data = &data->data_union.mouse.cur_mouse_data;
+            HID_Mouse_Data *  ms_data = &data->mouse.cur_mouse_data;
             if(ms_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
             if(gHID_Mouse_Mode == HID_MOUSE_MODE_TOUCH){
                 if(VPADButton == VPAD_BUTTON_TOUCH){
@@ -71,7 +73,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_
             }
             result = 0; break;
         }
-        u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
+        u8 * cur_data = &data->controller.cur_hid_data[0];
         if(cur_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
         s32 cur_config = 0;
@@ -224,7 +226,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isValueSet(HID_Data * data,s32 cur_config){
     if(data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
+    u8 * cur_data = &data->controller.cur_hid_data[0];
     if(cur_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
     u32 hidmask = data->slotdata.hidmask;
@@ -293,7 +295,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonData(VPADDat
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkActivePad(u32 hidmask,s32 pad){
     if(hidmask & gHID_LIST_GC && pad >= 0 && pad <= 3){
-        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[pad].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[pad].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 1;
+        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[pad].controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[pad].controller.cur_hid_data[0] & 0x22) != 0x22))) return 1;
         return CONTROLLER_PATCHER_ERROR_NO_PAD_CONNECTED;
     }else{
         s32 deviceslot = getDeviceSlot(hidmask);
@@ -310,10 +312,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkActivePad(u32 hi
 /*
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getActivePad(u32 hidmask){
      if(hidmask & gHID_LIST_GC){
-        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[0].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[0].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 0;
-        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[1].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[1].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 1;
-        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[2].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[2].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 2;
-        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[3].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[3].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 3;
+        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[0].controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[0].controller.cur_hid_data[0] & 0x22) != 0x22))) return 0;
+        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[1].controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[1].controller.cur_hid_data[0] & 0x22) != 0x22))) return 1;
+        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[2].controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[2].controller.cur_hid_data[0] & 0x22) != 0x22))) return 2;
+        if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[3].controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[3].controller.cur_hid_data[0] & 0x22) != 0x22))) return 3;
 
         return CONTROLLER_PATCHER_ERROR_NO_PAD_CONNECTED;
      }
@@ -420,7 +422,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
     if (data->type == DEVICE_TYPE_MOUSE){
 
         if(gHID_Mouse_Mode == HID_MOUSE_MODE_AIM){ // TODO: tweak values
-            HID_Mouse_Data * ms_data = &data->data_union.mouse.cur_mouse_data;
+            HID_Mouse_Data * ms_data = &data->mouse.cur_mouse_data;
             if(ms_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
             f32 x_value = ms_data->deltaX/10.0f;
@@ -438,7 +440,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
             buffer->rstick.y += y_value;
         }
     }else{
-        u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
+        u8 * cur_data = &data->controller.cur_hid_data[0];
         if(cur_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
         s32 deadzone = 0;
@@ -531,6 +533,164 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
+#define PI 3.14159265
+
+Vec3D smoothedAcc;
+Vec3D smoothedAccNorm;
+
+Vec3D smoothedGyro;
+Vec3D smoothedGyroNorm;
+
+
+float Vec3Ddot(Vec3D v1, Vec3D v2) {
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+float Vec3Dlength(Vec3D p) {
+    return (float) sqrt(Vec3Ddot(p,p));
+}
+
+Vec3D Vec3Dsub(Vec3D v1, Vec3D v2) {
+    v1.x -= v2.x;
+    v1.y -= v2.y;
+    v1.z -= v2.z;
+    return v1;
+}
+
+ Vec3D applyPitch(Vec3D in,float val){
+    Vec3D out = in;
+    out.y = (float) (in.y * cos(val) - in.z * sin(val));
+    out.z = (float) (in.z * cos(val) + in.y * sin(val));
+    return out;
+}
+
+Vec3D applyRoll(Vec3D in,double val){
+    Vec3D out = in;
+    out.x = (float) (in.x * cos(val) - in.y * sin(val));
+    out.y = (float) (in.y * cos(val) + in.x * sin(val));
+    return out;
+}
+
+Vec3D lastAcc = {0,0,0};
+
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertGyroAndAcc(HID_Data * data, VPADData * buffer){
+    if(buffer == NULL || data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
+
+    s32 deviceslot = data->slotdata.deviceslot;
+
+    u8 * cur_data = &data->controller.cur_hid_data[0];
+    if(cur_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
+
+    short accX,accY,accZ = 0;
+    short gyroX,gyroY,gyroZ = 0;
+
+
+
+
+    buffer->acc.x = smoothedAccNorm.x;
+
+    if((config_controller[deviceslot][CONTRPS_VPAD_ACC_X][0] != CONTROLLER_PATCHER_INVALIDVALUE) &&
+       (config_controller[deviceslot][CONTRPS_VPAD_ACC_X][1] != CONTROLLER_PATCHER_INVALIDVALUE)){
+        accX = (cur_data[config_controller[deviceslot][CONTRPS_VPAD_ACC_X][0]] *0x100 ) + cur_data[config_controller[deviceslot][CONTRPS_VPAD_ACC_X][1]];
+        smoothedAcc.x = (accX + smoothedAcc.x * 2.0f) / 3.0f; // smooth out
+        smoothedAccNorm.x = ((smoothedAcc.x/8192.0f));
+        buffer->dir.X.x = 1.0f;
+        buffer->dir.X.y = 0.0f;
+        buffer->dir.X.z = 0.0f;
+
+        buffer->dir.Y.x = 0.0f;
+        buffer->dir.Y.y = 1.0f;
+        buffer->dir.Y.z = 0.0f;
+
+        buffer->dir.Z.x = 0.0f;
+        buffer->dir.Z.y = 0.0f;
+        buffer->dir.Z.z = 1.0f;
+        //buffer->dir.X.y = smoothedAccNorm.x * -1.0f;
+    }
+
+    if((config_controller[deviceslot][CONTRPS_VPAD_ACC_Y][0] != CONTROLLER_PATCHER_INVALIDVALUE) &&
+       (config_controller[deviceslot][CONTRPS_VPAD_ACC_Y][1] != CONTROLLER_PATCHER_INVALIDVALUE)){
+        accY = (cur_data[config_controller[deviceslot][CONTRPS_VPAD_ACC_Y][0]] *0x100 ) + cur_data[config_controller[deviceslot][CONTRPS_VPAD_ACC_Y][1]];
+        smoothedAcc.y = (accY + smoothedAcc.y * 2.0f) / 3.0f; // smooth out
+        smoothedAccNorm.y = ((smoothedAcc.y/8192.0f));
+        buffer->acc.y = smoothedAccNorm.y * -1.0f;
+        if(smoothedAccNorm.y < 0.0f){
+            buffer->acc_vertical.x = smoothedAccNorm.y * -1.0f;
+        }else{
+            buffer->acc_vertical.x = smoothedAccNorm.y;
+        }
+    }
+
+    if((config_controller[deviceslot][CONTRPS_VPAD_ACC_Z][0] != CONTROLLER_PATCHER_INVALIDVALUE) &&
+       (config_controller[deviceslot][CONTRPS_VPAD_ACC_Z][1] != CONTROLLER_PATCHER_INVALIDVALUE)){
+        accZ = (cur_data[config_controller[deviceslot][CONTRPS_VPAD_ACC_Z][0]] *0x100 ) + cur_data[config_controller[deviceslot][CONTRPS_VPAD_ACC_Z][1]];
+        smoothedAcc.z = (accZ + smoothedAcc.z * 2.0f) / 3.0f; // smooth out
+        smoothedAccNorm.z = ((smoothedAcc.z/8192.0f));
+        buffer->acc.z = smoothedAccNorm.z;
+        buffer->acc_vertical.y = smoothedAccNorm.z * -1.0f;
+    }
+
+    if((config_controller[deviceslot][CONTRPS_VPAD_GYRO_X][0] != CONTROLLER_PATCHER_INVALIDVALUE) &&
+       (config_controller[deviceslot][CONTRPS_VPAD_GYRO_X][1] != CONTROLLER_PATCHER_INVALIDVALUE)){
+        gyroX = (cur_data[config_controller[deviceslot][CONTRPS_VPAD_GYRO_X][0]] *0x100 ) + cur_data[config_controller[deviceslot][CONTRPS_VPAD_GYRO_X][1]];
+        smoothedGyro.x = (gyroX + smoothedGyro.x * 2.0f) / 3.0f; // smooth out
+        //if(smoothedGyro.x > 256.0f  || smoothedGyro.x < - 256.0f){
+            buffer->gyro.x = (smoothedGyro.x/4096.0f * -1.0f);
+        //}else{
+        //    buffer->gyro.x = 0.0f;
+        //}
+    }
+
+    if((config_controller[deviceslot][CONTRPS_VPAD_GYRO_Y][0] != CONTROLLER_PATCHER_INVALIDVALUE) &&
+       (config_controller[deviceslot][CONTRPS_VPAD_GYRO_Y][1] != CONTROLLER_PATCHER_INVALIDVALUE)){
+        gyroY = (cur_data[config_controller[deviceslot][CONTRPS_VPAD_GYRO_Y][0]] *0x100 ) + cur_data[config_controller[deviceslot][CONTRPS_VPAD_GYRO_Y][1]];
+        smoothedGyro.y = (gyroY + smoothedGyro.y * 2.0f) / 3.0f; // smooth out
+        if(smoothedGyro.y < -260.0f  || smoothedGyro.y > -230.0f){
+            buffer->gyro.y = (smoothedGyro.y/4096.0f);
+        }else{
+            buffer->gyro.y = 0.0f;
+        }
+    }
+
+    if((config_controller[deviceslot][CONTRPS_VPAD_GYRO_Z][0] != CONTROLLER_PATCHER_INVALIDVALUE) &&
+       (config_controller[deviceslot][CONTRPS_VPAD_GYRO_Z][1] != CONTROLLER_PATCHER_INVALIDVALUE)){
+        gyroZ = (cur_data[config_controller[deviceslot][CONTRPS_VPAD_GYRO_Z][0]] *0x100 ) + cur_data[config_controller[deviceslot][CONTRPS_VPAD_GYRO_Z][1]];
+        smoothedGyro.z = (gyroZ + smoothedGyro.z * 2.0f) / 3.0f; // smooth out
+        if(smoothedGyro.z > 256.0f  || smoothedGyro.z < - 256.0f){
+            buffer->gyro.z = (smoothedGyro.z/4096.0f);
+        }else{
+            buffer->gyro.z = 0.0f;
+        }
+    }
+
+    float roll  = atan2(-smoothedAcc.y, smoothedAcc.z) + PI/2.0f;
+    float pitch = atan2(smoothedAcc.x, sqrt(smoothedAcc.y*smoothedAcc.y + smoothedAcc.z*smoothedAcc.z));
+
+    if(roll >  PI){
+        roll -= 2.0f*PI;
+    }
+    pitch = pitch * -1.0f;
+
+    //buffer->dir.X = applyRoll(buffer->dir.X,pitch);
+    //buffer->dir.Y = applyPitch(applyRoll(buffer->dir.Y,pitch),roll);
+    buffer->dir.Y = applyPitch(buffer->dir.Y,roll);
+    buffer->dir.Z = applyPitch(buffer->dir.Z,roll);
+
+    /*
+    buffer->dir.Y.y = buffer->acc.y * -1.0f;
+    buffer->dir.Y.z = buffer->acc.z;
+    buffer->dir.Z.y = buffer->acc.z * -1.0f;
+    buffer->dir.Z.z = buffer->acc.y * -1.0f;*/
+
+    buffer->acc_magnitude = Vec3Dlength(smoothedAccNorm);
+    Vec3D tmp = Vec3Dsub(smoothedAccNorm,lastAcc);
+    buffer->acc_variation = Vec3Dlength(tmp);
+    lastAcc = smoothedAccNorm;
+
+    return CONTROLLER_PATCHER_ERROR_NONE;
+
+}
+
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setEmulatedSticks(VPADData * buffer, u32 * last_emulatedSticks){
     if(buffer == NULL || last_emulatedSticks == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
@@ -583,27 +743,98 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setEmulatedSticks(VPA
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setTouch(HID_Data * data,VPADData * buffer){
     if(buffer == NULL || data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
+
+    u32 hidmask = data->slotdata.hidmask;
     if(data->type == DEVICE_TYPE_MOUSE && gHID_Mouse_Mode == HID_MOUSE_MODE_TOUCH){
+        data->mouse.isValid = 1;
         s32 buttons_hold;
         if(getButtonPressed(data,&buttons_hold,VPAD_BUTTON_TOUCH)){
-           HID_Mouse_Data *  ms_data = &data->data_union.mouse.cur_mouse_data;
-           if(ms_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
-           s32 x_mouse = 80 + ((int)(((ms_data->X)*1.0f/1280.0)*3890.0f));
-           s32 y_mouse = 3910 - ((int)(((ms_data->Y)*1.0f/720.0)*3760.0f));
-           buffer->tpdata.x = x_mouse;
-           buffer->tpdata.y = y_mouse;
-           buffer->tpdata.touched = 1;
-           buffer->tpdata.invalid = 0;
-           buffer->tpdata1.x = x_mouse;
-           buffer->tpdata1.y = y_mouse;
-           buffer->tpdata1.touched = 1;
-           buffer->tpdata1.invalid = 0;
-           buffer->tpdata2.x = x_mouse;
-           buffer->tpdata2.y = y_mouse;
-           buffer->tpdata2.touched = 1;
-           buffer->tpdata2.invalid = 0;
+            HID_Mouse_Data *  ms_data = &data->mouse.cur_mouse_data;
+            if(ms_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
+            clickTouchScreen(buffer,ms_data->X,ms_data->Y);
+        }
+    }else if(hidmask & gHID_LIST_DS4){
+        HID_Mouse_Data *  cur_ms_data = &data->mouse.cur_mouse_data;
+        u8 * extra_data = &data->extraData[0];
+        u8 * last_data = &data->controller.last_hid_data[0];
+        u8 * cur_data = &data->controller.cur_hid_data[0];
+        u8 id = cur_data[34] & 0x7f;
+        u8 isActiveDrag =  (cur_data[38] >> 7) == 0;
+        u8 isActive =  (cur_data[34] >> 7) == 0;
+        u8 lastActive =  (last_data[34] >> 7) == 0;
+        u8 click = 0;
+
+        if(isActive){
+            data->mouse.ticksSinceChange = 0;
+            data->mouse.isValid = 1;
+        }else{
+            data->mouse.ticksSinceChange++;
+            extra_data[1] = 0;
+            extra_data[2] = 0;
+        }
+
+        if(isActive && lastActive){
+            extra_data[0]++;
+
+            short xValue = ((cur_data[36] & 0x0f) << 8) | cur_data[35];
+            short yValue =  cur_data[37] << 4 | ((cur_data[36] & 0xf0) >> 4);
+
+            short lastXValue = ((last_data[36] & 0x0f) << 8) | last_data[35];
+            short lastYValue =  last_data[37] << 4 | ((last_data[36] & 0xf0) >> 4);
+
+            s16 deltaX = xValue - lastXValue;
+            s16 deltaY = yValue - lastYValue;
+
+            if((deltaX > -2 && deltaX < 2) &&
+               (deltaX > -2 && deltaX < 2)){
+                    extra_data[1]++;
+               }
+
+            cur_ms_data->X += (deltaX / 1.5f);
+            cur_ms_data->Y += (deltaY / 1.5f);
+
+            if(cur_ms_data->X < 0) cur_ms_data->X = 0;
+            if(cur_ms_data->X > 1280) cur_ms_data->X = 1280;
+
+            if(cur_ms_data->Y < 0) cur_ms_data->Y = 0;
+            if(cur_ms_data->Y > 720) cur_ms_data->Y = 720;
+            DCFlushRange(cur_ms_data,sizeof(cur_ms_data));
+            DCInvalidateRange(cur_ms_data,sizeof(cur_ms_data));
+        }else if(!isActive){
+            if(lastActive && extra_data[0] <=5){
+                //log_printf("click\n");
+                clickTouchScreen(buffer,cur_ms_data->X,cur_ms_data->Y);
+            }
+            extra_data[0] = 0;
+        }
+        if(extra_data[1] > 30 && extra_data[2] == 0){
+            //log_printf("drag started\n");
+            extra_data[2] = 1;
+        }
+
+        if((isActive && isActiveDrag) || extra_data[2]){
+            clickTouchScreen(buffer,cur_ms_data->X,cur_ms_data->Y);
         }
     }
+    return CONTROLLER_PATCHER_ERROR_NONE;
+}
+
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::clickTouchScreen(VPADData * buffer, short X, short Y){
+    if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
+    s32 x_mouse = 80 + ((int)(((X)*1.0f/1280.0)*3890.0f));
+    s32 y_mouse = 3910 - ((int)(((Y)*1.0f/720.0)*3760.0f));
+    buffer->tpdata.x = x_mouse;
+    buffer->tpdata.y = y_mouse;
+    buffer->tpdata.touched = 1;
+    buffer->tpdata.invalid = 0;
+    buffer->tpdata1.x = x_mouse;
+    buffer->tpdata1.y = y_mouse;
+    buffer->tpdata1.touched = 1;
+    buffer->tpdata1.invalid = 0;
+    buffer->tpdata2.x = x_mouse;
+    buffer->tpdata2.y = y_mouse;
+    buffer->tpdata2.touched = 1;
+    buffer->tpdata2.invalid = 0;
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
@@ -611,8 +842,8 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkAndSetMouseMode(
     u32 hidmask = data->slotdata.hidmask;
 
     if(hidmask & gHID_LIST_KEYBOARD){
-        u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
-        u8 * last_data = &data->data_union.controller.last_hid_data[0];
+        u8 * cur_data = &data->controller.cur_hid_data[0];
+        u8 * last_data = &data->controller.last_hid_data[0];
         if((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) && ((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) != (isInKeyboardData(last_data,HID_KEYBOARD_BUTTON_F1) > 0))){
             if(gHID_Mouse_Mode == HID_MOUSE_MODE_AIM){
                 gHID_Mouse_Mode = HID_MOUSE_MODE_TOUCH;

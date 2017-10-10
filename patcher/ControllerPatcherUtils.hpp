@@ -210,6 +210,8 @@ class ControllerPatcherUtils{
         **/
         static CONTROLLER_PATCHER_RESULT_OR_ERROR convertAnalogSticks(HID_Data * data,VPADData * buffer);
 
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR convertGyroAndAcc(HID_Data * data,VPADData * buffer);
+
     /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * Mouse functions
      *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -223,6 +225,9 @@ class ControllerPatcherUtils{
             \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
         **/
         static CONTROLLER_PATCHER_RESULT_OR_ERROR setTouch(HID_Data * data,VPADData * buffer);
+
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR clickTouchScreen(VPADData * buffer, short X, short Y);
+
 
         /** \brief  Checks if the mouse mode needs to be changed. Sets it to the new mode if necessary.
          *         Currently the incoming data needs to be from a keyboard.

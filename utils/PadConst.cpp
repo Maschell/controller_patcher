@@ -167,7 +167,6 @@ const u8 HID_DS4_BUTTON_R3[]        = { 0x06,HID_DS4_BUTTON_R3_VALUE};
 const u8 HID_DS4_BUTTON_SHARE[]     = { 0x06,HID_DS4_BUTTON_SHARE_VALUE};
 const u8 HID_DS4_BUTTON_OPTIONS[]   = { 0x06,HID_DS4_BUTTON_OPTIONS_VALUE};
 
-
 const u8 HID_DS4_BUTTON_DPAD_TYPE[]     = { CONTRPDM_Hat,HID_DS4_BUTTON_DPAD_MASK_VALUE};
 const u8 HID_DS4_BUTTON_DPAD_N[]        = { 0x05,HID_DS4_BUTTON_DPAD_N_VALUE};
 const u8 HID_DS4_BUTTON_DPAD_NE[]       = { 0x05,HID_DS4_BUTTON_DPAD_NE_VALUE};
@@ -181,6 +180,23 @@ const u8 HID_DS4_BUTTON_DPAD_NEUTRAL[]  = { 0x05,HID_DS4_BUTTON_DPAD_NEUTRAL_VAL
 
 const u8 HID_DS4_BUTTON_GUIDE[]          = { 0x07,HID_DS4_BUTTON_GUIDE_VALUE};
 const u8 HID_DS4_BUTTON_T_PAD_CLICK[]    = { 0x07,HID_DS4_BUTTON_T_PAD_CLICK_VALUE};
+
+const u8 HID_DS4_ACC[ACC_CONF_ENUM_MAXVALUE] =  {   ACC_CONF_MAGIC_VALUE, //ACC_CONF_MAGIC_VERSION
+                                                            0x13, //ACC_CONF_X_1BYTE,
+                                                            0x14, //ACC_CONF_X_2BYTE,
+                                                            0x15, //ACC_CONF_Y_1BYTE,
+                                                            0x16, //ACC_CONF_Y_2BYTE,
+                                                            0x17, //ACC_CONF_Z_1BYTE,
+                                                            0x18};//ACC_CONF_Z_2BYTE,
+
+const u8 HID_DS4_GYRO[GYRO_CONF_ENUM_MAXVALUE] =  {   GYRO_CONF_MAGIC_VALUE, //GYRO_CONF_MAGIC_VERSION
+                                                            0x0D, //GYRO_CONF_X_1BYTE,
+                                                            0x0E, //GYRO_CONF_X_2BYTE,
+                                                            0x0F, //GYRO_CONF_Y_1BYTE,
+                                                            0x10, //GYRO_CONF_Y_2BYTE,
+                                                            0x11, //GYRO_CONF_Z_1BYTE,
+                                                            0x12};//GYRO_CONF_Z_2BYTE,
+
 
 const u8 HID_DS4_STICK_L_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
                                                             0x01, //STICK_CONF_BYTE,
