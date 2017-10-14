@@ -40,9 +40,9 @@ static u32 last_button_hold[4] = {0,0,0,0};
 static VPADData myVPADBuffer[4];
 
 void ControllerPatcher::InitButtonMapping(){
-    if(HID_DEBUG){ log_printf("ControllerPatcher::InitButtonMapping(line %d): Init called \n",__LINE__); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Init called \n"); }
     if(!gButtonRemappingConfigDone){
-        if(HID_DEBUG){ log_printf("ControllerPatcher::InitButtonMapping(line %d): Remapping is running! \n",__LINE__); }
+        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Remapping is running! \n"); }
         gButtonRemappingConfigDone = 1;
         memset(gGamePadValues,0,sizeof(gGamePadValues)); // Init / Invalid everything
 
@@ -105,12 +105,12 @@ void ControllerPatcher::ResetConfig(){
     gHIDRegisteredDevices = 0;
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     gGamePadSlot = slotdata.deviceslot;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register Gamepad-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(slotdata.hidmask),gGamePadSlot); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register Gamepad-Config. HID-Mask %s Device-Slot: %d\n",CPStringTools::byte_to_binary(slotdata.hidmask),gGamePadSlot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     gMouseSlot = slotdata.deviceslot;
     gHID_LIST_MOUSE = slotdata.hidmask;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register Mouse-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_MOUSE),gMouseSlot); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register Mouse-Config. HID-Mask %s Device-Slot: %d\n",CPStringTools::byte_to_binary(gHID_LIST_MOUSE),gMouseSlot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 keyboard_slot = slotdata.deviceslot;
@@ -118,36 +118,36 @@ void ControllerPatcher::ResetConfig(){
     gHID_LIST_KEYBOARD = keyboard_hid;
     gHID_SLOT_KEYBOARD = keyboard_slot;
 
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register Keyboard-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_KEYBOARD),gHID_SLOT_KEYBOARD); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register Keyboard-Config. HID-Mask %s Device-Slot: %d\n",CPStringTools::byte_to_binary(gHID_LIST_KEYBOARD),gHID_SLOT_KEYBOARD); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 gc_slot = slotdata.deviceslot;
     u32 gc_hid = slotdata.hidmask;
     gHID_LIST_GC = gc_hid;
     gHID_SLOT_GC = gc_slot;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register GC-Adapter-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_GC),gHID_SLOT_GC); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register GC-Adapter-Config. HID-Mask %s Device-Slot: %d\n",CPStringTools::byte_to_binary(gHID_LIST_GC),gHID_SLOT_GC); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 ds3_slot = slotdata.deviceslot;
     u32 ds3_hid = slotdata.hidmask;
     gHID_LIST_DS3 = ds3_hid;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register DS3-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_DS3),ds3_slot); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register DS3-Config. HID-Mask %s Device-Slot: %d\n",CPStringTools::byte_to_binary(gHID_LIST_DS3),ds3_slot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 ds4_slot = slotdata.deviceslot;
     u32 ds4_hid = slotdata.hidmask;
     gHID_LIST_DS4 = ds4_hid;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register DS4-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(ds4_hid),ds4_slot); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register DS4-Config. HID-Mask %s Device-Slot: %d\n",CPStringTools::byte_to_binary(ds4_hid),ds4_slot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 xinput_slot = slotdata.deviceslot;
     u32 xinput_hid = slotdata.hidmask;
-    if(HID_DEBUG){ log_printf("ControllerPatcher::ResetConfig(line %d): Register XInput-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(xinput_hid),xinput_slot); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register XInput-Config. HID-Mask %s Device-Slot: %d\n",CPStringTools::byte_to_binary(xinput_hid),xinput_slot); }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 switch_pro_slot = slotdata.deviceslot;
     gHID_LIST_SWITCH_PRO = slotdata.hidmask;
-    log_printf("ControllerPatcher::ResetConfig(line %d): Register Switch-Pro-Config. HID-Mask %s Device-Slot: %d\n",__LINE__,CPStringTools::byte_to_binary(gHID_LIST_SWITCH_PRO),switch_pro_slot);
+    DEBUG_FUNCTION_LINE("Register Switch-Pro-Config. HID-Mask %s Device-Slot: %d\n",CPStringTools::byte_to_binary(gHID_LIST_SWITCH_PRO),switch_pro_slot);
 
 
     config_controller_hidmask[gc_slot] =                                                            gHID_LIST_GC;
@@ -486,39 +486,39 @@ bool ControllerPatcher::Init(){
             gSamplingCallback = NULL;
         }
     }
-    log_printf("ControllerPatcher::Init(line %d): Found the gSamplingCallback at %08X \n",__LINE__,gSamplingCallback);
+    DEBUG_FUNCTION_LINE("Found the gSamplingCallback at %08X \n",gSamplingCallback);
 
-    if(HID_DEBUG){ log_printf("ControllerPatcher::Init(line %d): Init called! \n",__LINE__); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Init called! \n"); }
 
     if(syshid_handle == 0){
-         log_printf("ControllerPatcher::Init(line %d): Failed to load the HID API \n",__LINE__);
+         DEBUG_FUNCTION_LINE("Failed to load the HID API \n");
          return false;
     }
 
     if(gConfig_done == HID_INIT_NOT_DONE){
-        if(HID_DEBUG){ log_printf("ControllerPatcher::Init(line %d): First time calling the Init\n",__LINE__); }
+        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("First time calling the Init\n"); }
         gConfig_done = HID_INIT_DONE;
         ControllerPatcher::ResetConfig();
     }else{
-        if(HID_DEBUG){ log_printf("ControllerPatcher::Init(line %d): ControllerPatcher::Init(): Config already done!\n",__LINE__); }
+        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Config already done!\n"); }
     }
 
     if(gConfig_done != HID_SDCARD_READ){
-        log_printf("ControllerPatcher::Init(line %d): Reading config files from SD Card\n",__LINE__);
+        DEBUG_FUNCTION_LINE("Reading config files from SD Card\n");
         ConfigReader* reader = ConfigReader::getInstance();
         s32 status = 0;
         if((status = reader->InitSDCard()) == 0){
-            if(HID_DEBUG){ log_printf("ControllerPatcher::Init(line %d):  SD Card mounted for controller config!\n",__LINE__); }
+            if(HID_DEBUG){ DEBUG_FUNCTION_LINE(" SD Card mounted for controller config!\n"); }
              reader->ReadAllConfigs();
-            log_printf("ControllerPatcher::Init(line %d): Done with reading config files from SD Card\n",__LINE__);
+            DEBUG_FUNCTION_LINE("Done with reading config files from SD Card\n");
             gConfig_done = HID_SDCARD_READ;
         }else{
-            log_printf("ControllerPatcher::Init(line %d): SD mounting failed! %d\n",__LINE__,status);
+            DEBUG_FUNCTION_LINE("SD mounting failed! %d\n",status);
         }
         ConfigReader::destroyInstance();
     }
 
-    log_printf("ControllerPatcher::Init(line %d): Initializing the data for button remapping\n",__LINE__);
+    DEBUG_FUNCTION_LINE("Initializing the data for button remapping\n");
     InitButtonMapping();
 
     if(!gHIDAttached){
@@ -530,20 +530,20 @@ bool ControllerPatcher::Init(){
 
 void ControllerPatcher::startNetworkServer(){
     if(!gNetworkControllerActivated) return;
-    log_printf("ControllerPatcher::startNetworkServer(line %d) statedNetworkServer! \n",__LINE__);
+    DEBUG_FUNCTION_LINE("statedNetworkServer! \n");
     UDPServer::getInstance();
     TCPServer::getInstance();
 }
 
 void ControllerPatcher::stopNetworkServer(){
-    log_printf("ControllerPatcher::stopNetworkServer(line %d) called! \n",__LINE__);
+    DEBUG_FUNCTION_LINE("called! \n");
     UDPServer::destroyInstance();
     UDPClient::destroyInstance();
     TCPServer::destroyInstance();
 }
 
 void ControllerPatcher::DeInit(){
-    if(HID_DEBUG){ log_printf("ControllerPatcher::DeInit(line %d) called! \n",__LINE__); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("called! \n"); }
 
     if(gHIDAttached) HIDDelClient(&gHIDClient);
 
@@ -604,21 +604,21 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::disableWiiUEnergySetting()
     s32 res;
     if(IMIsDimEnabled(&res) == 0){
         if(res == 1){
-            if(HID_DEBUG){ log_print("ControllerPatcher::disableWiiUEnergySetting(): Dim was orignally enabled!\n"); }
+            if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Dim was orignally enabled!\n"); }
             gOriginalDimState = 1;
         }
     }
 
     if(IMIsAPDEnabled(&res) == 0){
         if(res == 1){
-            if(HID_DEBUG){ log_print("ControllerPatcher::disableWiiUEnergySetting(): Auto power down was orignally enabled!\n"); }
+            if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Auto power down was orignally enabled!\n"); }
             gOriginalAPDState = 1;
         }
     }
 
     IMDisableDim();
     IMDisableAPD();
-    log_print("ControllerPatcher::disableWiiUEnergySetting(): Disable Energy savers\n");
+    DEBUG_FUNCTION_LINE("Disable Energy savers\n");
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
@@ -626,11 +626,11 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::restoreWiiUEnergySetting()
 
     //Check if we need to enable Auto Power down again on exiting
     if(gOriginalAPDState == 1){
-        log_print("ControllerPatcher::restoreWiiUEnergySetting(): Auto shutdown was on before using HID to VPAD. Setting it to on again.\n");
+        DEBUG_FUNCTION_LINE("Auto shutdown was on before using HID to VPAD. Setting it to on again.\n");
         IMEnableAPD();
     }
     if(gOriginalDimState == 1){
-        log_print("ControllerPatcher::restoreWiiUEnergySetting(): Burn-in reduction was on before using HID to VPAD. Setting it to on again.\n");
+        DEBUG_FUNCTION_LINE("Burn-in reduction was on before using HID to VPAD. Setting it to on again.\n");
         IMEnableDim();
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
@@ -859,7 +859,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
 
         s32 res;
         if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
-            log_printf("ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) = %d\n",res);
+            DEBUG_FUNCTION_LINE("ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) = %d\n",res);
             continue;
         }
 
@@ -869,7 +869,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
         HID_Data * data_cur;
 
         if((res = ControllerPatcherHID::getHIDData(hidmask,pad,&data_cur)) < 0) {
-            //log_printf("ControllerPatcherHID::getHIDData(hidmask,pad,&data_cur)) = %d\n",res);
+            //DEBUG_FUNCTION_LINE("ControllerPatcherHID::getHIDData(hidmask,pad,&data_cur)) = %d\n",res);
             continue;
         }
         data_list.push_back(data_cur);
@@ -987,7 +987,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::printVPADButtons(VPADData 
         if((buffer->btns_d & VPAD_STICK_L_EMULATION_UP)     ==  VPAD_STICK_L_EMULATION_UP)      strcat(output,"LE_Up    ");
         if((buffer->btns_d & VPAD_STICK_L_EMULATION_DOWN)   ==  VPAD_STICK_L_EMULATION_DOWN)    strcat(output,"LE_Down  ");
 
-        log_printf("%spressed Sticks: LX %f LY %f RX %f RY %f\n",output,buffer->lstick.x,buffer->lstick.y,buffer->rstick.x,buffer->rstick.y);
+        DEBUG_FUNCTION_LINE("%spressed Sticks: LX %f LY %f RX %f RY %f\n",output,buffer->lstick.x,buffer->lstick.y,buffer->rstick.x,buffer->rstick.y);
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
 }

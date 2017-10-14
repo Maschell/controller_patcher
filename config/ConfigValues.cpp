@@ -28,7 +28,7 @@ ConfigValues::ConfigValues(){
 }
 
 ConfigValues::~ConfigValues(){
-    if(HID_DEBUG){ log_printf("ConfigValues::~ConfigValues(line %d){\n",__LINE__);}
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("\n");}
 }
 
 const u8 * ConfigValues::getValuesForPreset(std::map<std::string,const u8*> values,std::string possibleValue){
@@ -59,9 +59,9 @@ bool ConfigValues::setIfValueIsPreset(std::map<std::string,const u8*> values,std
         keyslot == CONTRPS_VPAD_BUTTON_L_STICK_Y ||
         keyslot == CONTRPS_VPAD_BUTTON_R_STICK_X ||
         keyslot == CONTRPS_VPAD_BUTTON_R_STICK_Y){
-        if(HID_DEBUG){ log_printf("ConfigValues::setIfValueIsPreset(line %d): This may be a predefined stick %s\n",__LINE__,possibleValue.c_str());}
+        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("This may be a predefined stick %s\n",possibleValue.c_str());}
         if((values_ = ConfigValues::getValuesStickPreset(possibleValue)) != NULL){
-            if(HID_DEBUG){ log_printf("ConfigValues::setIfValueIsPreset(line %d): Found predefined stick!\n",__LINE__);}
+            if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Found predefined stick!\n");}
             config_controller[slot][keyslot][0] =                           values_[STICK_CONF_BYTE];       //CONTRPS_VPAD_BUTTON_L_STICK_X
             config_controller[slot][keyslot][1] =                           values_[STICK_CONF_DEFAULT];
             config_controller[slot][keyslot+DEF_STICK_OFFSET_INVERT][0] =   CONTROLLER_PATCHER_VALUE_SET;   //CONTRPS_VPAD_BUTTON_L_STICK_X_INVERT
@@ -98,9 +98,9 @@ s32 ConfigValues::getValueFromMap(std::map<std::string,int> values,std::string n
 s32 ConfigValues::getPresetValueEx(std::string possibleString){
     s32 rightValue = -1;
     if((rightValue = getValueFromMap(gGamePadValuesToCONTRPSString,possibleString))!= -1){
-        if(HID_DEBUG){ log_printf("ConfigValues::getPresetValueEx(line %d): Used pre-defined VPAD_VALUE! \"%s\" is %d\n",__LINE__,possibleString.c_str(),rightValue); }
+        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Used pre-defined VPAD_VALUE! \"%s\" is %d\n",possibleString.c_str(),rightValue); }
     }else if((rightValue = getValueFromMap(presetValues,possibleString))!= -1){
-        if(HID_DEBUG){ log_printf("ConfigValues::getPresetValueEx(line %d): Used pre-defined value! \"%s\" is %d\n",__LINE__,possibleString.c_str(),rightValue); }
+        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Used pre-defined value! \"%s\" is %d\n",possibleString.c_str(),rightValue); }
     }
     return rightValue;
 }

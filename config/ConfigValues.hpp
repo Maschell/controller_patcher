@@ -33,7 +33,7 @@ friend class ControllerPatcher;
 private:
     static ConfigValues *getInstance() {
         if(instance == NULL){
-            log_printf("ConfigValues: We need a new instance!!!\n");
+            DEBUG_FUNCTION_LINE("We need a new instance!!!\n");
             instance = new ConfigValues();
         }
         return instance;
@@ -171,7 +171,7 @@ private:
     s32 getPresetValueEx(std::string possibleString);
 
 	void InitValues(){
-        log_printf("ConfigValues::InitValues: Init values for the configuration\n");
+        DEBUG_FUNCTION_LINE("Init values for the configuration\n");
         CONTPRStringToValue["VPAD_BUTTON_A"] =                          CONTRPS_VPAD_BUTTON_A;
         CONTPRStringToValue["VPAD_BUTTON_B"] =                          CONTRPS_VPAD_BUTTON_B;
         CONTPRStringToValue["VPAD_BUTTON_X"] =                          CONTRPS_VPAD_BUTTON_X;

@@ -35,14 +35,14 @@ ConfigReader::ConfigReader(){
 void ConfigReader::ReadAllConfigs(){
     std::vector<std::string> fileList = ScanFolder();
     if(fileList.size() > 0){
-        if(HID_DEBUG){ log_printf("ConfigReader::ConfigReader(line %d): Found %d config files\n",__LINE__,fileList.size()); }
+        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Found %d config files\n",fileList.size()); }
         processFileList(fileList);
     }
 }
 
 
 ConfigReader::~ConfigReader(){
-    if(HID_DEBUG){ log_printf("ConfigReader::~ConfigReader(line %d): ~ConfigReader\n",__LINE__); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("~ConfigReader\n"); }
     freeFSHandles();
 }
 
@@ -60,7 +60,7 @@ void ConfigReader::freeFSHandles(){
 
 // Mounting the sdcard without any external lib to be portable
 s32 ConfigReader::InitSDCard(){
-    if(HID_DEBUG){ log_printf("ConfigReader::InitSDCard(line %d): InitSDCard\n",__LINE__); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("InitSDCard\n"); }
 
     char mountSrc[FS_MOUNT_SOURCE_SIZE];
     char mountPath[FS_MAX_MOUNTPATH_SIZE];
@@ -89,11 +89,11 @@ s32 ConfigReader::InitSDCard(){
             {
                 return 0;
             }else{
-                log_printf("ConfigReader::InitSDCard(line %d): error: FSMount failed %d\n",__LINE__,status);
+                DEBUG_FUNCTION_LINE("error: FSMount failed %d\n",status);
                 return status;
             }
         }else{
-            log_printf("ConfigReader::InitSDCard(line %d): error: FSGetMountSource failed %d\n",__LINE__,status);
+            DEBUG_FUNCTION_LINE("error: FSGetMountSource failed %d\n",status);
             return status;
         }
     }
@@ -103,7 +103,7 @@ s32 ConfigReader::InitSDCard(){
 std::vector<std::string> ConfigReader::ScanFolder(){
     std::string path = CONTROLLER_PATCHER_PATH;
     s32 dirhandle = 0;
-    if(HID_DEBUG){ log_printf("ConfigReader::ScanFolder(line %d): Opening %s\n",__LINE__,path.c_str()); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Opening %s\n",path.c_str()); }
     std::vector<std::string> config_files;
     if (this->pClient && this->pCmd){
         s32 status = 0;
@@ -114,13 +114,13 @@ std::vector<std::string> ConfigReader::ScanFolder(){
                 if((dir_entry.stat.flag&FS_STAT_FLAG_IS_DIRECTORY) != FS_STAT_FLAG_IS_DIRECTORY){
                     if(CPStringTools::EndsWith(std::string(dir_entry.name),".ini")){
                         config_files.push_back(full_path);
-                        if(HID_DEBUG){ log_printf("ConfigReader::ScanFolder(line %d): %s \n",__LINE__,full_path.c_str()); }
+                        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Found ini: %s \n",full_path.c_str()); }
                     }
                 }
             }
             FSCloseDir(this->pClient,this->pCmd,dirhandle,-1);
         }else{
-            log_printf("ConfigReader::ScanFolder(line %d): Failed to open %s!\n",__LINE__,path.c_str());
+            DEBUG_FUNCTION_LINE("Failed to open folder %s!\n",path.c_str());
         }
     }
     return config_files;
@@ -128,7 +128,7 @@ std::vector<std::string> ConfigReader::ScanFolder(){
 
 void ConfigReader::processFileList(std::vector<std::string> path){
     for(std::vector<std::string>::iterator it = path.begin(); it != path.end(); ++it) {
-        log_printf("ConfigReader::processFileList(line %d): Reading %s\n",__LINE__,it->c_str());
+        DEBUG_FUNCTION_LINE("Reading %s\n",it->c_str());
         std::string result = loadFileToString(*it);
 
         ConfigParser parser(result);
@@ -139,12 +139,12 @@ void ConfigReader::processFileList(std::vector<std::string> path){
 std::string ConfigReader::loadFileToString(std::string path){
     s32 handle = 0;
     s32 status = 0;
-    std::string strBuffer;
+    std::string strBuffer = "";
     FSStat stats;
     if((status = FSGetStat(this->pClient,this->pCmd,path.c_str(),&stats,-1)) == FS_STATUS_OK){
         char * file  = (char *) malloc((sizeof(char)*stats.size)+1);
 		if(!file){
-			log_printf("ConfigReader::loadFileToString(line %d): error: Failed to allocate space for reading the file\n",__LINE__);
+			DEBUG_FUNCTION_LINE("error: Failed to allocate space for reading the file\n");
 			return "";
 		}
         file[stats.size] = '\0';
@@ -156,7 +156,7 @@ std::string ConfigReader::loadFileToString(std::string path){
             }
 
         }else{
-            log_printf("ConfigReader::loadFileToString(line %d): error: (FSOpenFile) Couldn't open file (%s), error: %d",__LINE__,path.c_str(),status);
+            DEBUG_FUNCTION_LINE("error: (FSOpenFile) Couldn't open file (%s), error: %d",path.c_str(),status);
             free(file);
             file=NULL;
             return "";
@@ -174,7 +174,7 @@ std::string ConfigReader::loadFileToString(std::string path){
         strBuffer = CPStringTools::removeCharFromString(strBuffer,'\t');
 
     }else{
-        log_printf("ConfigReader::loadFileToString(line %d): error: (GetStat) Couldn't open file (%s), error: %d",__LINE__,path.c_str(),status);
+        DEBUG_FUNCTION_LINE("error: (GetStat) Couldn't open file (%s), error: %d",path.c_str(),status);
     }
 
     return strBuffer;

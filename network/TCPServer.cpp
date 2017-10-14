@@ -36,14 +36,14 @@ TCPServer::TCPServer(s32 port){
 
 TCPServer::~TCPServer(){
     CloseSockets();
-    if(HID_DEBUG){ log_printf("TCPServer::~TCPServer(line %d): Thread will be closed\n",__LINE__); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Thread will be closed\n"); }
     TCPServer::AttachDetach(DETACH);
     exitThread = 1;
     if(TCPServer::pThread != NULL){
-        if(HID_DEBUG){ log_printf("TCPServer::~TCPServer(line %d): Deleting it!\n",__LINE__); }
+        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Deleting it!\n"); }
         delete TCPServer::pThread;
     }
-    if(HID_DEBUG){ log_printf("TCPServer::~TCPServer(line %d): Thread done\n",__LINE__); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Thread done\n"); }
     TCPServer::pThread = NULL;
 }
 
@@ -66,7 +66,7 @@ void TCPServer::StartTCPThread(TCPServer * server){
        OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
        OSGetTitleID() == 0x00050000101a3c00){  //The Binding of Isaac: Rebirth USA
         priority = 10;
-        log_printf("TCPServer::StartTCPThread(line %d): This game needs higher thread priority. We set it to %d\n",__LINE__,priority);
+        DEBUG_FUNCTION_LINE("This game needs higher thread priority. We set it to %d\n",priority);
     }
     TCPServer::pThread = ControllerPatcherThread::create(TCPServer::DoTCPThread, (void*)server, ControllerPatcherThread::eAttributeAffCore2,priority);
     TCPServer::pThread->resumeThread();
@@ -75,16 +75,16 @@ void TCPServer::StartTCPThread(TCPServer * server){
 void TCPServer::AttachDetach(s32 attach){
     if(HID_DEBUG){
         if(attach){
-            log_printf("TCPServer::AttachDetach(line %d): Network Attach\n",__LINE__);
+            DEBUG_FUNCTION_LINE("Network Attach\n");
         }else{
-            log_printf("TCPServer::AttachDetach(line %d): Network Detach\n",__LINE__);
+            DEBUG_FUNCTION_LINE("Network Detach\n");
         }
     }
 
     for(s32 i= 0;i< gHIDMaxDevices;i++){
         for(s32 j= 0;j< HID_MAX_PADS_COUNT;j++){
             if(gNetworkController[i][j][NETWORK_CONTROLLER_ACTIVE] > 0){
-                log_printf("TCPServer::AttachDetach(line %d): Found a registered pad in deviceslot %d and padslot %d! Lets detach it.\n",__LINE__,i,j);
+                DEBUG_FUNCTION_LINE("Found a registered pad in deviceslot %d and padslot %d! Lets detach it.\n",i,j);
                 HIDDevice device;
                 memset(&device,0,sizeof(device));
 
@@ -101,9 +101,9 @@ void TCPServer::AttachDetach(s32 attach){
 
     if(HID_DEBUG){
         if(attach){
-            log_printf("TCPServer::AttachDetach(line %d): Network Attach DONE!\n",__LINE__);
+            DEBUG_FUNCTION_LINE("Network Attach DONE!\n");
         }else{
-            log_printf("TCPServer::AttachDetach(line %d): Network Detach DONE!\n",__LINE__);
+            DEBUG_FUNCTION_LINE("Network Detach DONE!\n");
         }
     }
 }
@@ -123,32 +123,32 @@ s32 TCPServer::RunTCP(){
             os_usleep(1000);
 			continue;
 		}
-        //log_printf("got byte from tcp! %01X\n",ret);
+        //DEBUG_FUNCTION_LINE("got byte from tcp! %01X\n",ret);
 		switch (ret) {
             case WIIU_CP_TCP_ATTACH: { /*attach */
                 if(gUsedProtocolVersion >= WIIU_CP_TCP_HANDSHAKE_VERSION_1){
                     s32 handle;
                     ret = ControllerPatcherNet::recvwait(clientfd, &handle, 4);
                     if(ret < 0){
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: recvwait handle\n",__LINE__,WIIU_CP_TCP_ATTACH);
+                        DEBUG_FUNCTION_LINE("Error in %02X: recvwait handle\n",WIIU_CP_TCP_ATTACH);
                         return ret;
                     }
-                    if(HID_DEBUG){ log_printf("TCPServer::RunTCP(line %d): got handle %d\n",handle); }
+                    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("got handle %d\n",handle); }
                     u16 vid = 0;
                     u16 pid = 0;
                     ret = ControllerPatcherNet::recvwait(clientfd, &vid, 2);
                     if(ret < 0){
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: recvwait vid\n",__LINE__,WIIU_CP_TCP_ATTACH);
+                        DEBUG_FUNCTION_LINE("Error in %02X: recvwait vid\n",WIIU_CP_TCP_ATTACH);
                         return ret;
                     }
-                   if(HID_DEBUG){ log_printf("TCPServer::RunTCP(line %d): got vid %04X\n",vid); }
+                   if(HID_DEBUG){ DEBUG_FUNCTION_LINE("got vid %04X\n",vid); }
 
                     ret = ControllerPatcherNet::recvwait(clientfd, &pid, 2);
                     if(ret < 0){
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: recvwait pid\n",__LINE__,WIIU_CP_TCP_ATTACH);
+                        DEBUG_FUNCTION_LINE("Error in %02X: recvwait pid\n",WIIU_CP_TCP_ATTACH);
                         return ret;
                     }
-                    if(HID_DEBUG){ log_printf("TCPServer::RunTCP(line %d): got pid %04X\n",pid); }
+                    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("got pid %04X\n",pid); }
                     HIDDevice device;
                     memset(&device,0,sizeof(device));
                     device.handle = handle;
@@ -160,51 +160,51 @@ s32 TCPServer::RunTCP(){
                     my_cb_user * user  = NULL;
                     ControllerPatcherHID::externAttachDetachCallback(&device,1);
                     if((ret = ControllerPatcherUtils::getDataByHandle(handle,&user)) < 0){
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: getDataByHandle(%d,%08X).\n",__LINE__,WIIU_CP_TCP_ATTACH,handle,&user);
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: Config for the controller is missing.\n",__LINE__,WIIU_CP_TCP_ATTACH);
+                        DEBUG_FUNCTION_LINE("Error in %02X: getDataByHandle(%d,%08X).\n",WIIU_CP_TCP_ATTACH,handle,&user);
+                        DEBUG_FUNCTION_LINE("Error in %02X: Config for the controller is missing.\n",WIIU_CP_TCP_ATTACH);
                         if((ret = ControllerPatcherNet::sendbyte(clientfd, WIIU_CP_TCP_ATTACH_CONFIG_NOT_FOUND) < 0)){
-                            log_printf("TCPServer::RunTCP(line %d): Error in %02X: Sending the WIIU_CP_TCP_ATTACH_CONFIG_NOT_FOUND byte failed. Error: %d.\n",__LINE__,WIIU_CP_TCP_ATTACH,ret);
+                            DEBUG_FUNCTION_LINE("Error in %02X: Sending the WIIU_CP_TCP_ATTACH_CONFIG_NOT_FOUND byte failed. Error: %d.\n",WIIU_CP_TCP_ATTACH,ret);
                         }
                         return -1;
                     }
                     if((ret = ControllerPatcherNet::sendbyte(clientfd, WIIU_CP_TCP_ATTACH_CONFIG_FOUND) < 0)){
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: Sending the WIIU_CP_TCP_ATTACH_CONFIG_FOUND byte failed. Error: %d.\n",__LINE__,WIIU_CP_TCP_ATTACH,ret);
+                        DEBUG_FUNCTION_LINE("Error in %02X: Sending the WIIU_CP_TCP_ATTACH_CONFIG_FOUND byte failed. Error: %d.\n",WIIU_CP_TCP_ATTACH,ret);
                         return ret;
                     }
                     if(user != NULL){
                         if((ret = ControllerPatcherNet::sendbyte(clientfd, WIIU_CP_TCP_ATTACH_USER_DATA_OKAY) < 0)){
-                            log_printf("TCPServer::RunTCP(line %d): Error in %02X: Sending the WIIU_CP_TCP_ATTACH_USER_DATA_OKAY byte failed. Error: %d.\n",__LINE__,WIIU_CP_TCP_ATTACH,ret);
+                            DEBUG_FUNCTION_LINE("Error in %02X: Sending the WIIU_CP_TCP_ATTACH_USER_DATA_OKAY byte failed. Error: %d.\n",WIIU_CP_TCP_ATTACH,ret);
                             return ret;
                         }
 
                         ret = ControllerPatcherNet::sendwait(clientfd,&user->slotdata.deviceslot,2);
                         if(ret < 0){
-                            log_printf("TCPServer::RunTCP(line %d): Error in %02X: sendwait slotdata: %04X\n",__LINE__,WIIU_CP_TCP_ATTACH,user->slotdata.deviceslot);
+                            DEBUG_FUNCTION_LINE("Error in %02X: sendwait slotdata: %04X\n",WIIU_CP_TCP_ATTACH,user->slotdata.deviceslot);
                             return ret;
                         }
                         ret = ControllerPatcherNet::sendwait(clientfd,&user->pad_slot,1);
                         if(ret < 0){
-                            log_printf("TCPServer::RunTCP(line %d): Error in %02X: sendwait pad_slot: %04X\n",__LINE__,WIIU_CP_TCP_ATTACH,user->pad_slot);
+                            DEBUG_FUNCTION_LINE("Error in %02X: sendwait pad_slot: %04X\n",WIIU_CP_TCP_ATTACH,user->pad_slot);
                             return ret;
                         }
                     }else{
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: invalid user data.\n",__LINE__,WIIU_CP_TCP_ATTACH);
+                        DEBUG_FUNCTION_LINE("Error in %02X: invalid user data.\n",WIIU_CP_TCP_ATTACH);
                         if((ret = ControllerPatcherNet::sendbyte(clientfd, WIIU_CP_TCP_ATTACH_USER_DATA_BAD) < 0)){
-                            log_printf("TCPServer::RunTCP(line %d): Error in %02X: Sending the WIIU_CP_TCP_ATTACH_USER_DATA_BAD byte failed. Error: %d.\n",__LINE__,WIIU_CP_TCP_ATTACH,ret);
+                            DEBUG_FUNCTION_LINE("Error in %02X: Sending the WIIU_CP_TCP_ATTACH_USER_DATA_BAD byte failed. Error: %d.\n",WIIU_CP_TCP_ATTACH,ret);
                             return ret;
                         }
                         return -1;
                         break;
                     }
 
-                    if(HID_DEBUG){ log_printf("TCPServer::RunTCP(line %d): attachted to device slot: %d , pad slot is: %d\n",__LINE__,user->slotdata.deviceslot,user->pad_slot); }
+                    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("attachted to device slot: %d , pad slot is: %d\n",user->slotdata.deviceslot,user->pad_slot); }
 
                     gNetworkController[user->slotdata.deviceslot][user->pad_slot][NETWORK_CONTROLLER_VID] = device.vid;
                     gNetworkController[user->slotdata.deviceslot][user->pad_slot][NETWORK_CONTROLLER_PID] = device.pid;
                     gNetworkController[user->slotdata.deviceslot][user->pad_slot][NETWORK_CONTROLLER_ACTIVE] = 1;
                     gNetworkController[user->slotdata.deviceslot][user->pad_slot][NETWORK_CONTROLLER_HANDLE] = handle;
 
-                    if(HID_DEBUG){ log_printf("TCPServer::RunTCP(line %d): handle %d connected! vid: %02X pid: %02X deviceslot %d, padslot %d\n",__LINE__,handle,vid,pid,user->slotdata.deviceslot,user->pad_slot); }
+                    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("handle %d connected! vid: %02X pid: %02X deviceslot %d, padslot %d\n",handle,vid,pid,user->slotdata.deviceslot,user->pad_slot); }
                     break;
                 }
                 break;
@@ -214,30 +214,30 @@ s32 TCPServer::RunTCP(){
                     s32 handle;
                     ret = ControllerPatcherNet::recvwait(clientfd, &handle, 4);
                     if(ret < 0){
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: recvwait handle\n",__LINE__,WIIU_CP_TCP_DETACH);
+                        DEBUG_FUNCTION_LINE("Error in %02X: recvwait handle\n",WIIU_CP_TCP_DETACH);
                         return ret;
                         break;
                     }
 
-                    if(HID_DEBUG){ log_printf("TCPServer::RunTCP(line %d): got detach for handle: %d\n",__LINE__,handle); }
+                    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("got detach for handle: %d\n",handle); }
                     my_cb_user * user  = NULL;
                     if(ControllerPatcherUtils::getDataByHandle(handle,&user) < 0){
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: getDataByHandle(%d,%08X).\n",__LINE__,WIIU_CP_TCP_DETACH,handle,&user);
+                        DEBUG_FUNCTION_LINE("Error in %02X: getDataByHandle(%d,%08X).\n",WIIU_CP_TCP_DETACH,handle,&user);
                         return -1;
                         break;
                     }
                     if(user == NULL){
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: invalid user data.\n",__LINE__,WIIU_CP_TCP_DETACH);
+                        DEBUG_FUNCTION_LINE("Error in %02X: invalid user data.\n",WIIU_CP_TCP_DETACH);
                         return -1;
                         break;
                     }
                     s32 deviceslot = user->slotdata.deviceslot;
-                    if(HID_DEBUG){ log_printf("TCPServer::RunTCP(line %d): device slot is: %d , pad slot is: %d\n",__LINE__,deviceslot,user->pad_slot); }
+                    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("device slot is: %d , pad slot is: %d\n",deviceslot,user->pad_slot); }
 
                     DeviceVIDPIDInfo vidpid;
                     s32 result;
                     if((result = ControllerPatcherUtils::getVIDPIDbyDeviceSlot(deviceslot,&vidpid)) < 0){
-                        log_printf("TCPServer::RunTCP(line %d): Error in %02X: Couldn't find a valid VID/PID for device slot %d. Error: %d\n",__LINE__,WIIU_CP_TCP_DETACH,deviceslot,ret);
+                        DEBUG_FUNCTION_LINE("Error in %02X: Couldn't find a valid VID/PID for device slot %d. Error: %d\n",WIIU_CP_TCP_DETACH,deviceslot,ret);
                         return -1;
                         break;
                     }
@@ -252,16 +252,16 @@ s32 TCPServer::RunTCP(){
 
                     ControllerPatcherHID::externAttachDetachCallback(&device,DETACH);
                     memset(gNetworkController[deviceslot][user->pad_slot],0,sizeof(gNetworkController[deviceslot][user->pad_slot]));
-                    if(HID_DEBUG){ log_printf("TCPServer::RunTCP(line %d): handle %d disconnected!\n",__LINE__,handle); }
+                    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("handle %d disconnected!\n",handle); }
                     break;
                 }
                 break;
             }
             case WIIU_CP_TCP_PING: { /*ping*/
                 if(gUsedProtocolVersion >= WIIU_CP_TCP_HANDSHAKE_VERSION_1){
-                    if(HID_DEBUG){ log_printf("TCPServer::RunTCP(line %d): Got Ping, sending now a Pong\n",__LINE__); }
+                    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Got Ping, sending now a Pong\n"); }
                     s32 ret = ControllerPatcherNet::sendbyte(clientfd, WIIU_CP_TCP_PONG);
-                    if(ret < 0){ log_printf("TCPServer::RunTCP(line %d): Error in %02X: sendbyte PONG\n",__LINE__); return -1;}
+                    if(ret < 0){ DEBUG_FUNCTION_LINE("Error in %02X: sendbyte PONG\n"); return -1;}
 
                     break;
                 }
@@ -302,7 +302,7 @@ void TCPServer::DoTCPThreadInternal(){
 		if(ret < 0){ ErrorHandling(); continue;}
 
         do{
-            if(HID_DEBUG){ log_printf("TCPServer::DoTCPThreadInternal(line %d): Waiting for a connection\n",__LINE__); }
+            if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Waiting for a connection\n"); }
             if(exitThread) break;
             len = 16;
 
@@ -317,37 +317,37 @@ void TCPServer::DoTCPThreadInternal(){
             clientfd = ret = accept(sockfd, (sockaddr *)&(sock_addr), &len);
 
             if(ret == -1){ ErrorHandling(); break;}
-            log_printf("TCPServer::DoTCPThreadInternal(line %d): TCP Connection accepted! Sending my protocol version: %d (0x%02X)\n",__LINE__, (WIIU_CP_TCP_HANDSHAKE - WIIU_CP_TCP_HANDSHAKE_VERSION_1)+1,WIIU_CP_TCP_HANDSHAKE);
+            DEBUG_FUNCTION_LINE("TCP Connection accepted! Sending my protocol version: %d (0x%02X)\n", (WIIU_CP_TCP_HANDSHAKE - WIIU_CP_TCP_HANDSHAKE_VERSION_1)+1,WIIU_CP_TCP_HANDSHAKE);
 
             gUDPClientip = sock_addr.sin_addr.s_addr;
             UDPClient::createInstance();
 
             s32 ret;
             ret = ControllerPatcherNet::sendbyte(clientfd, WIIU_CP_TCP_HANDSHAKE); //Hey I'm a WiiU console!
-            if(ret < 0){ log_printf("TCPServer::DoTCPThreadInternal(line %d): Error sendbyte: %02X\n",__LINE__,WIIU_CP_TCP_HANDSHAKE); ErrorHandling(); break;}
+            if(ret < 0){ DEBUG_FUNCTION_LINE("Error sendbyte: %02X\n",WIIU_CP_TCP_HANDSHAKE); ErrorHandling(); break;}
 
             u8 clientProtocolVersion = ControllerPatcherNet::recvbyte(clientfd);
-            if(ret < 0){ log_printf("TCPServer::DoTCPThreadInternal(line %d): Error recvbyte: %02X\n",__LINE__,WIIU_CP_TCP_HANDSHAKE); ErrorHandling(); break;}
+            if(ret < 0){ DEBUG_FUNCTION_LINE("Error recvbyte: %02X\n",WIIU_CP_TCP_HANDSHAKE); ErrorHandling(); break;}
 
             if(clientProtocolVersion == WIIU_CP_TCP_HANDSHAKE_ABORT){
-                 log_printf("TCPServer::DoTCPThreadInternal(line %d): The network client wants to abort.\n",__LINE__);
+                 DEBUG_FUNCTION_LINE("The network client wants to abort.\n");
                  ErrorHandling(); break;
             }
 
-            log_printf("TCPServer::DoTCPThreadInternal(line %d): received protocol version: %d (0x%02X)\n",__LINE__,(clientProtocolVersion - WIIU_CP_TCP_HANDSHAKE_VERSION_1)+1,clientProtocolVersion);
+            DEBUG_FUNCTION_LINE("received protocol version: %d (0x%02X)\n",(clientProtocolVersion - WIIU_CP_TCP_HANDSHAKE_VERSION_1)+1,clientProtocolVersion);
 
             if(clientProtocolVersion >= WIIU_CP_TCP_HANDSHAKE_VERSION_MIN && clientProtocolVersion <= WIIU_CP_TCP_HANDSHAKE_VERSION_MAX){
-                log_printf("TCPServer::DoTCPThreadInternal(line %d): We support this protocol version. Let's confirm it to the network client.\n",__LINE__);
+                DEBUG_FUNCTION_LINE("We support this protocol version. Let's confirm it to the network client.\n");
                 gUsedProtocolVersion = clientProtocolVersion;
                 ret = ControllerPatcherNet::sendbyte(clientfd, clientProtocolVersion);
-                if(ret < 0){ log_printf("TCPServer::DoTCPThreadInternal(line %d): Error sendbyte: %02X\n",__LINE__,clientProtocolVersion); ErrorHandling(); break;}
+                if(ret < 0){ DEBUG_FUNCTION_LINE("Error sendbyte: %02X\n",clientProtocolVersion); ErrorHandling(); break;}
             }else{
-                log_printf("TCPServer::DoTCPThreadInternal(line %d): We don't support this protocol version. We need to abort =(.\n",__LINE__);
+                DEBUG_FUNCTION_LINE("We don't support this protocol version. We need to abort =(.\n");
                 ret = ControllerPatcherNet::sendbyte(clientfd, WIIU_CP_TCP_HANDSHAKE_ABORT);
                 ErrorHandling(); break;
             }
 
-            log_printf("TCPServer::DoTCPThreadInternal(line %d): Handshake done! Success!\n",__LINE__);
+            DEBUG_FUNCTION_LINE("Handshake done! Success!\n");
 
             TCPServer::DetachAndDelete(); //Clear connected controller
             RunTCP();
@@ -357,7 +357,7 @@ void TCPServer::DoTCPThreadInternal(){
             }
             clientfd = -1;
         }while(0);
-        log_printf("TCPServer::DoTCPThreadInternal(line %d): Connection closed\n",__LINE__);
+        DEBUG_FUNCTION_LINE("Connection closed\n");
         gUDPClientip = 0;
         UDPClient::destroyInstance();
         TCPServer::DetachAndDelete(); //Clear connected controller

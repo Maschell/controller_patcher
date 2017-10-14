@@ -59,7 +59,7 @@ UDPServer::~UDPServer(){
             this->sockfd = -1;
         }
     }
-    if(HID_DEBUG){ log_printf("UDPServer::~UDPServer(line %d): Thread has been closed\n",__LINE__); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Thread has been closed\n"); }
 
 
 }
@@ -72,7 +72,7 @@ void UDPServer::StartUDPThread(UDPServer * server){
        OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
        OSGetTitleID() == 0x00050000101a3c00){  //The Binding of Isaac: Rebirth USA
         priority = 10;
-        log_printf("UDPServer::StartUDPThread(line %d): This game needs higher thread priority. We set it to %d\n",__LINE__,priority);
+        DEBUG_FUNCTION_LINE("This game needs higher thread priority. We set it to %d\n",priority);
     }
     UDPServer::pThread = ControllerPatcherThread::create(UDPServer::DoUDPThread, (void*)server, ControllerPatcherThread::eAttributeAffCore2,priority);
     UDPServer::pThread->resumeThread();
@@ -80,7 +80,7 @@ void UDPServer::StartUDPThread(UDPServer * server){
 
 bool UDPServer::cpyIncrementBufferOffset(void * target, void * source, s32 * offset, s32 typesize, s32 maximum){
     if(((int)*offset + typesize) > maximum){
-        log_printf("UDPServer::cpyIncrementBufferOffset(line %d): Transfer error. Excepted %04X bytes, but only got %04X\n",__LINE__,(*offset + typesize),maximum);
+        DEBUG_FUNCTION_LINE("Transfer error. Excepted %04X bytes, but only got %04X\n",(*offset + typesize),maximum);
         return false;
     }
     memcpy(target,(void*)((u32)source+(*offset)),typesize);
@@ -135,19 +135,19 @@ void UDPServer::DoUDPThreadInternal(){
                         if(!cpyIncrementBufferOffset((void *)&datasize,     (void *)buffer,&bufferoffset,sizeof(datasize),  n))continue;
                         u8 * databuffer = (u8*) malloc(datasize * sizeof(u8));
                         if(!databuffer){
-                            log_printf("UDPServer::DoUDPThreadInternal(line %d): Allocating memory failed\n",__LINE__);
+                            DEBUG_FUNCTION_LINE("Allocating memory failed\n");
                             continue;
                         }
 
                         if(!cpyIncrementBufferOffset((void *)databuffer,    (void *)buffer,&bufferoffset,datasize,          n))continue;
-                        //log_printf("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
+                        //DEBUG_FUNCTION_LINE("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
 
                         user.pad_slot = padslot;
                         user.slotdata.deviceslot =  deviceSlot;
                         user.slotdata.hidmask = hid;
 
                         if(gNetworkController[deviceSlot][padslot][0] == 0){
-                            log_printf("UDPServer::DoUDPThreadInternal(line %d): Ehm. Pad is not connected. STOP SENDING DATA ;) \n",__LINE__);
+                            DEBUG_FUNCTION_LINE("Ehm. Pad is not connected. STOP SENDING DATA ;) \n");
                         }else{
                             ControllerPatcherHID::externHIDReadCallback(handle,databuffer,datasize,&user);
                         }
@@ -165,5 +165,5 @@ void UDPServer::DoUDPThreadInternal(){
             }
         }
     }
-    if(HID_DEBUG){ log_printf("UDPServer::DoUDPThreadInternal(line %d): UDPServer Thread ended\n",__LINE__); }
+    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("UDPServer Thread ended\n"); }
 }
