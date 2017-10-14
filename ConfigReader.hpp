@@ -23,8 +23,6 @@
 
 #include "./ControllerPatcher.hpp"
 
-#define CONTROLLER_PATCHER_PATH "/vol/external01/wiiu/controller";
-
 class ConfigReader{
     friend class ControllerPatcher;
     friend class ConfigParser;
@@ -50,7 +48,7 @@ class ConfigReader{
         static void increaseNumberOfLoadedFiles(){
             ConfigReader::numberValidFiles++;
         }
-        void ReadAllConfigs();
+        bool ReadConfigs(std::string path);
         static s32 numberValidFiles;
 
         //!Constructor
@@ -59,15 +57,12 @@ class ConfigReader{
         ~ConfigReader();
 
         s32 InitSDCard();
-        void freeFSHandles();
 
-        void * pClient = NULL;
-        void * pCmd = NULL;
         static ConfigReader *instance;
 
         std::string loadFileToString(std::string path);
         void processFileList(std::vector<std::string> path);
 
-        std::vector<std::string> ScanFolder();
+        std::vector<std::string> ScanFolder(std::string path);
 };
 #endif

@@ -470,7 +470,7 @@ void ControllerPatcher::ResetConfig(){
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[xinput_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT],   CONTROLLER_PATCHER_VALUE_SET,          HID_XINPUT_STICK_R_Y[STICK_CONF_INVERT]);
 }
 
-bool ControllerPatcher::Init(){
+bool ControllerPatcher::Init(const char * pathToConfig){
     InitOSFunctionPointers();
     InitSocketFunctionPointers();
     InitSysHIDFunctionPointers();
@@ -503,19 +503,15 @@ bool ControllerPatcher::Init(){
         if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Config already done!\n"); }
     }
 
-    if(gConfig_done != HID_SDCARD_READ){
+    if(pathToConfig != NULL && gConfig_done != HID_SDCARD_READ){
         DEBUG_FUNCTION_LINE("Reading config files from SD Card\n");
         ConfigReader* reader = ConfigReader::getInstance();
-        s32 status = 0;
-        if((status = reader->InitSDCard()) == 0){
-            if(HID_DEBUG){ DEBUG_FUNCTION_LINE(" SD Card mounted for controller config!\n"); }
-             reader->ReadAllConfigs();
+
+        if(reader->ReadConfigs(pathToConfig)){
             DEBUG_FUNCTION_LINE("Done with reading config files from SD Card\n");
             gConfig_done = HID_SDCARD_READ;
-        }else{
-            DEBUG_FUNCTION_LINE("SD mounting failed! %d\n",status);
         }
-        ConfigReader::destroyInstance();
+
     }
 
     DEBUG_FUNCTION_LINE("Initializing the data for button remapping\n");

@@ -65,8 +65,11 @@ class ControllerPatcher{
         static void ResetConfig();
         /**
             \brief Initializes the libraries, functions, values and arrays. Need to be called on each start of an Application. Returns false on errors.
+            @param pathToConfig: The path of the directory containing the configuration files. The path needs already to be mounted and accessible via the
+                                 devoptabs! If no configuration should be loaded from the SD Card, set this parameter to NULL.
         **/
-        static bool Init();
+
+        static bool Init(const char * pathToConfig);
 
         /**
             \brief De-Initialises the controller_patcher

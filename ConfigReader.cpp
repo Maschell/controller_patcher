@@ -15,11 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "./ConfigReader.hpp"
+#include "./utils/CPFSUtils.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <map>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <dirent.h>
 
 #include "dynamic_libs/fs_functions.h"
 #include "utils/logger.h"
@@ -28,101 +36,50 @@ s32 ConfigReader::numberValidFiles = 0;
 ConfigReader *ConfigReader::instance = NULL;
 
 ConfigReader::ConfigReader(){
-    InitOSFunctionPointers();
-    InitFSFunctionPointers();
 }
 
-void ConfigReader::ReadAllConfigs(){
-    std::vector<std::string> fileList = ScanFolder();
+bool ConfigReader::ReadConfigs(std::string path){
+    std::vector<std::string> fileList = ScanFolder(path);
+    if(fileList.size() == 1 && fileList[0].compare("ERROR") == 0){
+        return false;
+    }
+
     if(fileList.size() > 0){
         if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Found %d config files\n",fileList.size()); }
         processFileList(fileList);
     }
+    return true;
 }
 
 
 ConfigReader::~ConfigReader(){
     if(HID_DEBUG){ DEBUG_FUNCTION_LINE("~ConfigReader\n"); }
-    freeFSHandles();
 }
 
-void ConfigReader::freeFSHandles(){
-    if(this->pClient != NULL){
-        FSDelClient(this->pClient);
-        free(this->pClient);
-        this->pClient = NULL;
-    }
-     if(this->pCmd != NULL){
-        free(this->pCmd);
-        this->pCmd = NULL;
-    }
-}
-
-// Mounting the sdcard without any external lib to be portable
-s32 ConfigReader::InitSDCard(){
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("InitSDCard\n"); }
-
-    char mountSrc[FS_MOUNT_SOURCE_SIZE];
-    char mountPath[FS_MAX_MOUNTPATH_SIZE];
-
-    freeFSHandles();
-
-    this->pClient = malloc(FS_CLIENT_SIZE);
-    this->pCmd = malloc(FS_CMD_BLOCK_SIZE);
-
-    s32 status = 0;
-
-    if (this->pClient && this->pCmd)
-    {
-        // Do an FSInit first
-        FSInit();
-        // Add client to FS.
-        FSAddClientEx(this->pClient, FS_RET_NO_ERROR,-1);
-
-        // Init command block.
-        FSInitCmdBlock(this->pCmd);
-
-        // Mount sdcard
-        if ((status = FSGetMountSource(this->pClient, this->pCmd, FS_SOURCETYPE_EXTERNAL, &mountSrc, FS_RET_NO_ERROR)) == FS_STATUS_OK)
-        {
-            if ((status = FSMount(this->pClient, this->pCmd, &mountSrc, mountPath, FS_MAX_MOUNTPATH_SIZE, FS_RET_UNSUPPORTED_CMD)) == FS_STATUS_OK)
-            {
-                return 0;
-            }else{
-                DEBUG_FUNCTION_LINE("error: FSMount failed %d\n",status);
-                return status;
-            }
-        }else{
-            DEBUG_FUNCTION_LINE("error: FSGetMountSource failed %d\n",status);
-            return status;
-        }
-    }
-    return -1;
-}
-
-std::vector<std::string> ConfigReader::ScanFolder(){
-    std::string path = CONTROLLER_PATCHER_PATH;
-    s32 dirhandle = 0;
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Opening %s\n",path.c_str()); }
+std::vector<std::string> ConfigReader::ScanFolder(std::string path){
     std::vector<std::string> config_files;
-    if (this->pClient && this->pCmd){
-        s32 status = 0;
-        if((status = FSOpenDir(this->pClient,this->pCmd,path.c_str(),&dirhandle,-1)) == FS_STATUS_OK){
-            FSDirEntry dir_entry;
-            while (FSReadDir(this->pClient,  this->pCmd, dirhandle, &dir_entry, FS_RET_ALL_ERROR) == FS_STATUS_OK){
-                std::string full_path = path + "/" +  dir_entry.name;
-                if((dir_entry.stat.flag&FS_STAT_FLAG_IS_DIRECTORY) != FS_STAT_FLAG_IS_DIRECTORY){
-                    if(CPStringTools::EndsWith(std::string(dir_entry.name),".ini")){
-                        config_files.push_back(full_path);
-                        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Found ini: %s \n",full_path.c_str()); }
-                    }
-                }
-            }
-            FSCloseDir(this->pClient,this->pCmd,dirhandle,-1);
-        }else{
-            DEBUG_FUNCTION_LINE("Failed to open folder %s!\n",path.c_str());
+
+    struct dirent *dirent = NULL;
+	DIR *dirHandle = opendir(path.c_str());
+	if (dirHandle == NULL){
+        DEBUG_FUNCTION_LINE("Failed to open dir %s\n",path.c_str());
+        config_files.push_back("ERROR"); //TODO: Find a proper solution
+		return config_files;
+	}
+	while ((dirent = readdir(dirHandle)) != 0){
+		bool isDir = dirent->d_type & DT_DIR;
+		const char *filename = dirent->d_name;
+
+		if(strcmp(filename,".") == 0 || strcmp(filename,"..") == 0){ continue; }
+
+        std::string newPath = path + "/" + std::string(filename);
+
+        if(!isDir && CPStringTools::EndsWith(std::string(filename),".ini")){
+            config_files.push_back(newPath);
+            if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Found ini: %s \n",newPath.c_str()); }
         }
-    }
+	}
+
     return config_files;
 }
 
@@ -137,45 +94,13 @@ void ConfigReader::processFileList(std::vector<std::string> path){
 }
 
 std::string ConfigReader::loadFileToString(std::string path){
-    s32 handle = 0;
-    s32 status = 0;
     std::string strBuffer = "";
-    FSStat stats;
-    if((status = FSGetStat(this->pClient,this->pCmd,path.c_str(),&stats,-1)) == FS_STATUS_OK){
-        char * file  = (char *) malloc((sizeof(char)*stats.size)+1);
-		if(!file){
-			DEBUG_FUNCTION_LINE("error: Failed to allocate space for reading the file\n");
-			return "";
-		}
-        file[stats.size] = '\0';
-        if((status = FSOpenFile(this->pClient,this->pCmd,path.c_str(),"r",&handle,-1)) == FS_STATUS_OK){
-            s32 total_read = 0;
-			s32 ret2 = 0;
-			while ((ret2 = FSReadFile(pClient,  pCmd, file+total_read, 1, stats.size-total_read, handle, 0, FS_RET_ALL_ERROR)) > 0){
-				total_read += ret2;
-            }
-
-        }else{
-            DEBUG_FUNCTION_LINE("error: (FSOpenFile) Couldn't open file (%s), error: %d",path.c_str(),status);
-            free(file);
-            file=NULL;
-            return "";
-        }
-
-        FSCloseFile(this->pClient,this->pCmd,handle,-1);
-
-        strBuffer = std::string(file);
-        free(file);
-        file = NULL;
-
-        //! remove all windows crap signs
+    u8 * buffer = NULL;
+    if(CPFSUtils::LoadFileToMem(path.c_str(),&buffer,NULL) > 0){
+        strBuffer = std::string((char *)buffer);
         strBuffer = CPStringTools::removeCharFromString(strBuffer,'\r');
         strBuffer = CPStringTools::removeCharFromString(strBuffer,' ');
         strBuffer = CPStringTools::removeCharFromString(strBuffer,'\t');
-
-    }else{
-        DEBUG_FUNCTION_LINE("error: (GetStat) Couldn't open file (%s), error: %d",path.c_str(),status);
     }
-
     return strBuffer;
 }
