@@ -7,15 +7,38 @@ Detailed information about creating config files and adding support for more con
 # Where can I find config files
 Configfiles for all controllers are collection in [this repository](https://github.com/Maschell/controller_patch_configs)
 
-# Dependencies for including it in other applications
-This controller_patcher is build to be used in serveral projects. It don't uses some ultra fancy external libraries. </br>
-To be able to use in other projects, you will need some external data though.</br>
-- At first, you need a copy of the [dynamic_libs](https://github.com/Maschell/dynamic_libs) in your src/dynamic_libs folder.
-- To able to log something, you need the right [logger functions](https://github.com/Maschell/hid_to_vpad/tree/master/src/utils).
+## Logging usage
+To able to use the logging change the "DO_LOGGING" parameter in the Makefile.
+
+# Compiling
+You need to install all dependencies first!
+
+Install this static library into your portlibs folder via: 
+
+```
+make && make install
+```
+
+# Dependencies
+- Application needs to be loaded from the [homebrew_launcher](https://github.com/dimok789/homebrew_launcher)
+- [libutils](https://github.com/Maschell/libutils) for common function.
+- [dynamic_libs](https://github.com/Maschell/dynamic_libs/tree/lib) for access to the functions.
 
 # Example implementation
+
 ### How to "install" it
 TODO!
+
+```
+ControllerPatcher::Init(NULL); //No custom configuration
+ControllerPatcher::disableControllerMapping();
+ControllerPatcher::startNetworkServer();
+```
+
+```
+ControllerPatcher::DeInit();
+ControllerPatcher::stopNetworkServer();
+```
 
 # Credits:
 - Maschell  
