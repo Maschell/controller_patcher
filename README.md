@@ -19,9 +19,15 @@ Install this static library into your portlibs folder via:
 make && make install
 ```
 
+Link the application with
+
+```
+-lutils -ldynamiclibs -lcontrollerpatcher
+```
+
 # Dependencies
 - Application needs to be loaded from the [homebrew_launcher](https://github.com/dimok789/homebrew_launcher)
-- [libutils](https://github.com/Maschell/libutils) for common function.
+- [libutils](https://github.com/Maschell/libutils) for common functions.
 - [dynamic_libs](https://github.com/Maschell/dynamic_libs/tree/lib) for access to the functions.
 
 # Example implementation
