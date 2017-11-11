@@ -25,6 +25,12 @@ Link the application with
 -lutils -ldynamiclibs -lcontrollerpatcher
 ```
 
+You also need to add the include path to your Makefile. Example:
+
+```
+export INCLUDE	:= [...] -I$(PORTLIBS)/include
+```
+
 # Dependencies
 - Application needs to be loaded from the [homebrew_launcher](https://github.com/dimok789/homebrew_launcher)
 - [libutils](https://github.com/Maschell/libutils) for common functions.
