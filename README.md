@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Maschell/controller_patcher.svg?branch=master)](https://travis-ci.org/Maschell/controller_patcher)  
+
 # What is in this controller_patcher repository
 These files are the magic behind tools like HID to VPAD and can used to use your USB HID Device on your WiiU console.
 

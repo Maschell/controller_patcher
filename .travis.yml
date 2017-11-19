@@ -1,0 +1,45 @@
+language: c
+sudo: false
+
+os:
+  - linux
+
+env:
+  global:
+    - DEVKITPRO=$HOME/devkitPro
+    - DEVKITPPC=${DEVKITPRO}/devkitPPC	
+    - DEVKITTMP=$HOME/tmpFolder
+
+cache:
+  directories:
+    - ${DEVKITPRO}
+
+addons:
+  apt:
+    packages:
+    - p7zip-full
+
+before_install: 
+  - mkdir -p $DEVKITPRO
+  - cd $DEVKITPRO
+  - wget https://raw.githubusercontent.com/Maschell/controller_patcher/lib/other/devkitPPCupdatePPCr29.pl
+  - mkdir -p $DEVKITTMP
+  - cd $DEVKITTMP
+  - git clone https://github.com/Maschell/dynamic_libs.git -b lib
+  - git clone https://github.com/Maschell/libutils.git
+
+install:
+  - cd $DEVKITPRO
+  - perl devkitPPCupdatePPCr29.pl
+  - cd $DEVKITTMP/dynamic_libs
+  - 7z x -y ./libs/portlibs.zip -o${DEVKITPRO}
+  - make && make install
+  - cd $DEVKITTMP/libutils
+  - make && make install
+ 
+before_script:
+  - cd $TRAVIS_BUILD_DIR/
+ 
+script:
+  - make
+  
