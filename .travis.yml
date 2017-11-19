@@ -22,7 +22,7 @@ addons:
 before_install: 
   - mkdir -p $DEVKITPRO
   - cd $DEVKITPRO
-  - wget https://raw.githubusercontent.com/Maschell/controller_patcher/lib/other/devkitPPCupdatePPCr29.pl
+  - wget https://raw.githubusercontent.com/Maschell/controller_patcher/master/other/devkitPPCupdatePPCr29.pl
   - mkdir -p $DEVKITTMP
   - cd $DEVKITTMP
   - git clone https://github.com/Maschell/dynamic_libs.git -b lib
