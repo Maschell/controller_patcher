@@ -7,8 +7,7 @@ os:
 env:
   global:
     - DEVKITPRO=$HOME/devkitPro
-    - DEVKITPPC=${DEVKITPRO}/devkitPPC	
-    - DEVKITTMP=$HOME/tmpFolder
+    - DEVKITPPC=${DEVKITPRO}/devkitPPC
 
 cache:
   directories:
@@ -20,25 +19,18 @@ addons:
     - p7zip-full
 
 before_install: 
-  - mkdir -p $DEVKITPRO
-  - cd $DEVKITPRO
-  - wget https://raw.githubusercontent.com/Maschell/controller_patcher/master/other/devkitPPCupdatePPCr29.pl
-  - mkdir -p $DEVKITTMP
-  - cd $DEVKITTMP
-  - git clone https://github.com/Maschell/dynamic_libs.git -b lib
-  - git clone https://github.com/Maschell/libutils.git
+  - mkdir -p "${DEVKITPRO}"
+  - wget http://download.sourceforge.net/devkitpro/devkitPPC_r29-1-x86_64-linux.tar.bz2 -O devkitPPC-linux.tar.bz2
+  - wget https://github.com/Maschell/dynamic_libs/archive/lib.tar.gz -O dynamic_libs.tar.gz
+  - wget https://github.com/Maschell/libutils/archive/master.tar.gz -O libutils.tar.gz
 
 install:
-  - cd $DEVKITPRO
-  - perl devkitPPCupdatePPCr29.pl
-  - cd $DEVKITTMP/dynamic_libs
-  - 7z x -y ./libs/portlibs.zip -o${DEVKITPRO}
-  - make && make install
-  - cd $DEVKITTMP/libutils
-  - make && make install
- 
-before_script:
-  - cd $TRAVIS_BUILD_DIR/
+  - tar -xjf devkitPPC-linux.tar.bz2 -C ${DEVKITPRO}/
+  - tar -xzvf dynamic_libs.tar.gz
+  - tar -xzvf libutils.tar.gz
+  - 7z x -y ./dynamic_libs-lib/libs/portlibs.zip -o${DEVKITPRO}
+  - (cd dynamic_libs-lib && make && make install)
+  - (cd libutils-master && make && make install)
  
 script:
   - make
