@@ -562,7 +562,7 @@ std::vector<HID_Data *> ControllerPatcherHID::getHIDDataAll(){
                 s32 res;
                 HID_Data * new_data = NULL;
                 if((res = ControllerPatcherHID::getHIDData(cur_hidmask,pad,&new_data)) < 0){ // Checks if the pad is invalid.
-                    DEBUG_FUNCTION_LINE("error: Error getting the HID data from HID(%s) CHAN(). Error %d\n",StringTools::byte_to_binary(cur_hidmask),pad,res);
+                    //DEBUG_FUNCTION_LINE("error: Error getting the HID data from HID(%s) CHAN(). Error %d\n",StringTools::byte_to_binary(cur_hidmask),pad,res);
                     continue;
                 }
                 if(new_data != NULL) data_list.push_back(new_data);
