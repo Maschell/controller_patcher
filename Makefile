@@ -35,7 +35,7 @@ LIB		:=	lib
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-CFLAGS	= -shared -fPIC -g -O2 -Wall -D__wiiu__ $(MACHDEP) $(INCLUDE)
+CFLAGS	= -g -O2 -Wall -D__wiiu__ $(MACHDEP) $(INCLUDE)
 CXXFLAGS	=	$(CFLAGS) -D_GNU_SOURCE
 
 ifeq ($(DO_LOGGING), 1)
