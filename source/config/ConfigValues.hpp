@@ -270,6 +270,9 @@ private:
         CONTPRStringToValueSingle["DOUBLE_USE"] =                       CONTRPS_DOUBLE_USE;
         CONTPRStringToValueSingle["PAD_COUNT"] =                        CONTRPS_PAD_COUNT;
 
+        CONTPRStringToValueSingle["VPAD_L_STICK_COPY_DPAD"] =           CONTRPS_VPAD_STICK_L_COPY_DPAD;
+        CONTPRStringToValueSingle["VPAD_R_STICK_COPY_DPAD"] =           CONTRPS_VPAD_STICK_R_COPY_DPAD;
+
         mouseLeftValues["LEFT_CLICK"] =                                 CONTRPS_VPAD_BUTTON_LEFT;
         mouseLeftValues["RIGHT_CLICK"] =                                CONTRPS_VPAD_BUTTON_RIGHT;
         mouseLeftValues["EMULATED_STICK"] =                             CONTRPS_MOUSE_STICK;

@@ -418,7 +418,6 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
 
     s32 deviceslot = data->slotdata.deviceslot;
     if (data->type == DEVICE_TYPE_MOUSE){
-
         if(gHID_Mouse_Mode == HID_MOUSE_MODE_AIM){ // TODO: tweak values
             HID_Mouse_Data * ms_data = &data->data_union.mouse.cur_mouse_data;
             if(ms_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
@@ -520,6 +519,39 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
             Vec2D stick = getAnalogValueByButtons(stick_values);
             buffer->rstick.x += stick.x;
             buffer->rstick.y += stick.y;
+        }
+
+        if(config_controller[deviceslot][CONTRPS_VPAD_STICK_L_COPY_DPAD][0] != CONTROLLER_PATCHER_INVALIDVALUE){
+            if(config_controller[deviceslot][CONTRPS_VPAD_STICK_L_COPY_DPAD][0] == 1){
+                u8 stick_values = 0;
+
+                if(buffer->btns_h & VPAD_BUTTON_UP){    stick_values |= STICK_VALUE_UP; }
+                if(buffer->btns_h & VPAD_BUTTON_DOWN){  stick_values |= STICK_VALUE_DOWN; }
+                if(buffer->btns_h & VPAD_BUTTON_LEFT){  stick_values |= STICK_VALUE_LEFT; }
+                if(buffer->btns_h & VPAD_BUTTON_RIGHT){ stick_values |= STICK_VALUE_RIGHT; }
+
+                if(stick_values > 0 ){
+                    Vec2D stick = getAnalogValueByButtons(stick_values);
+                    buffer->lstick.x += stick.x;
+                    buffer->lstick.y += stick.y;
+                }
+            }
+        }
+        if(config_controller[deviceslot][CONTRPS_VPAD_STICK_R_COPY_DPAD][0] != CONTROLLER_PATCHER_INVALIDVALUE){
+            if(config_controller[deviceslot][CONTRPS_VPAD_STICK_R_COPY_DPAD][0] == 1){
+                u8 stick_values = 0;
+
+                if(buffer->btns_h & VPAD_BUTTON_UP){    stick_values |= STICK_VALUE_UP; }
+                if(buffer->btns_h & VPAD_BUTTON_DOWN){  stick_values |= STICK_VALUE_DOWN; }
+                if(buffer->btns_h & VPAD_BUTTON_LEFT){  stick_values |= STICK_VALUE_LEFT; }
+                if(buffer->btns_h & VPAD_BUTTON_RIGHT){ stick_values |= STICK_VALUE_RIGHT; }
+
+                if(stick_values > 0 ){
+                    Vec2D stick = getAnalogValueByButtons(stick_values);
+                    buffer->rstick.x += stick.x;
+                    buffer->rstick.y += stick.y;
+                }
+            }
         }
 
         /*log_printf("LX %f(%02X) LY %f(%02X) RX %f(%02X) RY %f(%02X)\n",buffer->lstick.x,cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X][0]],
