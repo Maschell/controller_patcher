@@ -613,14 +613,18 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkAndSetMouseMode(
     if(hidmask & gHID_LIST_KEYBOARD){
         u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
         u8 * last_data = &data->data_union.controller.last_hid_data[0];
-        if((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) && ((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) != (isInKeyboardData(last_data,HID_KEYBOARD_BUTTON_F1) > 0))){
+        if((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) && ((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) != (isInKeyboardData(last_data,HID_KEYBOARD_BUTTON_F1) > 0)) && gMouseModeCoolDown == 0){
+            gMouseModeCoolDown = 60;
             if(gHID_Mouse_Mode == HID_MOUSE_MODE_AIM){
                 gHID_Mouse_Mode = HID_MOUSE_MODE_TOUCH;
-                if(HID_DEBUG){ log_printf("ControllerPatcherUtils::checkAndSetMouseMode(line %d): Mouse mode changed! to touch \n",__LINE__); }
+                //log_printf("ControllerPatcherUtils::checkAndSetMouseMode(line %d): Mouse mode changed! to touch \n",__LINE__);
             }else if(gHID_Mouse_Mode == HID_MOUSE_MODE_TOUCH){
-                if(HID_DEBUG){ log_printf("ControllerPatcherUtils::checkAndSetMouseMode(line %d): Mouse mode changed! to aim \n",__LINE__); }
+                //log_printf("ControllerPatcherUtils::checkAndSetMouseMode(line %d): Mouse mode changed! to aim \n",__LINE__);
                 gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
             }
+        }
+        if(gMouseModeCoolDown > 0){
+            gMouseModeCoolDown--;
         }
     }
     return CONTROLLER_PATCHER_ERROR_NONE;

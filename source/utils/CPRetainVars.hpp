@@ -36,6 +36,8 @@ extern HID_DEVICE_DATA gHID_Devices[gHIDMaxDevices];
 
 extern u8 gHID_Mouse_Mode;
 
+extern u8 gMouseModeCoolDown;
+
 extern u32 gGamePadValues[CONTRPS_MAX_VALUE];
 
 extern u8 config_controller[gHIDMaxDevices][CONTRPS_MAX_VALUE][2];

@@ -359,6 +359,7 @@ typedef struct _InputButtonData{
  */
 typedef struct _InputData{
     DeviceInfo device_info; /**< Infos about the device where the data is coming from */
+    ControllerMapping_Type_Defines type;
     InputButtonData button_data[HID_MAX_PADS_COUNT];
 }InputData;
 

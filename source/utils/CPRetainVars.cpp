@@ -33,6 +33,8 @@ HID_DEVICE_DATA gHID_Devices[gHIDMaxDevices] __attribute__((section(".data")));
 
 u8 gHID_Mouse_Mode __attribute__((section(".data"))) = HID_MOUSE_MODE_TOUCH;
 
+u8 gMouseModeCoolDown __attribute__((section(".data"))) = 0;
+
 u32 gGamePadValues[CONTRPS_MAX_VALUE] __attribute__((section(".data")));
 
 u8  config_controller[gHIDMaxDevices][CONTRPS_MAX_VALUE][2] __attribute__((section(".data")));

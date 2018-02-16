@@ -741,6 +741,9 @@ HID_Mouse_Data * ControllerPatcher::getMouseData(){
         }
         if(padinfo->type == CM_Type_Mouse){
             result = &(gHID_Devices[gMouseSlot].pad_data[padinfo->pad].data_union.mouse.cur_mouse_data);
+            DCFlushRange(&result,sizeof(result));
+            DCInvalidateRange(&result,sizeof(result));
+            break;
         }
     }
     return result;
@@ -766,11 +769,20 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
             s32 newhid = (1 << i);
             s32 deviceslot = ControllerPatcherUtils::getDeviceSlot(newhid);
             if(deviceslot < 0) continue;
+
+            output[result].type = CM_Type_Controller;
+
             DeviceInfo * deviceinfo = &(output[result].device_info);
             InputButtonData * buttondata = output[result].button_data;
 
             deviceinfo->slotdata.deviceslot = deviceslot;
             deviceinfo->slotdata.hidmask = newhid;
+
+            if(newhid == gHID_LIST_MOUSE){
+                output[result].type = CM_Type_Mouse;
+            } else if(newhid == gHID_LIST_KEYBOARD){
+                output[result].type = CM_Type_Keyboard;
+            }
 
             deviceinfo->vidpid.vid = config_controller[deviceslot][CONTRPS_VID][0] * 0x100 + config_controller[deviceslot][CONTRPS_VID][1];
             deviceinfo->vidpid.pid = config_controller[deviceslot][CONTRPS_PID][0] * 0x100 + config_controller[deviceslot][CONTRPS_PID][1];
