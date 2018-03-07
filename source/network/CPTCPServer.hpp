@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-#ifndef _TCPSERVER_WINDOW_H_
-#define _TCPSERVER_WINDOW_H_
+#ifndef _CP_TCPSERVER_WINDOW_H_
+#define _CP_TCPSERVER_WINDOW_H_
 
 #include "../ControllerPatcherIncludes.hpp"
 
 #include <dynamic_libs/socket_functions.h>
 #include <dynamic_libs/os_functions.h>
+#include <utils/TCPServer.hpp>
+#include <utils/net.h>
 
 #define WIIU_CP_TCP_HANDSHAKE               WIIU_CP_TCP_HANDSHAKE_VERSION_3
 
@@ -48,13 +50,15 @@
 
 #define DEFAULT_TCP_PORT    8112
 
-class TCPServer{
+class CPTCPServer: TCPServer{
     friend class ControllerPatcher;
 
 private:
-     static TCPServer *getInstance() {
-        if(!instance)
-            instance = new TCPServer(DEFAULT_TCP_PORT);
+     static CPTCPServer *getInstance() {
+        if(!instance){
+
+            instance = new CPTCPServer(DEFAULT_TCP_PORT);
+        }
         return instance;
     }
 
@@ -65,29 +69,37 @@ private:
         }
     }
 
-    TCPServer(s32 port);
-    ~TCPServer();
+    static s32 getPriority(){
+        s32 priority = 28;
+        if(OSGetTitleID() == 0x00050000101c9300 || //The Legend of Zelda Breath of the Wild JPN
+           OSGetTitleID() == 0x00050000101c9400 || //The Legend of Zelda Breath of the Wild USA
+           OSGetTitleID() == 0x00050000101c9500 || //The Legend of Zelda Breath of the Wild EUR
+           OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
+           OSGetTitleID() == 0x00050000101a3c00){  //The Binding of Isaac: Rebirth USA
+            priority = 10;
+            DEBUG_FUNCTION_LINE("This game needs higher thread priority. We set it to %d\n",priority);
+        }
+        return priority;
+    }
 
-    void CloseSockets();
-    void ErrorHandling();
+    CPTCPServer(s32 port);
 
-    void StartTCPThread(TCPServer * server);
-    static void DoTCPThread(CThread *thread, void *arg);
-    void DoTCPThreadInternal();
+    virtual ~CPTCPServer();
+
     static void DetachConnectedNetworkController();
+
     static void AttachDetach(s32 attach);
-    void DetachAndDelete();
-    static TCPServer *instance;
 
-    s32 RunTCP();
+    virtual void DetachAndDelete();
 
-    struct sockaddr_in sock_addr;
-    volatile s32 sockfd = -1;
-    volatile s32 clientfd = -1;
+    virtual bool whileLoop();
 
+    virtual bool acceptConnection();
 
-    volatile s32 exitThread = 0;
-    static CThread *pThread;
+    virtual void onConnectionClosed();
+
+    static CPTCPServer * instance;
+
 };
 
 #endif //_TCPSERVER_WINDOW_H_

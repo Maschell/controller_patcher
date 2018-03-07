@@ -528,14 +528,14 @@ void ControllerPatcher::startNetworkServer(){
     if(!gNetworkControllerActivated) return;
     DEBUG_FUNCTION_LINE("statedNetworkServer! \n");
     UDPServer::getInstance();
-    TCPServer::getInstance();
+    CPTCPServer::getInstance();
 }
 
 void ControllerPatcher::stopNetworkServer(){
     DEBUG_FUNCTION_LINE("called! \n");
     UDPServer::destroyInstance();
     UDPClient::destroyInstance();
-    TCPServer::destroyInstance();
+    CPTCPServer::destroyInstance();
 }
 
 void ControllerPatcher::DeInit(){
@@ -734,7 +734,7 @@ HID_Mouse_Data * ControllerPatcher::getMouseData(){
 
     HID_Mouse_Data * result = NULL;
 
-    for(s32 i;i<HID_MAX_DEVICES_PER_SLOT;i++){
+    for(s32 i = 0;i<HID_MAX_DEVICES_PER_SLOT;i++){
         ControllerMappingPADInfo * padinfo = &(CMPAD->pad_infos[i]);
         if(!padinfo->active){
             break;

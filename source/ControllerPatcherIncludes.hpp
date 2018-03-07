@@ -36,10 +36,8 @@
 #include "./config/ConfigValues.hpp"
 #include "./config/ConfigParser.hpp"
 
-#include "./network/ControllerPatcherNet.hpp"
-#include "./network/TCPServer.hpp"
+#include "./network/CPTCPServer.hpp"
 #include "./network/UDPServer.hpp"
 #include "./network/UDPClient.hpp"
-
 
 #endif /* _CONTROLLER_PATCHER_INCLUDES_H_ */

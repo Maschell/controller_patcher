@@ -26,7 +26,7 @@
 class UDPClient{
     friend class ControllerPatcher;
     friend class ControllerPatcherHID;
-    friend class TCPServer;
+    friend class CPTCPServer;
 public:
 
 private:
