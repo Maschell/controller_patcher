@@ -10,9 +10,18 @@ ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>devkitPRO")
 endif
 
-include $(DEVKITPPC)/wii_rules
-
+export PATH			:=	$(DEVKITPPC)/bin:$(PORTLIBS)/bin:$(PATH)
 export PORTLIBS		:=	$(DEVKITPRO)/portlibs/ppc
+
+PREFIX	:=	powerpc-eabi-
+
+export AS	:=	$(PREFIX)as
+export CC	:=	$(PREFIX)gcc
+export CXX	:=	$(PREFIX)g++
+export AR	:=	$(PREFIX)ar
+export OBJCOPY	:=	$(PREFIX)objcopy
+
+include $(DEVKITPPC)/base_rules
 
 #---------------------------------------------------------------------------------
 # BUILD is the directory where object files & intermediate files will be placed
