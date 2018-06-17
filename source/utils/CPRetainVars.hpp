@@ -17,9 +17,8 @@
 #ifndef CP_RETAINS_VARS_H_
 #define CP_RETAINS_VARS_H_
 
-#include <dynamic_libs/syshid_functions.h>
-#include <dynamic_libs/padscore_functions.h>
-#include "../ControllerPatcherDefs.h"
+#include <controller_patcher/ControllerPatcherDefs.h>
+#include <nsyshid/hid.h>
 
 extern ControllerMapping gControllerMapping;
 

@@ -20,10 +20,19 @@
 
 #define HID_DEBUG 0
 
-#include <dynamic_libs/os_types.h>
+#include <wut_types.h>
+
+extern int32_t * (* __gh_errno_ptr)(void);
+
+#include <padscore/kpad.h>
+#include <padscore/wpad.h>
+#include <vpad/input.h>
+#include <coreinit/systeminfo.h>
+#include <nsysnet/socket.h>
 
 #include "./ConfigReader.hpp"
-#include "./ControllerPatcher.hpp"
+#include <controller_patcher/ControllerPatcher.hpp>
+
 
 #include <system/CThread.h>
 #include "./utils/CPRetainVars.hpp"

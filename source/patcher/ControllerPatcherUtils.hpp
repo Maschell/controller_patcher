@@ -27,8 +27,8 @@
 #ifndef _CONTROLLER_PATCHER_UTIL_H_
 #define _CONTROLLER_PATCHER_UTIL_H_
 
-#include <dynamic_libs/vpad_functions.h>
-#include <dynamic_libs/padscore_functions.h>
+#include <padscore/kpad.h>
+#include <padscore/wpad.h>
 
 #include "../ControllerPatcherIncludes.hpp"
 
@@ -70,13 +70,13 @@ class ControllerPatcherUtils{
 
             /** \brief Set the VPAD data for a given KPAD data.
          *
-         * \param vpad_buffer VPADData* A pointer to the VPAD Data where the result will be stored.
+         * \param vpad_buffer VPADStatus* A pointer to the VPAD Data where the result will be stored.
          * \param pro_buffer KPADData* A pointer to the given KPADData data.
          * \param lastButtonsPressesPRO u32* A pointer to the button presses of the previous call. Will be updated while calling.
          * \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
          *
          */
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR translateToVPAD(VPADData * vpad_buffer,KPADData * pro_buffer,u32 * lastButtonsPressesVPAD);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR translateToVPAD(VPADStatus * vpad_buffer,KPADStatus * pro_buffer,u32 * lastButtonsPressesVPAD);
     private:
     /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * Analyse inputs
@@ -119,27 +119,27 @@ class ControllerPatcherUtils{
         /** \brief Checks if a @p VPADButton (VPAD_BUTTON_XXX) is set in the given @p CONTRPS_SLOT (usually the one for buttons remapping) of the GamePad. When its set it'll be
          *         set for the corresponding Button (aka button remapping). When the @p CONTRPS_SLOT is not valid, the normal buttons layout will be used.
          *
-         * \param old_buffer A pointer to a VPADData struct from which will be read.
-         * \param new_buffer A pointer to a VPADData struct where the result will be written.
+         * \param old_buffer A pointer to a VPADStatus struct from which will be read.
+         * \param new_buffer A pointer to a VPADStatus struct where the result will be written.
          * \param VPADButton The buttons that will be may replaced
          * \param CONTRPS_SLOT The CONTRPS_SLOT where the VPAD_Buttons we want to use instead of the parameter "VPADButton" could be saved.
          * \return When the functions failed result < 0 is returned. If the pad is active/connected, 1 is returned.
          *
          */
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setButtonRemappingData(VPADData * old_buffer, VPADData * new_buffer,u32 VPADButton, s32 CONTRPS_SLOT);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setButtonRemappingData(VPADStatus * old_buffer, VPADStatus * new_buffer,u32 VPADButton, s32 CONTRPS_SLOT);
 
         /**
-            \brief Checks if a given button (oldVPADButton) is set in a given VPADData struct (old_buffer). If its set, it will set an other
-            button (newVPADButton) to the second given VPADData struct (new_buffer)
+            \brief Checks if a given button (oldVPADButton) is set in a given VPADStatus struct (old_buffer). If its set, it will set an other
+            button (newVPADButton) to the second given VPADStatus struct (new_buffer)
 
-            \param old_buffer       A pointer to a VPADData struct from which will be read.
-            \param new_buffer       A pointer to a VPADData struct where the result will be written.
-            \param oldVPADButton    The buttons that need to be set in the first VPADData
-            \param newVPADButton    The buttons that will be set in the second VPADData, when the oldVPADButton is pressed in the first buffer.
+            \param old_buffer       A pointer to a VPADStatus struct from which will be read.
+            \param new_buffer       A pointer to a VPADStatus struct where the result will be written.
+            \param oldVPADButton    The buttons that need to be set in the first VPADStatus
+            \param newVPADButton    The buttons that will be set in the second VPADStatus, when the oldVPADButton is pressed in the first buffer.
 
             \return When the functions failed result < 0 is returned. If the pad is active/connected, 1 is returned.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setButtonData(VPADData * old_buffer, VPADData * new_buffer,u32 oldVPADButton,u32 newVPADButton);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setButtonData(VPADStatus * old_buffer, VPADStatus * new_buffer,u32 oldVPADButton,u32 newVPADButton);
 
     /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * Pad Status functions
@@ -173,7 +173,7 @@ class ControllerPatcherUtils{
 
             \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR normalizeStickValues(Vec2D * stick);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR normalizeStickValues(VPADVec2D * stick);
 
         /**
             \brief Converts the digital absolute stick data into a float value. It also applies the deadzones, and can invert the result.
@@ -190,37 +190,37 @@ class ControllerPatcherUtils{
         static f32 convertAnalogValue(u8 value, u8 default_val, u8 min, u8 max, u8 invert,u8 deadzone);
 
         /**
-            \brief Calculates a the stick data (Vec2D) from given digital direction.
+            \brief Calculates a the stick data (VPADVec2D) from given digital direction.
 
             \param stick_values bits need to set for each direction. (STICK_VALUE_UP,STICK_VALUE_DOWN,STICK_VALUE_LEFT,STICK_VALUE_RIGHT)
 
-            \return The Vec2D with the set values.
+            \return The VPADVec2D with the set values.
         **/
-        static Vec2D getAnalogValueByButtons(u8 stick_values);
+        static VPADVec2D getAnalogValueByButtons(u8 stick_values);
 
         /**
-            \brief Handles the analog-stick data of HID devices. The result will written in the VPADData buffer.
+            \brief Handles the analog-stick data of HID devices. The result will written in the VPADStatus buffer.
 
             \param data Pointer to the current data of the HID device
-            \param buffer Pointer to VPADData where the analog-stick data will be set.
+            \param buffer Pointer to VPADStatus where the analog-stick data will be set.
 
             \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR convertAnalogSticks(HID_Data * data,VPADData * buffer);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR convertAnalogSticks(HID_Data * data,VPADStatus * buffer);
 
     /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * Mouse functions
      *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
         /**
-            \brief Set the touch data in the VPADData buffer.
+            \brief Set the touch data in the VPADStatus buffer.
             Currently its only possible to set the touch data from a Mouse
 
             \param data The current data of the HID device
-            \param buffer Pointer to VPADData where the touch data will be set.
+            \param buffer Pointer to VPADStatus where the touch data will be set.
 
             \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setTouch(HID_Data * data,VPADData * buffer);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setTouch(HID_Data * data,VPADStatus * buffer);
 
         /** \brief  Checks if the mouse mode needs to be changed. Sets it to the new mode if necessary.
          *         Currently the incoming data needs to be from a keyboard.
@@ -239,21 +239,21 @@ class ControllerPatcherUtils{
 
             \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
         **/
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setEmulatedSticks(VPADData * buffer, u32 * last_emulatedSticks);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setEmulatedSticks(VPADStatus * buffer, u32 * last_emulatedSticks);
 
     /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * Other functions
      *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
         /** \brief Set the Pro Controller for a given VPAD data.
          *
-         * \param vpad_buffer VPADData* A pointer to the given VPAD Data.
+         * \param vpad_buffer VPADStatus* A pointer to the given VPAD Data.
          * \param pro_buffer KPADData* A pointer to the KPADData where the result will be stored.
          * \param lastButtonsPressesPRO u32* A pointer to the button presses of the previous call. Will be updated while calling.
          * \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
          *
          */
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR translateToPro(VPADData * vpad_buffer,KPADData * pro_buffer,u32 * lastButtonsPressesPRO);
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR translateToProWPADRead(VPADData * vpad_buffer,WPADReadData * pro_buffer);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR translateToPro(VPADStatus * vpad_buffer, KPADStatus * pro_buffer, u32 * lastButtonsPressesPRO);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR translateToProWPADRead(VPADStatus * vpad_buffer,WPADReadData * pro_buffer);
 
         /**
             \brief Checks if the value at the given device + CONTRPS slot equals the expected value.

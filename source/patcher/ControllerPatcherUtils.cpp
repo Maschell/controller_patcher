@@ -260,7 +260,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isInKeyboardData(unsi
  * Utils for setting the Button data
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonRemappingData(VPADData * old_buffer, VPADData * new_buffer,u32 VPADButton, s32 CONTRPS_SLOT){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonRemappingData(VPADStatus * old_buffer, VPADStatus * new_buffer,u32 VPADButton, s32 CONTRPS_SLOT){
     if(old_buffer == NULL || new_buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     u32 new_value = VPADButton;
 
@@ -272,16 +272,16 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonRemappingDat
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonData(VPADData * old_buffer, VPADData * new_buffer,u32 oldVPADButton,u32 newVPADButton){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonData(VPADStatus * old_buffer, VPADStatus * new_buffer,u32 oldVPADButton,u32 newVPADButton){
     if(old_buffer == NULL || new_buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
-    if((old_buffer->btns_h & oldVPADButton) == oldVPADButton){
-        new_buffer->btns_h |= newVPADButton;
+    if((old_buffer->hold & oldVPADButton) == oldVPADButton){
+        new_buffer->hold |= newVPADButton;
     }
-    if((old_buffer->btns_r & oldVPADButton) == oldVPADButton){
-        new_buffer->btns_r |= newVPADButton;
+    if((old_buffer->release & oldVPADButton) == oldVPADButton){
+        new_buffer->release |= newVPADButton;
     }
-    if((old_buffer->btns_d & oldVPADButton) == oldVPADButton){
-        new_buffer->btns_d |= newVPADButton;
+    if((old_buffer->trigger & oldVPADButton) == oldVPADButton){
+        new_buffer->trigger |= newVPADButton;
     }
 
     return CONTROLLER_PATCHER_ERROR_NONE;
@@ -324,7 +324,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getActivePad(u32 hidm
  * Stick functions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::normalizeStickValues(Vec2D * stick){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::normalizeStickValues(VPADVec2D * stick){
     if(stick == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
     f32 max_val = 0.0f;
@@ -370,8 +370,8 @@ f32 ControllerPatcherUtils::convertAnalogValue(u8 value, u8 default_val, u8 min,
     }
 }
 
-Vec2D ControllerPatcherUtils::getAnalogValueByButtons(u8 stick_values){
-    Vec2D stick;
+VPADVec2D ControllerPatcherUtils::getAnalogValueByButtons(u8 stick_values){
+    VPADVec2D stick;
     stick.x = 0.0f;
     stick.y = 0.0f;
 
@@ -413,7 +413,7 @@ Vec2D ControllerPatcherUtils::getAnalogValueByButtons(u8 stick_values){
     return stick;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(HID_Data * data, VPADData * buffer){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(HID_Data * data, VPADStatus * buffer){
     if(buffer == NULL || data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
     s32 deviceslot = data->slotdata.deviceslot;
@@ -427,14 +427,14 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
 
             if(config_controller[deviceslot][CONTRPS_MOUSE_STICK][0] != CONTROLLER_PATCHER_INVALIDVALUE){
                 if(config_controller[deviceslot][CONTRPS_MOUSE_STICK][1] == DEF_L_STICK){
-                    buffer->lstick.x += x_value;
-                    buffer->lstick.y += y_value;
+                    buffer->leftStick.x += x_value;
+                    buffer->leftStick.y += y_value;
                     return CONTROLLER_PATCHER_ERROR_NONE;
                 }
             }
 
-            buffer->rstick.x += x_value;
-            buffer->rstick.y += y_value;
+            buffer->rightStick.x += x_value;
+            buffer->rightStick.y += y_value;
         }
     }else{
         u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
@@ -447,7 +447,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
                  deadzone = config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE][1];
             }
 
-            buffer->lstick.x += convertAnalogValue(cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X][0]],
+            buffer->leftStick.x += convertAnalogValue(cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X][0]],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X][1],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX][0],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X_MINMAX][1],
@@ -460,7 +460,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
             if(config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE][0] == CONTROLLER_PATCHER_VALUE_SET){
                  deadzone = config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_Y_DEADZONE][1];
             }
-            buffer->lstick.y += convertAnalogValue(cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_Y][0]],
+            buffer->leftStick.y += convertAnalogValue(cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_Y][0]],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_Y][1],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX][0],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_Y_MINMAX][1],
@@ -474,7 +474,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
                  deadzone = config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_X_DEADZONE][1];
             }
 
-            buffer->rstick.x += convertAnalogValue(cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_X][0]],
+            buffer->rightStick.x += convertAnalogValue(cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_X][0]],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_X][1],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX][0],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_X_MINMAX][1],
@@ -488,7 +488,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
                  deadzone = config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE][1];
             }
 
-            buffer->rstick.y += convertAnalogValue(cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_Y][0]],
+            buffer->rightStick.y += convertAnalogValue(cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_Y][0]],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_Y][1],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX][0],
                                                    config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX][1],
@@ -504,9 +504,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
         if(isValueSet(data,CONTRPS_VPAD_BUTTON_L_STICK_RIGHT)){ stick_values |= STICK_VALUE_RIGHT; }
 
         if(stick_values > 0 ){
-            Vec2D stick = getAnalogValueByButtons(stick_values);
-            buffer->lstick.x += stick.x;
-            buffer->lstick.y += stick.y;
+            VPADVec2D stick = getAnalogValueByButtons(stick_values);
+            buffer->leftStick.x += stick.x;
+            buffer->leftStick.y += stick.y;
         }
 
         stick_values = 0;
@@ -516,24 +516,24 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
         if(isValueSet(data,CONTRPS_VPAD_BUTTON_R_STICK_RIGHT)){ stick_values |= STICK_VALUE_RIGHT; }
 
         if(stick_values > 0 ){
-            Vec2D stick = getAnalogValueByButtons(stick_values);
-            buffer->rstick.x += stick.x;
-            buffer->rstick.y += stick.y;
+            VPADVec2D stick = getAnalogValueByButtons(stick_values);
+            buffer->rightStick.x += stick.x;
+            buffer->rightStick.y += stick.y;
         }
 
         if(config_controller[deviceslot][CONTRPS_VPAD_STICK_L_COPY_DPAD][0] != CONTROLLER_PATCHER_INVALIDVALUE){
             if(config_controller[deviceslot][CONTRPS_VPAD_STICK_L_COPY_DPAD][0] == 1){
                 u8 stick_values = 0;
 
-                if(buffer->btns_h & VPAD_BUTTON_UP){    stick_values |= STICK_VALUE_UP; }
-                if(buffer->btns_h & VPAD_BUTTON_DOWN){  stick_values |= STICK_VALUE_DOWN; }
-                if(buffer->btns_h & VPAD_BUTTON_LEFT){  stick_values |= STICK_VALUE_LEFT; }
-                if(buffer->btns_h & VPAD_BUTTON_RIGHT){ stick_values |= STICK_VALUE_RIGHT; }
+                if(buffer->hold & VPAD_BUTTON_UP){    stick_values |= STICK_VALUE_UP; }
+                if(buffer->hold & VPAD_BUTTON_DOWN){  stick_values |= STICK_VALUE_DOWN; }
+                if(buffer->hold & VPAD_BUTTON_LEFT){  stick_values |= STICK_VALUE_LEFT; }
+                if(buffer->hold & VPAD_BUTTON_RIGHT){ stick_values |= STICK_VALUE_RIGHT; }
 
                 if(stick_values > 0 ){
-                    Vec2D stick = getAnalogValueByButtons(stick_values);
-                    buffer->lstick.x += stick.x;
-                    buffer->lstick.y += stick.y;
+                    VPADVec2D stick = getAnalogValueByButtons(stick_values);
+                    buffer->leftStick.x += stick.x;
+                    buffer->leftStick.y += stick.y;
                 }
             }
         }
@@ -541,68 +541,68 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
             if(config_controller[deviceslot][CONTRPS_VPAD_STICK_R_COPY_DPAD][0] == 1){
                 u8 stick_values = 0;
 
-                if(buffer->btns_h & VPAD_BUTTON_UP){    stick_values |= STICK_VALUE_UP; }
-                if(buffer->btns_h & VPAD_BUTTON_DOWN){  stick_values |= STICK_VALUE_DOWN; }
-                if(buffer->btns_h & VPAD_BUTTON_LEFT){  stick_values |= STICK_VALUE_LEFT; }
-                if(buffer->btns_h & VPAD_BUTTON_RIGHT){ stick_values |= STICK_VALUE_RIGHT; }
+                if(buffer->hold & VPAD_BUTTON_UP){    stick_values |= STICK_VALUE_UP; }
+                if(buffer->hold & VPAD_BUTTON_DOWN){  stick_values |= STICK_VALUE_DOWN; }
+                if(buffer->hold & VPAD_BUTTON_LEFT){  stick_values |= STICK_VALUE_LEFT; }
+                if(buffer->hold & VPAD_BUTTON_RIGHT){ stick_values |= STICK_VALUE_RIGHT; }
 
                 if(stick_values > 0 ){
-                    Vec2D stick = getAnalogValueByButtons(stick_values);
-                    buffer->rstick.x += stick.x;
-                    buffer->rstick.y += stick.y;
+                    VPADVec2D stick = getAnalogValueByButtons(stick_values);
+                    buffer->rightStick.x += stick.x;
+                    buffer->rightStick.y += stick.y;
                 }
             }
         }
 
-        /*log_printf("LX %f(%02X) LY %f(%02X) RX %f(%02X) RY %f(%02X)\n",buffer->lstick.x,cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X][0]],
-                                                               buffer->lstick.y,cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_Y][0]],
-                                                               buffer->rstick.x,cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_X][0]],
-                                                               buffer->rstick.y,cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_Y][0]]);*/
+        /*log_printf("LX %f(%02X) LY %f(%02X) RX %f(%02X) RY %f(%02X)\n",buffer->leftStick.x,cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X][0]],
+                                                               buffer->leftStick.y,cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_Y][0]],
+                                                               buffer->rightStick.x,cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_X][0]],
+                                                               buffer->rightStick.y,cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_R_STICK_Y][0]]);*/
 
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setEmulatedSticks(VPADData * buffer, u32 * last_emulatedSticks){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setEmulatedSticks(VPADStatus * buffer, u32 * last_emulatedSticks){
     if(buffer == NULL || last_emulatedSticks == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
     u32 emulatedSticks = 0;
 
-    s32 l_x_full = (buffer->lstick.x > 0.5f || buffer->lstick.x < -0.5f)? 1:0;
-    s32 l_y_full = (buffer->lstick.y > 0.5f || buffer->lstick.y < -0.5f)? 1:0;
-    s32 r_x_full = (buffer->rstick.x > 0.5f || buffer->rstick.x < -0.5f)? 1:0;
-    s32 r_y_full = (buffer->rstick.y > 0.5f || buffer->rstick.y < -0.5f)? 1:0;
+    s32 l_x_full = (buffer->leftStick.x > 0.5f || buffer->leftStick.x < -0.5f)? 1:0;
+    s32 l_y_full = (buffer->leftStick.y > 0.5f || buffer->leftStick.y < -0.5f)? 1:0;
+    s32 r_x_full = (buffer->rightStick.x > 0.5f || buffer->rightStick.x < -0.5f)? 1:0;
+    s32 r_y_full = (buffer->rightStick.y > 0.5f || buffer->rightStick.y < -0.5f)? 1:0;
 
-    if((buffer->lstick.x > 0.5f) || (buffer->lstick.x > 0.1f && !l_y_full)){
+    if((buffer->leftStick.x > 0.5f) || (buffer->leftStick.x > 0.1f && !l_y_full)){
         emulatedSticks |= VPAD_STICK_L_EMULATION_RIGHT;
     }
-    if((buffer->lstick.x < -0.5f) || (buffer->lstick.x < -0.1f && !l_y_full)){
+    if((buffer->leftStick.x < -0.5f) || (buffer->leftStick.x < -0.1f && !l_y_full)){
         emulatedSticks |= VPAD_STICK_L_EMULATION_LEFT;
     }
-    if((buffer->lstick.y > 0.5f) || (buffer->lstick.y > 0.1f && !l_x_full)){
+    if((buffer->leftStick.y > 0.5f) || (buffer->leftStick.y > 0.1f && !l_x_full)){
         emulatedSticks |= VPAD_STICK_L_EMULATION_UP;
     }
-    if((buffer->lstick.y < -0.5f) || (buffer->lstick.y < -0.1f && !l_x_full)){
+    if((buffer->leftStick.y < -0.5f) || (buffer->leftStick.y < -0.1f && !l_x_full)){
         emulatedSticks |= VPAD_STICK_L_EMULATION_DOWN;
     }
 
-    if((buffer->rstick.x > 0.5f) || (buffer->rstick.x > 0.1f && !r_y_full)){
+    if((buffer->rightStick.x > 0.5f) || (buffer->rightStick.x > 0.1f && !r_y_full)){
         emulatedSticks |= VPAD_STICK_R_EMULATION_RIGHT;
     }
-    if((buffer->rstick.x < -0.5f) || (buffer->rstick.x < -0.1f && !r_y_full)){
+    if((buffer->rightStick.x < -0.5f) || (buffer->rightStick.x < -0.1f && !r_y_full)){
         emulatedSticks |= VPAD_STICK_R_EMULATION_LEFT;
     }
-    if((buffer->rstick.y > 0.5f) || (buffer->rstick.y > 0.1f && !r_x_full)){
+    if((buffer->rightStick.y > 0.5f) || (buffer->rightStick.y > 0.1f && !r_x_full)){
         emulatedSticks |= VPAD_STICK_R_EMULATION_UP;
     }
-    if((buffer->rstick.y < -0.5f) || (buffer->rstick.y < -0.1f && !r_x_full)){
+    if((buffer->rightStick.y < -0.5f) || (buffer->rightStick.y < -0.1f && !r_x_full)){
         emulatedSticks |= VPAD_STICK_R_EMULATION_DOWN;
     }
 
     //Setting the emulated sticks
-    buffer->btns_h |= emulatedSticks;
-    buffer->btns_d |= (emulatedSticks & (~*last_emulatedSticks));
-    buffer->btns_r |= (*last_emulatedSticks & (~emulatedSticks));
+    buffer->hold |= emulatedSticks;
+    buffer->trigger |= (emulatedSticks & (~*last_emulatedSticks));
+    buffer->release |= (*last_emulatedSticks & (~emulatedSticks));
 
     *last_emulatedSticks = emulatedSticks;
 
@@ -613,7 +613,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setEmulatedSticks(VPA
  * Touch functions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setTouch(HID_Data * data,VPADData * buffer){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setTouch(HID_Data * data,VPADStatus * buffer){
     if(buffer == NULL || data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     if(data->type == DEVICE_TYPE_MOUSE && gHID_Mouse_Mode == HID_MOUSE_MODE_TOUCH){
         s32 buttons_hold;
@@ -622,18 +622,18 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setTouch(HID_Data * d
            if(ms_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
            s32 x_mouse = 80 + ((int)(((ms_data->X)*1.0f/1280.0)*3890.0f));
            s32 y_mouse = 3910 - ((int)(((ms_data->Y)*1.0f/720.0)*3760.0f));
-           buffer->tpdata.x = x_mouse;
-           buffer->tpdata.y = y_mouse;
-           buffer->tpdata.touched = 1;
-           buffer->tpdata.invalid = 0;
-           buffer->tpdata1.x = x_mouse;
-           buffer->tpdata1.y = y_mouse;
-           buffer->tpdata1.touched = 1;
-           buffer->tpdata1.invalid = 0;
-           buffer->tpdata2.x = x_mouse;
-           buffer->tpdata2.y = y_mouse;
-           buffer->tpdata2.touched = 1;
-           buffer->tpdata2.invalid = 0;
+           buffer->tpNormal.x = x_mouse;
+           buffer->tpNormal.y = y_mouse;
+           buffer->tpNormal.touched = 1;
+           buffer->tpNormal.validity = 0;
+           buffer->tpFiltered1.x = x_mouse;
+           buffer->tpFiltered1.y = y_mouse;
+           buffer->tpFiltered1.touched = 1;
+           buffer->tpFiltered1.validity = 0;
+           buffer->tpFiltered2.x = x_mouse;
+           buffer->tpFiltered2.y = y_mouse;
+           buffer->tpFiltered2.touched = 1;
+           buffer->tpFiltered2.validity = 0;
         }
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
@@ -666,48 +666,48 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkAndSetMouseMode(
  * Other functions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToPro(VPADData * vpad_buffer,KPADData * pro_buffer,u32 * lastButtonsPressesPRO){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToPro(VPADStatus * vpad_buffer,KPADStatus * pro_buffer,u32 * lastButtonsPressesPRO){
     if(vpad_buffer == NULL || pro_buffer == NULL || lastButtonsPressesPRO == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
     s32 buttons_hold = 0;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_A)                 buttons_hold |= WPAD_PRO_BUTTON_A;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_B)                 buttons_hold |= WPAD_PRO_BUTTON_B;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_X)                 buttons_hold |= WPAD_PRO_BUTTON_X;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_Y)                 buttons_hold |= WPAD_PRO_BUTTON_Y;
+    if(vpad_buffer->hold & VPAD_BUTTON_A)                 buttons_hold |= WPAD_PRO_BUTTON_A;
+    if(vpad_buffer->hold & VPAD_BUTTON_B)                 buttons_hold |= WPAD_PRO_BUTTON_B;
+    if(vpad_buffer->hold & VPAD_BUTTON_X)                 buttons_hold |= WPAD_PRO_BUTTON_X;
+    if(vpad_buffer->hold & VPAD_BUTTON_Y)                 buttons_hold |= WPAD_PRO_BUTTON_Y;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_PLUS)              buttons_hold |= WPAD_PRO_BUTTON_PLUS;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_MINUS)             buttons_hold |= WPAD_PRO_BUTTON_MINUS;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_HOME)              buttons_hold |= WPAD_PRO_BUTTON_HOME;
+    if(vpad_buffer->hold & VPAD_BUTTON_PLUS)              buttons_hold |= WPAD_PRO_BUTTON_PLUS;
+    if(vpad_buffer->hold & VPAD_BUTTON_MINUS)             buttons_hold |= WPAD_PRO_BUTTON_MINUS;
+    if(vpad_buffer->hold & VPAD_BUTTON_HOME)              buttons_hold |= WPAD_PRO_BUTTON_HOME;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_LEFT)              buttons_hold |= WPAD_PRO_BUTTON_LEFT;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_RIGHT)             buttons_hold |= WPAD_PRO_BUTTON_RIGHT;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_UP)                buttons_hold |= WPAD_PRO_BUTTON_UP;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_DOWN)              buttons_hold |= WPAD_PRO_BUTTON_DOWN;
+    if(vpad_buffer->hold & VPAD_BUTTON_LEFT)              buttons_hold |= WPAD_PRO_BUTTON_LEFT;
+    if(vpad_buffer->hold & VPAD_BUTTON_RIGHT)             buttons_hold |= WPAD_PRO_BUTTON_RIGHT;
+    if(vpad_buffer->hold & VPAD_BUTTON_UP)                buttons_hold |= WPAD_PRO_BUTTON_UP;
+    if(vpad_buffer->hold & VPAD_BUTTON_DOWN)              buttons_hold |= WPAD_PRO_BUTTON_DOWN;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_L)                 buttons_hold |= WPAD_PRO_TRIGGER_L;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_ZL)                buttons_hold |= WPAD_PRO_TRIGGER_ZL;
+    if(vpad_buffer->hold & VPAD_BUTTON_L)                 buttons_hold |= WPAD_PRO_TRIGGER_L;
+    if(vpad_buffer->hold & VPAD_BUTTON_ZL)                buttons_hold |= WPAD_PRO_TRIGGER_ZL;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_R)                 buttons_hold |= WPAD_PRO_TRIGGER_R;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_ZR)                buttons_hold |= WPAD_PRO_TRIGGER_ZR;
+    if(vpad_buffer->hold & VPAD_BUTTON_R)                 buttons_hold |= WPAD_PRO_TRIGGER_R;
+    if(vpad_buffer->hold & VPAD_BUTTON_ZR)                buttons_hold |= WPAD_PRO_TRIGGER_ZR;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_STICK_L)           buttons_hold |= WPAD_PRO_BUTTON_STICK_L;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_STICK_R)           buttons_hold |= WPAD_PRO_BUTTON_STICK_R;
+    if(vpad_buffer->hold & VPAD_BUTTON_STICK_L)           buttons_hold |= WPAD_PRO_BUTTON_STICK_L;
+    if(vpad_buffer->hold & VPAD_BUTTON_STICK_R)           buttons_hold |= WPAD_PRO_BUTTON_STICK_R;
 
-    if(vpad_buffer->btns_h & VPAD_STICK_L_EMULATION_LEFT)   buttons_hold |= WPAD_PRO_STICK_L_EMULATION_LEFT;
-    if(vpad_buffer->btns_h & VPAD_STICK_L_EMULATION_RIGHT)  buttons_hold |= WPAD_PRO_STICK_L_EMULATION_RIGHT;
-    if(vpad_buffer->btns_h & VPAD_STICK_L_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_L_EMULATION_UP;
-    if(vpad_buffer->btns_h & VPAD_STICK_L_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_L_EMULATION_DOWN;
+    if(vpad_buffer->hold & VPAD_STICK_L_EMULATION_LEFT)   buttons_hold |= WPAD_PRO_STICK_L_EMULATION_LEFT;
+    if(vpad_buffer->hold & VPAD_STICK_L_EMULATION_RIGHT)  buttons_hold |= WPAD_PRO_STICK_L_EMULATION_RIGHT;
+    if(vpad_buffer->hold & VPAD_STICK_L_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_L_EMULATION_UP;
+    if(vpad_buffer->hold & VPAD_STICK_L_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_L_EMULATION_DOWN;
 
-    if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_LEFT)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_LEFT;
-    if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_RIGHT)  buttons_hold |= WPAD_PRO_STICK_R_EMULATION_RIGHT;
-    if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_R_EMULATION_UP;
-    if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_DOWN;
+    if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_LEFT)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_LEFT;
+    if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_RIGHT)  buttons_hold |= WPAD_PRO_STICK_R_EMULATION_RIGHT;
+    if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_R_EMULATION_UP;
+    if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_DOWN;
 
-    pro_buffer->pro.lstick_x = vpad_buffer->lstick.x;
-    pro_buffer->pro.lstick_y = vpad_buffer->lstick.y;
-    pro_buffer->pro.rstick_x = vpad_buffer->rstick.x;
-    pro_buffer->pro.rstick_y = vpad_buffer->rstick.y;
+    pro_buffer->pro.leftStick.x = vpad_buffer->leftStick.x;
+    pro_buffer->pro.leftStick.y = vpad_buffer->leftStick.y;
+    pro_buffer->pro.rightStick.x = vpad_buffer->rightStick.x;
+    pro_buffer->pro.rightStick.y = vpad_buffer->rightStick.y;
 
     /*
     pro_buffer->unused_1[1] = 0xBF800000;
@@ -719,9 +719,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToPro(VPADDa
     pro_buffer->unused_7[1] = 0x3F800000;
     pro_buffer->unused_7[5] = 0x3F800000;*/
 
-    pro_buffer->pro.btns_h = buttons_hold;
-    pro_buffer->pro.btns_d = (buttons_hold & (~*lastButtonsPressesPRO));
-    pro_buffer->pro.btns_r = (*lastButtonsPressesPRO & (~buttons_hold));
+    pro_buffer->pro.hold = buttons_hold;
+    pro_buffer->pro.trigger = (buttons_hold & (~*lastButtonsPressesPRO));
+    pro_buffer->pro.release = (*lastButtonsPressesPRO & (~buttons_hold));
 
     *lastButtonsPressesPRO = buttons_hold;
 
@@ -734,48 +734,48 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToPro(VPADDa
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRead(VPADData * vpad_buffer,WPADReadData * pro_buffer){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRead(VPADStatus * vpad_buffer,WPADReadData * pro_buffer){
     if(vpad_buffer == NULL || pro_buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
     s32 buttons_hold = 0;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_A)                 buttons_hold |= WPAD_PRO_BUTTON_A;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_B)                 buttons_hold |= WPAD_PRO_BUTTON_B;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_X)                 buttons_hold |= WPAD_PRO_BUTTON_X;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_Y)                 buttons_hold |= WPAD_PRO_BUTTON_Y;
+    if(vpad_buffer->hold & VPAD_BUTTON_A)                 buttons_hold |= WPAD_PRO_BUTTON_A;
+    if(vpad_buffer->hold & VPAD_BUTTON_B)                 buttons_hold |= WPAD_PRO_BUTTON_B;
+    if(vpad_buffer->hold & VPAD_BUTTON_X)                 buttons_hold |= WPAD_PRO_BUTTON_X;
+    if(vpad_buffer->hold & VPAD_BUTTON_Y)                 buttons_hold |= WPAD_PRO_BUTTON_Y;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_PLUS)              buttons_hold |= WPAD_PRO_BUTTON_PLUS;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_MINUS)             buttons_hold |= WPAD_PRO_BUTTON_MINUS;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_HOME)              buttons_hold |= WPAD_PRO_BUTTON_HOME;
+    if(vpad_buffer->hold & VPAD_BUTTON_PLUS)              buttons_hold |= WPAD_PRO_BUTTON_PLUS;
+    if(vpad_buffer->hold & VPAD_BUTTON_MINUS)             buttons_hold |= WPAD_PRO_BUTTON_MINUS;
+    if(vpad_buffer->hold & VPAD_BUTTON_HOME)              buttons_hold |= WPAD_PRO_BUTTON_HOME;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_LEFT)              buttons_hold |= WPAD_PRO_BUTTON_LEFT;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_RIGHT)             buttons_hold |= WPAD_PRO_BUTTON_RIGHT;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_UP)                buttons_hold |= WPAD_PRO_BUTTON_UP;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_DOWN)              buttons_hold |= WPAD_PRO_BUTTON_DOWN;
+    if(vpad_buffer->hold & VPAD_BUTTON_LEFT)              buttons_hold |= WPAD_PRO_BUTTON_LEFT;
+    if(vpad_buffer->hold & VPAD_BUTTON_RIGHT)             buttons_hold |= WPAD_PRO_BUTTON_RIGHT;
+    if(vpad_buffer->hold & VPAD_BUTTON_UP)                buttons_hold |= WPAD_PRO_BUTTON_UP;
+    if(vpad_buffer->hold & VPAD_BUTTON_DOWN)              buttons_hold |= WPAD_PRO_BUTTON_DOWN;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_L)                 buttons_hold |= WPAD_PRO_TRIGGER_L;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_ZL)                buttons_hold |= WPAD_PRO_TRIGGER_ZL;
+    if(vpad_buffer->hold & VPAD_BUTTON_L)                 buttons_hold |= WPAD_PRO_TRIGGER_L;
+    if(vpad_buffer->hold & VPAD_BUTTON_ZL)                buttons_hold |= WPAD_PRO_TRIGGER_ZL;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_R)                 buttons_hold |= WPAD_PRO_TRIGGER_R;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_ZR)                buttons_hold |= WPAD_PRO_TRIGGER_ZR;
+    if(vpad_buffer->hold & VPAD_BUTTON_R)                 buttons_hold |= WPAD_PRO_TRIGGER_R;
+    if(vpad_buffer->hold & VPAD_BUTTON_ZR)                buttons_hold |= WPAD_PRO_TRIGGER_ZR;
 
-    if(vpad_buffer->btns_h & VPAD_BUTTON_STICK_L)           buttons_hold |= WPAD_PRO_BUTTON_STICK_L;
-    if(vpad_buffer->btns_h & VPAD_BUTTON_STICK_R)           buttons_hold |= WPAD_PRO_BUTTON_STICK_R;
+    if(vpad_buffer->hold & VPAD_BUTTON_STICK_L)           buttons_hold |= WPAD_PRO_BUTTON_STICK_L;
+    if(vpad_buffer->hold & VPAD_BUTTON_STICK_R)           buttons_hold |= WPAD_PRO_BUTTON_STICK_R;
 
-    if(vpad_buffer->btns_h & VPAD_STICK_L_EMULATION_LEFT)   buttons_hold |= WPAD_PRO_STICK_L_EMULATION_LEFT;
-    if(vpad_buffer->btns_h & VPAD_STICK_L_EMULATION_RIGHT)  buttons_hold |= WPAD_PRO_STICK_L_EMULATION_RIGHT;
-    if(vpad_buffer->btns_h & VPAD_STICK_L_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_L_EMULATION_UP;
-    if(vpad_buffer->btns_h & VPAD_STICK_L_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_L_EMULATION_DOWN;
+    if(vpad_buffer->hold & VPAD_STICK_L_EMULATION_LEFT)   buttons_hold |= WPAD_PRO_STICK_L_EMULATION_LEFT;
+    if(vpad_buffer->hold & VPAD_STICK_L_EMULATION_RIGHT)  buttons_hold |= WPAD_PRO_STICK_L_EMULATION_RIGHT;
+    if(vpad_buffer->hold & VPAD_STICK_L_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_L_EMULATION_UP;
+    if(vpad_buffer->hold & VPAD_STICK_L_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_L_EMULATION_DOWN;
 
-    if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_LEFT)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_LEFT;
-    if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_RIGHT)  buttons_hold |= WPAD_PRO_STICK_R_EMULATION_RIGHT;
-    if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_R_EMULATION_UP;
-    if(vpad_buffer->btns_h & VPAD_STICK_R_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_DOWN;
+    if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_LEFT)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_LEFT;
+    if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_RIGHT)  buttons_hold |= WPAD_PRO_STICK_R_EMULATION_RIGHT;
+    if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_R_EMULATION_UP;
+    if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_DOWN;
 
-    pro_buffer->l_stick_x = (s16) (vpad_buffer->lstick.x * 950.0f);
-    pro_buffer->l_stick_y = (s16) (vpad_buffer->lstick.y * 950.0f);
-    pro_buffer->r_stick_x = (s16) (vpad_buffer->rstick.x * 950.0f);
-    pro_buffer->r_stick_y = (s16) (vpad_buffer->rstick.y * 950.0f);
+    pro_buffer->leftStick.x = (s16) (vpad_buffer->leftStick.x * 950.0f);
+    pro_buffer->leftStick.y = (s16) (vpad_buffer->leftStick.y * 950.0f);
+    pro_buffer->rightStick.x = (s16) (vpad_buffer->rightStick.x * 950.0f);
+    pro_buffer->rightStick.y = (s16) (vpad_buffer->rightStick.y * 950.0f);
 
     pro_buffer->buttons = buttons_hold;
 
@@ -786,54 +786,54 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRea
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToVPAD(VPADData * vpad_buffer,KPADData * pro_buffer,u32 * lastButtonsPressesVPAD){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToVPAD(VPADStatus * vpad_buffer,KPADStatus * pro_buffer,u32 * lastButtonsPressesVPAD){
     if(vpad_buffer == NULL || pro_buffer == NULL || lastButtonsPressesVPAD == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
     s32 buttons_hold = 0;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_A)                 buttons_hold |= VPAD_BUTTON_A;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_A)                 buttons_hold |= VPAD_BUTTON_A;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_B)                 buttons_hold |= VPAD_BUTTON_B;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_X)                 buttons_hold |= VPAD_BUTTON_X;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_Y)                 buttons_hold |= VPAD_BUTTON_Y;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_B)                 buttons_hold |= VPAD_BUTTON_B;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_X)                 buttons_hold |= VPAD_BUTTON_X;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_Y)                 buttons_hold |= VPAD_BUTTON_Y;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_PLUS)              buttons_hold |= VPAD_BUTTON_PLUS;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_MINUS)             buttons_hold |= VPAD_BUTTON_MINUS;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_PLUS)              buttons_hold |= VPAD_BUTTON_PLUS;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_MINUS)             buttons_hold |= VPAD_BUTTON_MINUS;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_HOME)              buttons_hold |= VPAD_BUTTON_HOME;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_HOME)              buttons_hold |= VPAD_BUTTON_HOME;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_LEFT)              buttons_hold |= VPAD_BUTTON_LEFT;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_RIGHT)             buttons_hold |= VPAD_BUTTON_RIGHT;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_UP)                buttons_hold |= VPAD_BUTTON_UP;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_DOWN)              buttons_hold |= VPAD_BUTTON_DOWN;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_LEFT)              buttons_hold |= VPAD_BUTTON_LEFT;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_RIGHT)             buttons_hold |= VPAD_BUTTON_RIGHT;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_UP)                buttons_hold |= VPAD_BUTTON_UP;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_DOWN)              buttons_hold |= VPAD_BUTTON_DOWN;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_TRIGGER_L)                buttons_hold |= VPAD_BUTTON_L;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_TRIGGER_ZL)               buttons_hold |= VPAD_BUTTON_ZL;
+    if(pro_buffer->pro.hold & WPAD_PRO_TRIGGER_L)                buttons_hold |= VPAD_BUTTON_L;
+    if(pro_buffer->pro.hold & WPAD_PRO_TRIGGER_ZL)               buttons_hold |= VPAD_BUTTON_ZL;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_TRIGGER_R)                buttons_hold |= VPAD_BUTTON_R;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_TRIGGER_ZR)               buttons_hold |= VPAD_BUTTON_ZR;
+    if(pro_buffer->pro.hold & WPAD_PRO_TRIGGER_R)                buttons_hold |= VPAD_BUTTON_R;
+    if(pro_buffer->pro.hold & WPAD_PRO_TRIGGER_ZR)               buttons_hold |= VPAD_BUTTON_ZR;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_STICK_L)           buttons_hold |= VPAD_BUTTON_STICK_L;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_BUTTON_STICK_R)           buttons_hold |= VPAD_BUTTON_STICK_R;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_STICK_L)           buttons_hold |= VPAD_BUTTON_STICK_L;
+    if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_STICK_R)           buttons_hold |= VPAD_BUTTON_STICK_R;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_STICK_L_EMULATION_LEFT)   buttons_hold |= VPAD_STICK_L_EMULATION_LEFT;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_STICK_L_EMULATION_RIGHT)  buttons_hold |= VPAD_STICK_L_EMULATION_RIGHT;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_STICK_L_EMULATION_UP)     buttons_hold |= VPAD_STICK_L_EMULATION_UP;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_STICK_L_EMULATION_DOWN)   buttons_hold |= VPAD_STICK_L_EMULATION_DOWN;
+    if(pro_buffer->pro.hold & WPAD_PRO_STICK_L_EMULATION_LEFT)   buttons_hold |= VPAD_STICK_L_EMULATION_LEFT;
+    if(pro_buffer->pro.hold & WPAD_PRO_STICK_L_EMULATION_RIGHT)  buttons_hold |= VPAD_STICK_L_EMULATION_RIGHT;
+    if(pro_buffer->pro.hold & WPAD_PRO_STICK_L_EMULATION_UP)     buttons_hold |= VPAD_STICK_L_EMULATION_UP;
+    if(pro_buffer->pro.hold & WPAD_PRO_STICK_L_EMULATION_DOWN)   buttons_hold |= VPAD_STICK_L_EMULATION_DOWN;
 
-    if(pro_buffer->pro.btns_h & WPAD_PRO_STICK_R_EMULATION_LEFT)   buttons_hold |= VPAD_STICK_R_EMULATION_LEFT;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_STICK_R_EMULATION_RIGHT)  buttons_hold |= VPAD_STICK_R_EMULATION_RIGHT;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_STICK_R_EMULATION_UP)     buttons_hold |= VPAD_STICK_R_EMULATION_UP;
-    if(pro_buffer->pro.btns_h & WPAD_PRO_STICK_R_EMULATION_DOWN)   buttons_hold |= VPAD_STICK_R_EMULATION_DOWN;
+    if(pro_buffer->pro.hold & WPAD_PRO_STICK_R_EMULATION_LEFT)   buttons_hold |= VPAD_STICK_R_EMULATION_LEFT;
+    if(pro_buffer->pro.hold & WPAD_PRO_STICK_R_EMULATION_RIGHT)  buttons_hold |= VPAD_STICK_R_EMULATION_RIGHT;
+    if(pro_buffer->pro.hold & WPAD_PRO_STICK_R_EMULATION_UP)     buttons_hold |= VPAD_STICK_R_EMULATION_UP;
+    if(pro_buffer->pro.hold & WPAD_PRO_STICK_R_EMULATION_DOWN)   buttons_hold |= VPAD_STICK_R_EMULATION_DOWN;
 
-    vpad_buffer->lstick.x = pro_buffer->pro.lstick_x;
-    vpad_buffer->lstick.y = pro_buffer->pro.lstick_y;
-    vpad_buffer->rstick.x = pro_buffer->pro.rstick_x;
-    vpad_buffer->rstick.y = pro_buffer->pro.rstick_y;
+    vpad_buffer->leftStick.x = pro_buffer->pro.leftStick.x;
+    vpad_buffer->leftStick.y = pro_buffer->pro.leftStick.y;
+    vpad_buffer->rightStick.x = pro_buffer->pro.rightStick.x;
+    vpad_buffer->rightStick.y = pro_buffer->pro.rightStick.y;
 
-    vpad_buffer->btns_h |= buttons_hold;
-    vpad_buffer->btns_d |= (buttons_hold & (~*lastButtonsPressesVPAD));
-    vpad_buffer->btns_r |= (*lastButtonsPressesVPAD & (~buttons_hold));
+    vpad_buffer->hold |= buttons_hold;
+    vpad_buffer->trigger |= (buttons_hold & (~*lastButtonsPressesVPAD));
+    vpad_buffer->release |= (*lastButtonsPressesVPAD & (~buttons_hold));
 
     *lastButtonsPressesVPAD = buttons_hold;
 

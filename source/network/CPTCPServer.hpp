@@ -19,10 +19,9 @@
 
 #include "../ControllerPatcherIncludes.hpp"
 
-#include <dynamic_libs/socket_functions.h>
-#include <dynamic_libs/os_functions.h>
 #include <utils/TCPServer.hpp>
-#include <utils/net.h>
+#include <network/net.h>
+#include <coreinit/title.h>
 
 #define WIIU_CP_TCP_HANDSHAKE               WIIU_CP_TCP_HANDSHAKE_VERSION_3
 

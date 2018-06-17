@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <dynamic_libs/socket_functions.h>
 #include <utils/logger.h>
 
 #define MAX_UDP_SIZE 0x578
@@ -105,7 +104,7 @@ void UDPServer::DoUDPThreadInternal(){
         n = recv(sockfd,buffer,MAX_UDP_SIZE,0);
         if (n < 0){
             s32 errno_ = wiiu_errno;
-            os_usleep(2000);
+            OSSleepTicks(OSMillisecondsToTicks(2000));
             if(errno_ != 11 && errno_ != 9){
                 break;
             }

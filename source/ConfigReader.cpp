@@ -29,7 +29,6 @@
 
 #include <dirent.h>
 
-#include <dynamic_libs/fs_functions.h>
 #include <utils/logger.h>
 
 s32 ConfigReader::numberValidFiles = 0;

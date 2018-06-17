@@ -6,14 +6,14 @@ dist: trusty
 
 env:
   global:
-    - DEVKITPRO=/opt/devkitpro    
+    - DEVKITPRO=/opt/devkitpro
+    - WUT_ROOT=/opt/devkitpro/wut
     - DEVKITPPC=/opt/devkitpro/devkitPPC
     - PORTLIBREPOS=$HOME/portlibrepos
 
 cache:
   directories:
     - "$HOME/.local"
-    - "$PORTLIBREPOS"
     - "$DEVKITPRO"
 
 addons:
@@ -27,16 +27,22 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb -O /tmp/devkitpro-pacman.deb; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo dpkg -i /tmp/devkitpro-pacman.deb; fi
   - yes | sudo dkp-pacman -Syu devkitPPC --needed
+  - wget $(curl -s https://api.github.com/repos/decaf-emu/wut/releases/latest | grep 'browser_' | grep 'linux' | cut -d\" -f4
 
 install:
+  - 7z x -y $(ls | grep "linux") -o${WUT_ROOT}
   - cd $PORTLIBREPOS
-  - ((git clone https://github.com/Maschell/dynamic_libs.git -b lib && (7z x -y ./dynamic_libs/libs/portlibs.zip -o${DEVKITPRO})) || (cd dynamic_libs && git pull))
-  - (git clone https://github.com/Maschell/libutils.git || (cd libutils && git pull))   
-  - (cd dynamic_libs && ((make -j8 | grep -c "built ... ") && make install && echo "installed" ) || (echo "no need for make install" && make))
-  - (cd libutils && ((make -j8 | grep -c "built ... ") && make install && echo "installed" ) || (echo "no need for make install" && make))
+  - git clone https://github.com/Maschell/libutils.git -b wut
+  - cd libutils
+  - mkdir build && cd build
+  - cmake -DCMAKE_TOOLCHAIN_FILE=$WUT_ROOT/share/wut.toolchain.cmake -DCMAKE_INSTALL_PREFIX=$WUT_ROOT ../
+  - make install
+  - cd $PORTLIBREPOS
  
 before_script:
   - cd $TRAVIS_BUILD_DIR/
  
 script:
-  - make && make install
+  - mkdir build && cd build
+  - cmake -DCMAKE_TOOLCHAIN_FILE=$WUT_ROOT/share/wut.toolchain.cmake -DCMAKE_INSTALL_PREFIX=$WUT_ROOT ../
+  - make install

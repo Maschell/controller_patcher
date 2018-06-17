@@ -20,9 +20,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
-#include <dynamic_libs/os_functions.h>
-
 #include <utils/logger.h>
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -102,7 +99,7 @@ void ControllerPatcherHID::myHIDReadCallback(u32 handle, s32 error, unsigned cha
 	    HIDReadCallback(handle,buf,bytes_transfered,usr);
 
         if(usr->slotdata.hidmask == gHID_LIST_DS4){
-	        os_usleep(1000*2); //DS4 is way tooo fast. sleeping to reduce lag. (need to check the other pads)
+	        OSSleepTicks(OSMillisecondsToTicks(2000)); //DS4 is way tooo fast. sleeping to reduce lag. (need to check the other pads)
 	    }
         HIDRead(handle, usr->buf, bytes_transfered, myHIDReadCallback, usr);
 	}
@@ -482,7 +479,7 @@ void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 b
  * Other functions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(VPADData * buffer,std::vector<HID_Data *>& data){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(VPADStatus * buffer,std::vector<HID_Data *>& data){
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     HID_Data * data_cur;
 
@@ -526,9 +523,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
         u32 last_emulate_stick =  (data_cur->last_buttons) & VPAD_MASK_EMULATED_STICKS; // We should only need the emulated stick data.
         s32 last_realbuttons = (data_cur->last_buttons) & VPAD_MASK_BUTTONS;
 
-        buffer->btns_h |= buttons_hold;
-        buffer->btns_d |= (buttons_hold & (~last_realbuttons));
-        buffer->btns_r |= (last_realbuttons & (~buttons_hold));
+        buffer->hold |= buttons_hold;
+        buffer->trigger |= (buttons_hold & (~last_realbuttons));
+        buffer->release |= (last_realbuttons & (~buttons_hold));
 
         ControllerPatcherUtils::convertAnalogSticks(data_cur,buffer);
 
@@ -544,8 +541,8 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
 
     // Caculates a valid stick position
     if(data.size() > 0){
-        ControllerPatcherUtils::normalizeStickValues(&buffer->lstick);
-        ControllerPatcherUtils::normalizeStickValues(&buffer->rstick);
+        ControllerPatcherUtils::normalizeStickValues(&buffer->leftStick);
+        ControllerPatcherUtils::normalizeStickValues(&buffer->rightStick);
     }
 
     return CONTROLLER_PATCHER_ERROR_NONE;

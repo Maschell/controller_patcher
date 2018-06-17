@@ -27,8 +27,7 @@
 #ifndef _CONTROLLER_PATCHER_DEFS_H_
 #define _CONTROLLER_PATCHER_DEFS_H_
 
-#include <dynamic_libs/os_types.h>
-
+#include <wut.h>
 
 #define FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK 0x9421FFB8
 

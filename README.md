@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Maschell/controller_patcher.svg?branch=master)](https://travis-ci.org/Maschell/controller_patcher)  
+[![Build Status](https://travis-ci.org/Maschell/controller_patcher.svg?branch=wut)](https://travis-ci.org/Maschell/controller_patcher)  
 
 # What is in this controller_patcher repository
 These files are the magic behind tools like HID to VPAD and can used to use your USB HID Device on your WiiU console.
@@ -15,28 +15,29 @@ To able to use the logging change the "DO_LOGGING" parameter in the Makefile.
 # Compiling
 You need to install all dependencies first!
 
-Install this static library into your portlibs folder via: 
+Install this static library into your wut folder via: 
 
 ```
-make && make install
+mkdir build && cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=$WUT_ROOT/share/wut.toolchain.cmake -DCMAKE_INSTALL_PREFIX=$WUT_ROOT ../
+make install
 ```
 
 Link the application with
 
 ```
--lutils -ldynamiclibs -lcontrollerpatcher
+-lutilswut -lcontrollerpatcherwut
 ```
 
 You also need to add the include path to your Makefile. Example:
 
 ```
-export INCLUDE	:= [...] -I$(PORTLIBS)/include
+export INCLUDE	:= [...] -I$(WUT_ROOT)/include
 ```
 
 # Dependencies
-- Application needs to be loaded from the [homebrew_launcher](https://github.com/dimok789/homebrew_launcher)
-- [libutils](https://github.com/Maschell/libutils) for common functions.
-- [dynamic_libs](https://github.com/Maschell/dynamic_libs/tree/lib) for access to the functions.
+- [libutils](https://github.com/Maschell/libutils/tree/wut) (WUT branch) for common functions.
+- [wut](https://github.com/decaf-emu/wut) (WUT branch) for common functions.
 
 # Example implementation
 

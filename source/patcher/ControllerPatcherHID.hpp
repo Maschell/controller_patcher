@@ -29,10 +29,13 @@
 
 #include <vector>
 
-#include <dynamic_libs/syshid_functions.h>
-#include <dynamic_libs/vpad_functions.h>
-
 #include "../ControllerPatcherIncludes.hpp"
+
+//! Own definitions
+#define VPAD_BUTTON_TOUCH               0x00080000
+#define VPAD_MASK_EMULATED_STICKS       0x7F800000
+#define VPAD_MASK_BUTTONS ~VPAD_MASK_EMULATED_STICKS
+
 
 #define SWAP16(x) ((x>>8) | ((x&0xFF)<<8))
 #define SWAP8(x) ((x>>4) | ((x&0xF)<<4))
@@ -45,7 +48,7 @@ class ControllerPatcherHID{
         static void externHIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr);
 
     private:
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setVPADControllerData(VPADData * buffer,std::vector<HID_Data *>& data);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setVPADControllerData(VPADStatus * buffer,std::vector<HID_Data *>& data);
         static std::vector<HID_Data *> getHIDDataAll();
         static CONTROLLER_PATCHER_RESULT_OR_ERROR getHIDData(u32 hidmask, s32 pad,  HID_Data ** data);
 

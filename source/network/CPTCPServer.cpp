@@ -86,7 +86,7 @@ bool CPTCPServer::whileLoop() {
             if(wiiu_errno != 6) {
                 return false;
             }
-            os_usleep(1000);
+            OSSleepTicks(OSMillisecondsToTicks(1000));
             continue;
         }
         //DEBUG_FUNCTION_LINE("got byte from tcp! %01X\n",ret);

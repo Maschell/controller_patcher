@@ -19,8 +19,6 @@
 
 #include "../ControllerPatcherIncludes.hpp"
 
-#include <dynamic_libs/socket_functions.h>
-
 #define DEFAULT_UDP_CLIENT_PORT    8114
 
 class UDPClient{
