@@ -22,8 +22,6 @@
 
 #include <wut_types.h>
 
-extern int32_t * (* __gh_errno_ptr)(void);
-
 #include <padscore/kpad.h>
 #include <padscore/wpad.h>
 #include <vpad/input.h>

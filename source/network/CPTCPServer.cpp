@@ -21,8 +21,6 @@
 
 #include <utils/logger.h>
 
-#define wiiu_errno (*__gh_errno_ptr())
-
 CPTCPServer * CPTCPServer::instance = NULL;
 
 CPTCPServer::CPTCPServer(s32 port): TCPServer(port,CPTCPServer::getPriority()) {
@@ -83,7 +81,7 @@ bool CPTCPServer::whileLoop() {
         }
         ret = checkbyte(clientfd);
         if (ret < 0) {
-            if(wiiu_errno != 6) {
+            if(socketlasterr() != 6) {
                 return false;
             }
             OSSleepTicks(OSMicrosecondsToTicks(1000));

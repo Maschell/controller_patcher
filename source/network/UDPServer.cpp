@@ -22,7 +22,6 @@
 #include <utils/logger.h>
 
 #define MAX_UDP_SIZE 0x578
-#define wiiu_errno (*__gh_errno_ptr())
 
 CThread * UDPServer::pThread = NULL;
 UDPServer * UDPServer::instance = NULL;
@@ -103,7 +102,7 @@ void UDPServer::DoUDPThreadInternal(){
         memset(buffer,0,MAX_UDP_SIZE);
         n = recv(sockfd,buffer,MAX_UDP_SIZE,0);
         if (n < 0){
-            s32 errno_ = wiiu_errno;
+            s32 errno_ = socketlasterr();
             OSSleepTicks(OSMicrosecondsToTicks(2000));
             if(errno_ != 11 && errno_ != 9){
                 break;
