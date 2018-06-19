@@ -466,12 +466,17 @@ void ControllerPatcher::ResetConfig(){
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[xinput_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT],   CONTROLLER_PATCHER_VALUE_SET,          HID_XINPUT_STICK_R_Y[STICK_CONF_INVERT]);
 }
 
-bool ControllerPatcher::Init(const char * pathToConfig){
-    gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead + 0x1F0);
-    if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK){
+bool ControllerPatcher::Init(const char * pathToConfig) {
+    OSDynLoad_Module handle;
+    void* kpad_ptr;
+    OSDynLoad_Acquire("padscore",&handle);
+    OSDynLoad_FindExport(handle, 0 ,"KPADRead",&kpad_ptr);
+
+    gSamplingCallback = (WPADSamplingCallback)((u32)kpad_ptr + 0x1F0);
+    if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK) {
         //In Firmware <= 5.1.2 the offset changes
-        gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead + 0x1F8);
-        if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK){
+        gSamplingCallback = (WPADSamplingCallback)((u32)kpad_ptr + 0x1F8);
+        if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK) {
             //Should never happen. I looked into the padscore.rpl of ALL firmwares.
             gSamplingCallback = NULL;
         }
