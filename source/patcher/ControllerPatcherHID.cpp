@@ -99,7 +99,7 @@ void ControllerPatcherHID::myHIDReadCallback(u32 handle, s32 error, unsigned cha
 	    HIDReadCallback(handle,buf,bytes_transfered,usr);
 
         if(usr->slotdata.hidmask == gHID_LIST_DS4){
-	        OSSleepTicks(OSMillisecondsToTicks(2000)); //DS4 is way tooo fast. sleeping to reduce lag. (need to check the other pads)
+	        OSSleepTicks(OSMicrosecondsToTicks(2000)); //DS4 is way tooo fast. sleeping to reduce lag. (need to check the other pads)
 	    }
         HIDRead(handle, usr->buf, bytes_transfered, myHIDReadCallback, usr);
 	}

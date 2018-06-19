@@ -104,7 +104,7 @@ void UDPServer::DoUDPThreadInternal(){
         n = recv(sockfd,buffer,MAX_UDP_SIZE,0);
         if (n < 0){
             s32 errno_ = wiiu_errno;
-            OSSleepTicks(OSMillisecondsToTicks(2000));
+            OSSleepTicks(OSMicrosecondsToTicks(2000));
             if(errno_ != 11 && errno_ != 9){
                 break;
             }
