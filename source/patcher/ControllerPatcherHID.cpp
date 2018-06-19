@@ -26,7 +26,7 @@
  * public implementation for the network controller
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-s32 ControllerPatcherHID::externAttachDetachCallback(HIDDevice *p_device, u32 attach){
+s32 ControllerPatcherHID::externAttachDetachCallback(HIDDevice *p_device, HIDAttachEvent attach){
     HIDClient client;
     memset(&client,0,sizeof(client));
     return AttachDetachCallback(&client,p_device,attach);
@@ -40,7 +40,7 @@ void ControllerPatcherHID::externHIDReadCallback(u32 handle, unsigned char *buf,
  * private implementation for the HID Api.
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-s32 ControllerPatcherHID::myAttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, u32 attach){
+s32 ControllerPatcherHID::myAttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, HIDAttachEvent attach){
     return AttachDetachCallback(p_client,p_device,attach);
 }
 
@@ -109,14 +109,14 @@ void ControllerPatcherHID::myHIDReadCallback(u32 handle, s32 error, unsigned cha
  * Intern Callback actions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, u32 attach){
+s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, HIDAttachEvent attach){
     if(attach){
         DEBUG_FUNCTION_LINE("vid %04x pid %04x connected\n", SWAP16(p_device->vid),SWAP16(p_device->pid));
-        if(HID_DEBUG){  DEBUG_FUNCTION_LINE("interface index  %02x\n", p_device->interface_index);
-                        DEBUG_FUNCTION_LINE("sub class        %02x\n", p_device->sub_class);
+        if(HID_DEBUG){  DEBUG_FUNCTION_LINE("interface index  %02x\n", p_device->interfaceIndex);
+                        DEBUG_FUNCTION_LINE("sub class        %02x\n", p_device->subClass);
                         DEBUG_FUNCTION_LINE("protocol         %02x\n", p_device->protocol);
-                        DEBUG_FUNCTION_LINE("max packet in    %02x\n", p_device->max_packet_size_rx);
-                        DEBUG_FUNCTION_LINE("max packet out   %02x\n", p_device->max_packet_size_tx); }
+                        DEBUG_FUNCTION_LINE("max packet in    %02x\n", p_device->maxPacketSizeRx);
+                        DEBUG_FUNCTION_LINE("max packet out   %02x\n", p_device->maxPacketSizeRx); }
     }
     if(!attach){
         DEBUG_FUNCTION_LINE("vid %04x pid %04x disconnected\n", SWAP16(p_device->vid),SWAP16(p_device->pid));
@@ -129,11 +129,11 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
 
     HIDSlotData * slotdata = &(device_info.slotdata);
 
-    if ((p_device->sub_class == 1) && (p_device->protocol == 1)) { //Keyboard
+    if ((p_device->subClass == 1) && (p_device->protocol == 1)) { //Keyboard
         slotdata->hidmask = gHID_LIST_KEYBOARD;
         slotdata->deviceslot = gHID_SLOT_KEYBOARD;
         //DEBUG_FUNCTION_LINE("Found Keyboard: device: %s slot: %d\n",byte_to_binary(device_info.slotdata.hidmask),device_info.slotdata.deviceslot);
-    }else if ((p_device->sub_class == 1) && (p_device->protocol == 2)){ // MOUSE
+    }else if ((p_device->subClass == 1) && (p_device->protocol == 2)){ // MOUSE
         slotdata->hidmask = gHID_LIST_MOUSE;
         slotdata->deviceslot = gMouseSlot;
         //DEBUG_FUNCTION_LINE("Found Mouse: device: %s slot: %d\n",byte_to_binary(device_info.hid),device_info.slot);
@@ -158,7 +158,7 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             my_cb_user *usr = (my_cb_user *) memalign(64,sizeof(my_cb_user));
             usr->buf = buf;
             usr->slotdata = device_info.slotdata;
-            usr->transfersize = p_device->max_packet_size_rx;
+            usr->transfersize = p_device->maxPacketSizeRx;
             usr->handle = p_device->handle;
             gHIDAttached |= slotdata->hidmask;
             gHIDCurrentDevice |= slotdata->hidmask;
@@ -233,11 +233,11 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 HIDWrite(p_device->handle, usr->buf, 1, NULL,NULL);
                 HIDRead(p_device->handle, usr->buf, usr->transfersize, myHIDReadCallback, usr);
             }else if (slotdata->hidmask == gHID_LIST_MOUSE){
-                HIDSetProtocol(p_device->handle, p_device->interface_index, 0, 0, 0);
+                HIDSetProtocol(p_device->handle, p_device->interfaceIndex, 0, 0, 0);
                 //HIDGetDescriptor(p_device->handle,0x22,0x00,0,my_buf,512,my_foo_cb,NULL);
-                HIDSetIdle(p_device->handle,p_device->interface_index,1,NULL,NULL);
+                HIDSetIdle(p_device->handle,p_device->interfaceIndex,1,NULL,NULL);
                 gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
-                HIDRead(p_device->handle, buf, p_device->max_packet_size_rx, myHIDMouseReadCallback, usr);
+                HIDRead(p_device->handle, buf, p_device->maxPacketSizeRx, myHIDMouseReadCallback, usr);
             }else if (slotdata->hidmask == gHID_LIST_SWITCH_PRO){
                 s32 read_result = HIDRead(p_device->handle, usr->buf, usr->transfersize, NULL, NULL);
                 if(read_result == 64){
@@ -267,17 +267,17 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                     HIDRead(p_device->handle, usr->buf, usr->transfersize, myHIDReadCallback, usr);
                 }
             }else if (slotdata->hidmask == gHID_LIST_KEYBOARD){
-                HIDSetProtocol(p_device->handle, p_device->interface_index, 1, 0, 0);
-                HIDSetIdle(p_device->handle, p_device->interface_index, 0, 0, 0);
-                HIDRead(p_device->handle, buf, p_device->max_packet_size_rx, myHIDReadCallback, usr);
+                HIDSetProtocol(p_device->handle, p_device->interfaceIndex, 1, 0, 0);
+                HIDSetIdle(p_device->handle, p_device->interfaceIndex, 0, 0, 0);
+                HIDRead(p_device->handle, buf, p_device->maxPacketSizeRx, myHIDReadCallback, usr);
             }else if (slotdata->hidmask == gHID_LIST_DS3){
-                HIDSetProtocol(p_device->handle, p_device->interface_index, 1, 0, 0);
+                HIDSetProtocol(p_device->handle, p_device->interfaceIndex, 1, 0, 0);
                 HIDDS3Rumble(p_device->handle,usr,0);
                 buf[0] = 0x42; buf[1] = 0x0c; buf[2] = 0x00; buf[3] = 0x00;
                 HIDSetReport(p_device->handle, HID_REPORT_FEATURE, PS3_F4_REPORT_ID, buf, PS3_F4_REPORT_LEN, NULL, NULL);
-                HIDRead(p_device->handle, usr->buf, p_device->max_packet_size_rx, myHIDReadCallback, usr);
+                HIDRead(p_device->handle, usr->buf, p_device->maxPacketSizeRx, myHIDReadCallback, usr);
             }else{
-                HIDRead(p_device->handle, usr->buf, p_device->max_packet_size_rx, myHIDReadCallback, usr);
+                HIDRead(p_device->handle, usr->buf, p_device->maxPacketSizeRx, myHIDReadCallback, usr);
             }
             return HID_DEVICE_ATTACH;
 

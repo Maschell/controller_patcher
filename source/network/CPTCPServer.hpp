@@ -34,9 +34,6 @@
 
 #define  WIIU_CP_TCP_HANDSHAKE_ABORT        0x30
 
-#define ATTACH 0x01
-#define DETACH 0x00
-
 #define WIIU_CP_TCP_ATTACH      0x01
 #define WIIU_CP_TCP_DETACH      0x02
 #define WIIU_CP_TCP_PING        0xF0
@@ -87,7 +84,7 @@ private:
 
     static void DetachConnectedNetworkController();
 
-    static void AttachDetach(s32 attach);
+    static void AttachDetach(HIDAttachEvent attach);
 
     virtual void DetachAndDelete();
 

@@ -44,7 +44,7 @@ class ControllerPatcherHID{
         friend class ControllerPatcher;
         friend class ControllerPatcherUtils;
     public:
-        static s32  externAttachDetachCallback(HIDDevice *p_device, u32 attach);
+        static s32  externAttachDetachCallback(HIDDevice *p_device, HIDAttachEvent attach);
         static void externHIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr);
 
     private:
@@ -65,12 +65,12 @@ class ControllerPatcherHID{
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  * HID Callbacks
  *--------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-        static s32 myAttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, u32 attach);
+        static s32 myAttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, HIDAttachEvent attach);
 
         static void myHIDMouseReadCallback(u32 handle, s32 error, unsigned char *buf, u32 bytes_transfered, void *p_user);
         static void myHIDReadCallback(u32 handle, s32 error, unsigned char *buf, u32 bytes_transfered, void *p_user);
 
-        static s32 AttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, u32 attach);
+        static s32 AttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, HIDAttachEvent attach);
         static void HIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr);
 };
 

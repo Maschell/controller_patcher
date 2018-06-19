@@ -24,14 +24,14 @@
 CPTCPServer * CPTCPServer::instance = NULL;
 
 CPTCPServer::CPTCPServer(s32 port): TCPServer(port,CPTCPServer::getPriority()) {
-    CPTCPServer::AttachDetach(DETACH);
+    CPTCPServer::AttachDetach(HID_DEVICE_DETACH);
 }
 
 CPTCPServer::~CPTCPServer() {
-    CPTCPServer::AttachDetach(DETACH);
+    CPTCPServer::AttachDetach(HID_DEVICE_DETACH);
 }
 
-void CPTCPServer::AttachDetach(s32 attach) {
+void CPTCPServer::AttachDetach(HIDAttachEvent attach) {
     if(HID_DEBUG) {
         if(attach) {
             DEBUG_FUNCTION_LINE("Network Attach\n");
@@ -47,11 +47,11 @@ void CPTCPServer::AttachDetach(s32 attach) {
                 HIDDevice device;
                 memset(&device,0,sizeof(device));
 
-                device.interface_index = 0;
+                device.interfaceIndex = 0;
                 device.vid = gNetworkController[i][j][NETWORK_CONTROLLER_VID];
                 device.pid = gNetworkController[i][j][NETWORK_CONTROLLER_PID];
                 device.handle = gNetworkController[i][j][NETWORK_CONTROLLER_HANDLE];
-                device.max_packet_size_rx = 8;
+                device.maxPacketSizeRx = 8;
                 ControllerPatcherHID::externAttachDetachCallback(&device,attach);
                 memset(gNetworkController[i][j],0,sizeof(gNetworkController[i][j]));
             }
@@ -68,7 +68,7 @@ void CPTCPServer::AttachDetach(s32 attach) {
 }
 
 void CPTCPServer::DetachAndDelete() {
-    CPTCPServer::AttachDetach(DETACH);
+    CPTCPServer::AttachDetach(HID_DEVICE_DETACH);
     memset(&gNetworkController,0,sizeof(gNetworkController));
 }
 
@@ -122,13 +122,13 @@ bool CPTCPServer::whileLoop() {
                 HIDDevice device;
                 memset(&device,0,sizeof(device));
                 device.handle = handle;
-                device.interface_index = 0;
+                device.interfaceIndex = 0;
                 device.vid = SWAP16(vid);
                 device.pid = SWAP16(pid);
-                device.max_packet_size_rx = 8;
+                device.maxPacketSizeRx = 8;
 
                 my_cb_user * user  = NULL;
-                ControllerPatcherHID::externAttachDetachCallback(&device,1);
+                ControllerPatcherHID::externAttachDetachCallback(&device,HID_DEVICE_ATTACH);
                 if((ret = ControllerPatcherUtils::getDataByHandle(handle,&user)) < 0) {
                     DEBUG_FUNCTION_LINE("Error in %02X: getDataByHandle(%d,%08X).\n",WIIU_CP_TCP_ATTACH,handle,&user);
                     DEBUG_FUNCTION_LINE("Error in %02X: Config for the controller is missing.\n",WIIU_CP_TCP_ATTACH);
@@ -223,12 +223,12 @@ bool CPTCPServer::whileLoop() {
                 HIDDevice device;
                 memset(&device,0,sizeof(device));
                 device.handle = handle;
-                device.interface_index = 0;
+                device.interfaceIndex = 0;
                 device.vid = SWAP16(vidpid.vid);
                 device.pid = SWAP16(vidpid.pid);
-                device.max_packet_size_rx = 14;
+                device.maxPacketSizeRx = 14;
 
-                ControllerPatcherHID::externAttachDetachCallback(&device,DETACH);
+                ControllerPatcherHID::externAttachDetachCallback(&device,HID_DEVICE_DETACH);
                 memset(gNetworkController[deviceslot][user->pad_slot],0,sizeof(gNetworkController[deviceslot][user->pad_slot]));
                 if(HID_DEBUG) {
                     DEBUG_FUNCTION_LINE("handle %d disconnected!\n",handle);
