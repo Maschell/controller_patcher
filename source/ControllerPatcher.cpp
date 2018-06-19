@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <vector>
 #include <coreinit/energysaver.h>
+#include <coreinit/dynload.h>
 
 #include <utils/logger.h>
 
