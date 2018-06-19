@@ -29,6 +29,8 @@
 
 #include <string>
 
+#include <padscore/wpad.h>
+#include <vpad/input.h>
 #include "ControllerPatcherDefs.h"
 
 class ControllerPatcher{
@@ -235,13 +237,15 @@ class ControllerPatcher{
 
         static CONTROLLER_PATCHER_RESULT_OR_ERROR resetCallbackData();
 
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setKPADConnectedCallback(s32 chan, wpad_connect_callback_t callback);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setKPADConnectedCallback(s32 chan, WPADConnectCallback callback);
 
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setKPADExtensionCallback(s32 chan, wpad_connect_callback_t callback);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setKPADExtensionCallback(s32 chan, WPADConnectCallback callback);
 
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR setWPADConnectCallback(s32 chan, wpad_connect_callback_t callback);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR setWPADConnectCallback(s32 chan, WPADConnectCallback callback);
 
         static CONTROLLER_PATCHER_RESULT_OR_ERROR handleCallbackData(bool button_pressed);
+
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR handleCallbackDataInternal(WPADChan chan);
 };
 
 #endif /* _CONTROLLER_PATCHER_H_ */

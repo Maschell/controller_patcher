@@ -886,8 +886,8 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
     if(mode == PRO_CONTROLLER_MODE_KPADDATA){
         KPADStatus *  pro_buffer = (KPADStatus *) data;
         if((res = ControllerPatcherUtils::translateToPro(vpad_buffer,pro_buffer,&last_button_hold[chan])) < 0 ) return res;
-    }else if(mode == PRO_CONTROLLER_MODE_WPADReadData){
-        WPADReadData * pro_buffer = (WPADReadData *) data;
+    } else if(mode == PRO_CONTROLLER_MODE_WPADReadData) {
+        WPADStatusProController * pro_buffer = (WPADStatusProController *) data;
         if((res = ControllerPatcherUtils::translateToProWPADRead(vpad_buffer,pro_buffer)) < 0 ) return res;
     }
     for(std::vector<HID_Data *>::iterator it = data_list.begin(); it != data_list.end(); ++it) {

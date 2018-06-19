@@ -62,10 +62,10 @@ extern s32 gHIDNetworkClientID;
 
 extern u8 gUsedProtocolVersion;
 
-extern wpad_connect_callback_t gWPADConnectCallback[4];
-extern wpad_connect_callback_t gKPADConnectCallback[4];
-extern wpad_extension_callback_t gExtensionCallback[4];
-extern wpad_sampling_callback_t gSamplingCallback;
+extern WPADConnectCallback gWPADConnectCallback[4];
+extern WPADConnectCallback gKPADConnectCallback[4];
+extern WPADExtensionCallback gExtensionCallback[4];
+extern WPADSamplingCallback gSamplingCallback;
 extern u8 gCallbackCooldown;
 extern u8 gGlobalRumbleActivated;
 extern u8 gNetworkControllerActivated;

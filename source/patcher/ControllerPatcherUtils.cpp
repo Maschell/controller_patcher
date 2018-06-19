@@ -726,15 +726,15 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToPro(VPADSt
     *lastButtonsPressesPRO = buttons_hold;
 
     pro_buffer->format = WPAD_FMT_PRO_CONTROLLER;
-    pro_buffer->wpad_error = 0x00;
-    pro_buffer->device_type = WPAD_EXT_PRO_CONTROLLER;
+    pro_buffer->error = 0x00;
+    pro_buffer->extensionType = WPAD_EXT_PRO_CONTROLLER;
     pro_buffer->pro.wired = 1;
     pro_buffer->pro.charging = 1;
 
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRead(VPADStatus * vpad_buffer,WPADReadData * pro_buffer){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRead(VPADStatus * vpad_buffer,WPADStatusProController * pro_buffer){
     if(vpad_buffer == NULL || pro_buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
     s32 buttons_hold = 0;
@@ -779,9 +779,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRea
 
     pro_buffer->buttons = buttons_hold;
 
-    pro_buffer->fmt = WPAD_FMT_PRO_CONTROLLER;
+    pro_buffer->dataFormat = WPAD_FMT_PRO_CONTROLLER;
     pro_buffer->err = 0x00;
-    pro_buffer->dev = WPAD_EXT_PRO_CONTROLLER;
+    pro_buffer->extensionType = WPAD_EXT_PRO_CONTROLLER;
 
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
@@ -945,27 +945,33 @@ ControllerMappingPAD * ControllerPatcherUtils::getControllerMappingByType(UContr
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::doSampling(u16 deviceslot,u8 padslot = 0,bool ignorePadSlot = false){
     if(gSamplingCallback != NULL){
-        for(int i=0;i<4;i++){
-            ControllerMappingPADInfo * padinfo = gProPadInfo[i];
-            if(padinfo->active){
-                DeviceInfo device_info;
+            doSamplingSingle(WPAD_CHAN_0, deviceslot, padslot, ignorePadSlot);
+            doSamplingSingle(WPAD_CHAN_1, deviceslot, padslot, ignorePadSlot);
+            doSamplingSingle(WPAD_CHAN_2, deviceslot, padslot, ignorePadSlot);
+            doSamplingSingle(WPAD_CHAN_3, deviceslot, padslot, ignorePadSlot);
+    }
+    return CONTROLLER_PATCHER_ERROR_NONE;
+}
 
-                memset(&device_info,0,sizeof(device_info));
-                device_info.vidpid = padinfo->vidpid;
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::doSamplingSingle(WPADChan chan, u16 deviceslot,u8 padslot = 0,bool ignorePadSlot = false){
+    ControllerMappingPADInfo * padinfo = gProPadInfo[chan];
+    if(padinfo->active){
+        DeviceInfo device_info;
 
-                s32 res = -1;
-                if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) >= 0){
-                    if(!ignorePadSlot){
-                        s32 real_pad = (padinfo->pad/(device_info.pad_count))*device_info.pad_count;
-                        if(real_pad == padslot && device_info.slotdata.deviceslot == deviceslot){
-                            if(ControllerPatcherUtils::checkActivePad(device_info.slotdata.hidmask,padinfo->pad)){
-                                gSamplingCallback(i);
-                            }
-                        }
-                    }else{
-                        gSamplingCallback(i);
+        memset(&device_info,0,sizeof(device_info));
+        device_info.vidpid = padinfo->vidpid;
+
+        s32 res = -1;
+        if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) >= 0){
+            if(!ignorePadSlot){
+                s32 real_pad = (padinfo->pad/(device_info.pad_count))*device_info.pad_count;
+                if(real_pad == padslot && device_info.slotdata.deviceslot == deviceslot){
+                    if(ControllerPatcherUtils::checkActivePad(device_info.slotdata.hidmask,padinfo->pad)){
+                        gSamplingCallback(chan);
                     }
                 }
+            }else{
+                gSamplingCallback(chan);
             }
         }
     }

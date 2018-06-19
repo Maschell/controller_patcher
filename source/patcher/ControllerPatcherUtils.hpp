@@ -253,7 +253,7 @@ class ControllerPatcherUtils{
          *
          */
         static CONTROLLER_PATCHER_RESULT_OR_ERROR translateToPro(VPADStatus * vpad_buffer, KPADStatus * pro_buffer, u32 * lastButtonsPressesPRO);
-        static CONTROLLER_PATCHER_RESULT_OR_ERROR translateToProWPADRead(VPADStatus * vpad_buffer,WPADReadData * pro_buffer);
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR translateToProWPADRead(VPADStatus * vpad_buffer,WPADStatusProController * pro_buffer);
 
         /**
             \brief Checks if the value at the given device + CONTRPS slot equals the expected value.
@@ -314,6 +314,8 @@ class ControllerPatcherUtils{
         static ControllerMappingPAD * getControllerMappingByType(UController_Type type);
 
         static CONTROLLER_PATCHER_RESULT_OR_ERROR doSampling(u16 deviceslot,u8 padslot,bool ignorePadSlot);
+
+        static CONTROLLER_PATCHER_RESULT_OR_ERROR doSamplingSingle(WPADChan chan, u16 deviceslot, u8 padslot, bool ignorePadSlot);
 };
 
 #endif /* _CONTROLLER_PATCHER_UTIL_H_ */
