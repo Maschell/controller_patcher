@@ -26,9 +26,9 @@
 CThread * UDPServer::pThread = NULL;
 UDPServer * UDPServer::instance = NULL;
 
-UDPServer::UDPServer(s32 port){
+UDPServer::UDPServer(s32 port) {
     s32 ret;
-	struct sockaddr_in addr;
+    struct sockaddr_in addr;
 
     addr.sin_family = AF_INET;
     addr.sin_port = port;
@@ -44,31 +44,33 @@ UDPServer::UDPServer(s32 port){
     StartUDPThread(this);
 }
 
-UDPServer::~UDPServer(){
+UDPServer::~UDPServer() {
     CThread * pThreadPointer = UDPServer::pThread;
-    if(pThreadPointer != NULL){
+    if(pThreadPointer != NULL) {
         exitThread = 1;
-        if(pThreadPointer != NULL){
+        if(pThreadPointer != NULL) {
             delete pThreadPointer;
             UDPServer::pThread = NULL;
-            if (this->sockfd != -1){
+            if (this->sockfd != -1) {
                 socketclose(sockfd);
             }
             this->sockfd = -1;
         }
     }
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Thread has been closed\n"); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Thread has been closed\n");
+    }
 
 
 }
 
-void UDPServer::StartUDPThread(UDPServer * server){
+void UDPServer::StartUDPThread(UDPServer * server) {
     s32 priority = 28;
     if(OSGetTitleID() == 0x00050000101c9300 || //The Legend of Zelda Breath of the Wild JPN
-       OSGetTitleID() == 0x00050000101c9400 || //The Legend of Zelda Breath of the Wild USA
-       OSGetTitleID() == 0x00050000101c9500 || //The Legend of Zelda Breath of the Wild EUR
-       OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
-       OSGetTitleID() == 0x00050000101a3c00){  //The Binding of Isaac: Rebirth USA
+            OSGetTitleID() == 0x00050000101c9400 || //The Legend of Zelda Breath of the Wild USA
+            OSGetTitleID() == 0x00050000101c9500 || //The Legend of Zelda Breath of the Wild EUR
+            OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
+            OSGetTitleID() == 0x00050000101a3c00) { //The Binding of Isaac: Rebirth USA
         priority = 10;
         DEBUG_FUNCTION_LINE("This game needs higher thread priority. We set it to %d\n",priority);
     }
@@ -76,8 +78,8 @@ void UDPServer::StartUDPThread(UDPServer * server){
     UDPServer::pThread->resumeThread();
 }
 
-bool UDPServer::cpyIncrementBufferOffset(void * target, void * source, s32 * offset, s32 typesize, s32 maximum){
-    if(((int)*offset + typesize) > maximum){
+bool UDPServer::cpyIncrementBufferOffset(void * target, void * source, s32 * offset, s32 typesize, s32 maximum) {
+    if(((int)*offset + typesize) > maximum) {
         DEBUG_FUNCTION_LINE("Transfer error. Excepted %04X bytes, but only got %04X\n",(*offset + typesize),maximum);
         return false;
     }
@@ -86,82 +88,84 @@ bool UDPServer::cpyIncrementBufferOffset(void * target, void * source, s32 * off
     return true;
 }
 
-void UDPServer::DoUDPThread(CThread *thread, void *arg){
+void UDPServer::DoUDPThread(CThread *thread, void *arg) {
     UDPServer * args = (UDPServer * )arg;
     args->DoUDPThreadInternal();
 }
 
-void UDPServer::DoUDPThreadInternal(){
+void UDPServer::DoUDPThreadInternal() {
     u8 buffer[MAX_UDP_SIZE];
     s32 n;
 
     my_cb_user  user;
-    while(1){
+    while(1) {
         //s32 usingVar = exitThread;
         if(exitThread)break;
         memset(buffer,0,MAX_UDP_SIZE);
         n = recv(sockfd,buffer,MAX_UDP_SIZE,0);
-        if (n < 0){
+        if (n < 0) {
             s32 errno_ = socketlasterr();
             OSSleepTicks(OSMicrosecondsToTicks(2000));
-            if(errno_ != 11 && errno_ != 9){
+            if(errno_ != 11 && errno_ != 9) {
                 break;
             }
-          continue;
+            continue;
         }
         s32 bufferoffset = 0;
         u8 type;
         memcpy((void *)&type,buffer,sizeof(type));
         bufferoffset += sizeof(type);
         switch (buffer[0]) {
-            case WIIU_CP_UDP_CONTROLLER_READ_DATA: {
-                if(gUsedProtocolVersion >= WIIU_CP_TCP_HANDSHAKE_VERSION_1){
-                    u8 count_commands;
-                    memcpy((void *)&count_commands,buffer+bufferoffset,sizeof(count_commands));
-                    bufferoffset += sizeof(count_commands);
-                    for(s32 i = 0;i<count_commands;i++){
-                        s32 handle;
-                        u16 deviceSlot;
-                        u32 hid;
-                        u8 padslot;
-                        u8 datasize;
+        case WIIU_CP_UDP_CONTROLLER_READ_DATA: {
+            if(gUsedProtocolVersion >= WIIU_CP_TCP_HANDSHAKE_VERSION_1) {
+                u8 count_commands;
+                memcpy((void *)&count_commands,buffer+bufferoffset,sizeof(count_commands));
+                bufferoffset += sizeof(count_commands);
+                for(s32 i = 0; i<count_commands; i++) {
+                    s32 handle;
+                    u16 deviceSlot;
+                    u32 hid;
+                    u8 padslot;
+                    u8 datasize;
 
-                        if(!cpyIncrementBufferOffset((void *)&handle,       (void *)buffer,&bufferoffset,sizeof(handle),    n))continue;
-                        if(!cpyIncrementBufferOffset((void *)&deviceSlot,   (void *)buffer,&bufferoffset,sizeof(deviceSlot),n))continue;
-                        hid = (1  << deviceSlot);
-                        if(!cpyIncrementBufferOffset((void *)&padslot,      (void *)buffer,&bufferoffset,sizeof(padslot),   n))continue;
-                        if(!cpyIncrementBufferOffset((void *)&datasize,     (void *)buffer,&bufferoffset,sizeof(datasize),  n))continue;
-                        u8 * databuffer = (u8*) malloc(datasize * sizeof(u8));
-                        if(!databuffer){
-                            DEBUG_FUNCTION_LINE("Allocating memory failed\n");
-                            continue;
-                        }
-
-                        if(!cpyIncrementBufferOffset((void *)databuffer,    (void *)buffer,&bufferoffset,datasize,          n))continue;
-                        //DEBUG_FUNCTION_LINE("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
-
-                        user.pad_slot = padslot;
-                        user.slotdata.deviceslot =  deviceSlot;
-                        user.slotdata.hidmask = hid;
-
-                        if(gNetworkController[deviceSlot][padslot][0] == 0){
-                            DEBUG_FUNCTION_LINE("Ehm. Pad is not connected. STOP SENDING DATA ;) \n");
-                        }else{
-                            ControllerPatcherHID::externHIDReadCallback(handle,databuffer,datasize,&user);
-                        }
-                        if(databuffer){
-                            free(databuffer);
-                            databuffer = NULL;
-                        }
+                    if(!cpyIncrementBufferOffset((void *)&handle,       (void *)buffer,&bufferoffset,sizeof(handle),    n))continue;
+                    if(!cpyIncrementBufferOffset((void *)&deviceSlot,   (void *)buffer,&bufferoffset,sizeof(deviceSlot),n))continue;
+                    hid = (1  << deviceSlot);
+                    if(!cpyIncrementBufferOffset((void *)&padslot,      (void *)buffer,&bufferoffset,sizeof(padslot),   n))continue;
+                    if(!cpyIncrementBufferOffset((void *)&datasize,     (void *)buffer,&bufferoffset,sizeof(datasize),  n))continue;
+                    u8 * databuffer = (u8*) malloc(datasize * sizeof(u8));
+                    if(!databuffer) {
+                        DEBUG_FUNCTION_LINE("Allocating memory failed\n");
+                        continue;
                     }
-                    break;
+
+                    if(!cpyIncrementBufferOffset((void *)databuffer,    (void *)buffer,&bufferoffset,datasize,          n))continue;
+                    //DEBUG_FUNCTION_LINE("UDPServer::DoUDPThreadInternal(): Got handle: %d slot %04X hid %04X pad %02X datasize %02X\n",handle,deviceSlot,hid,padslot,datasize);
+
+                    user.pad_slot = padslot;
+                    user.slotdata.deviceslot =  deviceSlot;
+                    user.slotdata.hidmask = hid;
+
+                    if(gNetworkController[deviceSlot][padslot][0] == 0) {
+                        DEBUG_FUNCTION_LINE("Ehm. Pad is not connected. STOP SENDING DATA ;) \n");
+                    } else {
+                        ControllerPatcherHID::externHIDReadCallback(handle,databuffer,datasize,&user);
+                    }
+                    if(databuffer) {
+                        free(databuffer);
+                        databuffer = NULL;
+                    }
                 }
                 break;
             }
-            default:{
-                break;
-            }
+            break;
+        }
+        default: {
+            break;
+        }
         }
     }
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("UDPServer Thread ended\n"); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("UDPServer Thread ended\n");
+    }
 }

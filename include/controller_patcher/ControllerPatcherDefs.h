@@ -80,8 +80,7 @@ typedef int CONTROLLER_PATCHER_RESULT_OR_ERROR;
 /**
  *  @brief The enumeration of Controller sticks defines
  */
-enum Controller_Stick_Defines
-{
+enum Controller_Stick_Defines {
     STICK_CONF_MAGIC_VERSION,   /**< Version of the stick configuration. Changes with every format*/
     STICK_CONF_BYTE,            /**< Byte where the stick-axis data is stored*/
     STICK_CONF_DEFAULT,         /**< Default value*/
@@ -95,8 +94,7 @@ enum Controller_Stick_Defines
 #define STICK_CONF_MAGIC_VALUE 0xF0 // When you change the enum above, Dont forget to change the magic version!!!!
 
 //! most data has the format: byte,value (byte starting at 0)
-enum Controller_Patcher_Settings
-{
+enum Controller_Patcher_Settings {
     CONTRPS_VID,                          //! pid: 0x451d would be 0x45,0x1d
     CONTRPS_PID,                          //! vid: 0x488d would be 0x48,0x8d
     CONTRPS_BUF_SIZE,                     //! To set: CONTROLLER_PATCHER_VALUE_SET, BUF_SIZE (default is 64)
@@ -203,8 +201,7 @@ enum Controller_Patcher_Settings
 /**
  *  @brief The enumeration of different DPAD-Modes
  */
-enum Controller_Patcher_DPAD_MODE
-{
+enum Controller_Patcher_DPAD_MODE {
     CONTRPDM_Normal,            /**< Normal mode */
     CONTRPDM_Hat,               /**< Hat mode */
     CONTRPDM_Absolute_2Values,  /**< DPAD Value stored in 2 values (one for each axis), acting like a stick */
@@ -212,8 +209,7 @@ enum Controller_Patcher_DPAD_MODE
 /**
  *  @brief The enumeration of DPAD Settings. Needed for saving both in the PADConst.
  */
-enum Controller_Patcher_DPAD_Settings
-{
+enum Controller_Patcher_DPAD_Settings {
     CONTRDPAD_MODE = 0, /**< Byte where the DPAD Mode is stored */
     CONTRDPAD_MASK = 1, /**< Byte where the DPAD Mask is stored */
 };
@@ -221,24 +217,24 @@ enum Controller_Patcher_DPAD_Settings
 /**
  *  @brief Stores data if the Slot the device is using in gHID_Devices
  */
-typedef struct _HIDSlotData{
-	u16 deviceslot;     /**< deviceslot number */
-	u32 hidmask;        /**< Used HID-Mask */
-}HIDSlotData;
+typedef struct _HIDSlotData {
+    u16 deviceslot;     /**< deviceslot number */
+    u32 hidmask;        /**< Used HID-Mask */
+} HIDSlotData;
 
 /**
  *  @brief Struct where the data for the callback funtion is stored
  */
-typedef struct _my_cb_user{
-	u8 *buf;  /**< pointer the buffer that is used */
-	u32 transfersize; /**< number of transfered data */
-	u32 handle; /**< HID handle */
+typedef struct _my_cb_user {
+    u8 *buf;  /**< pointer the buffer that is used */
+    u32 transfersize; /**< number of transfered data */
+    u32 handle; /**< HID handle */
     HIDSlotData slotdata; /**< Information about the deviceslot and hidmask */
-	u32 pads_per_device; /**< Number of maximum pads of this device */
-	u8 pad_slot; /**< number of the pad that will be used */
-	u8 rumblestatus[HID_MAX_PADS_COUNT]; /**< Current status of the device rumble */
-	u8 forceRumbleInTicks[HID_MAX_PADS_COUNT];
-}my_cb_user;
+    u32 pads_per_device; /**< Number of maximum pads of this device */
+    u8 pad_slot; /**< number of the pad that will be used */
+    u8 rumblestatus[HID_MAX_PADS_COUNT]; /**< Current status of the device rumble */
+    u8 forceRumbleInTicks[HID_MAX_PADS_COUNT];
+} my_cb_user;
 
 /**
  *  @brief Stores data for the mouse
@@ -256,8 +252,7 @@ typedef struct _HID_Mouse_Data {
 /**
  *  @brief The enumeration of device types
  */
-enum DEVICE_TYPE
-{
+enum DEVICE_TYPE {
     DEVICE_TYPE_CONTROLLER  = 0, /**< Normal Controller */
     DEVICE_TYPE_MOUSE = 1,       /**< Mouse */
 };
@@ -269,16 +264,16 @@ typedef struct _HID_Data {
     u32 handle;         /**< The HID-handle this device is using */
     u8 rumbleActive;    /**< 1 when rumble is active */
     u32 last_buttons;   /**< The last pressed buttons, based on VPAD_BUTTON_XXX data */
-    union{
-        struct{
+    union {
+        struct {
             u8 cur_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];   /**< Array where the current controller data is stored */
             u8 last_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];  /**< Array where the last  controller data is stored */
         } controller; /**< Used when the device in a controller. Using u8 array where the raw data of the controller is placed. */
-        struct{
+        struct {
             HID_Mouse_Data cur_mouse_data;  /**< Struct where the current mouse data is stored */
             HID_Mouse_Data last_mouse_data; /**< Struct where the last mouse data is stored */
         } mouse; /**< Used when the device in a mouse. Using a new struct to store the data. */
-    }data_union; /**< The data union where the current and last data is stored.*/
+    } data_union; /**< The data union where the current and last data is stored.*/
     DEVICE_TYPE type;  /**< The device type*/
     HIDSlotData slotdata;  /**< Information about the deviceslot and his mask*/
     my_cb_user * user_data; /**< Pointer to the user data the read callback is using*/
@@ -296,24 +291,24 @@ typedef struct _HID_DEVICE_DATA {
 /**
  *  @brief Stores a VID and PID
  */
-typedef struct _DeviceVIDPIDInfo{
-	u16 vid; /**< Vendor ID of this device */
-	u16 pid; /**< Product ID of this device */
-}DeviceVIDPIDInfo;
+typedef struct _DeviceVIDPIDInfo {
+    u16 vid; /**< Vendor ID of this device */
+    u16 pid; /**< Product ID of this device */
+} DeviceVIDPIDInfo;
 
 /**
  *  @brief Infos of the device
  */
-typedef struct _DeviceInfo{
-	HIDSlotData slotdata; /**< The slot used by this device */
-	DeviceVIDPIDInfo vidpid; /**< The VID/PID of the device */
-	u8  pad_count; /**< Number of maximum pads this device can have*/
-}DeviceInfo;
+typedef struct _DeviceInfo {
+    HIDSlotData slotdata; /**< The slot used by this device */
+    DeviceVIDPIDInfo vidpid; /**< The VID/PID of the device */
+    u8  pad_count; /**< Number of maximum pads this device can have*/
+} DeviceInfo;
 
 /**
  *  @brief The enumeration of Controller-Mapping types
  */
-enum ControllerMapping_Type_Defines{
+enum ControllerMapping_Type_Defines {
     CM_Type_Controller = 0, /**< Device with single input */
     CM_Type_RealController = 1, /**< Real Pro Controller */
     CM_Type_Mouse = 2, /**< Mouse */
@@ -323,52 +318,52 @@ enum ControllerMapping_Type_Defines{
 /**
  *  @brief Infos of a mapped controller
  */
-typedef struct _ControllerMappingPADInfo{
+typedef struct _ControllerMappingPADInfo {
     u8 active; /**< Set to one if mapped */
     ControllerMapping_Type_Defines type; /**< Type of the controller mapping */
     DeviceVIDPIDInfo vidpid; /**< The VID/PID of the device */
     u8  pad; /**< Stores which pad it mapped */
-}ControllerMappingPADInfo;
+} ControllerMappingPADInfo;
 
 /**
  *  @brief Infos of a mapped controller
  */
-typedef struct _ControllerMappingPAD{
+typedef struct _ControllerMappingPAD {
     ControllerMappingPADInfo pad_infos[HID_MAX_DEVICES_PER_SLOT]; //lets limit this to HID_MAX_DEVICES_PER_SLOT.
     u8 useAll;
     u8 rumble; /**< Set when the controller should rumble */
-}ControllerMappingPAD;
+} ControllerMappingPAD;
 
 /**
  *  @brief Stores informations about all mapped controller
  */
-typedef struct _ControllerMapping{
+typedef struct _ControllerMapping {
     ControllerMappingPAD gamepad; /**< Information about the gamepad mapping */
     ControllerMappingPAD proController[4]; /**< Information about the Pro Controller mapping */
-}ControllerMapping;
+} ControllerMapping;
 
 /**
  *  @brief Pressed/Released/Down Button data.
  */
-typedef struct _InputButtonData{
+typedef struct _InputButtonData {
     u32 btn_h; /**< Buttons beeing hold */
     u32 btn_d; /**< Buttons that started pressing */
     u32 btn_r; /**< Buttons that were button released */
-}InputButtonData;
+} InputButtonData;
 
 /**
  *  @brief Struct where the inputdata of a device for all HID_MAX_PADS_COUNT pads can be stored
  */
-typedef struct _InputData{
+typedef struct _InputData {
     DeviceInfo device_info; /**< Infos about the device where the data is coming from */
     ControllerMapping_Type_Defines type;
     InputButtonData button_data[HID_MAX_PADS_COUNT];
-}InputData;
+} InputData;
 
 /**
  *  @brief The enumeration of WiiU Controller types
  */
-enum UController_Type{
+enum UController_Type {
     UController_Type_Gamepad,
     UController_Type_Pro1,
     UController_Type_Pro2,

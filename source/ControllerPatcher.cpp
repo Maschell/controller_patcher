@@ -36,10 +36,14 @@ static u32 last_button_hold[4] = {0,0,0,0};
 // This arrays stores the VPADStatus that will be used to get the HID Data for the Pro Controllers. One for each channel.
 static VPADStatus myVPADBuffer[4];
 
-void ControllerPatcher::InitButtonMapping(){
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Init called \n"); }
-    if(!gButtonRemappingConfigDone){
-        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Remapping is running! \n"); }
+void ControllerPatcher::InitButtonMapping() {
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Init called \n");
+    }
+    if(!gButtonRemappingConfigDone) {
+        if(HID_DEBUG) {
+            DEBUG_FUNCTION_LINE("Remapping is running! \n");
+        }
         gButtonRemappingConfigDone = 1;
         memset(gGamePadValues,0,sizeof(gGamePadValues)); // Init / Invalid everything
 
@@ -74,7 +78,7 @@ void ControllerPatcher::InitButtonMapping(){
     }
 }
 
-void ControllerPatcher::ResetConfig(){
+void ControllerPatcher::ResetConfig() {
     memset(&gControllerMapping,0,sizeof(gControllerMapping));
     disableControllerMapping();
     memset(config_controller,CONTROLLER_PATCHER_INVALIDVALUE,sizeof(config_controller)); // Init / Invalid everything
@@ -102,12 +106,16 @@ void ControllerPatcher::ResetConfig(){
     gHIDRegisteredDevices = 0;
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     gGamePadSlot = slotdata.deviceslot;
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register Gamepad-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(slotdata.hidmask),gGamePadSlot); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Register Gamepad-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(slotdata.hidmask),gGamePadSlot);
+    }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     gMouseSlot = slotdata.deviceslot;
     gHID_LIST_MOUSE = slotdata.hidmask;
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register Mouse-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(gHID_LIST_MOUSE),gMouseSlot); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Register Mouse-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(gHID_LIST_MOUSE),gMouseSlot);
+    }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 keyboard_slot = slotdata.deviceslot;
@@ -115,31 +123,41 @@ void ControllerPatcher::ResetConfig(){
     gHID_LIST_KEYBOARD = keyboard_hid;
     gHID_SLOT_KEYBOARD = keyboard_slot;
 
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register Keyboard-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(gHID_LIST_KEYBOARD),gHID_SLOT_KEYBOARD); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Register Keyboard-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(gHID_LIST_KEYBOARD),gHID_SLOT_KEYBOARD);
+    }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 gc_slot = slotdata.deviceslot;
     u32 gc_hid = slotdata.hidmask;
     gHID_LIST_GC = gc_hid;
     gHID_SLOT_GC = gc_slot;
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register GC-Adapter-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(gHID_LIST_GC),gHID_SLOT_GC); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Register GC-Adapter-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(gHID_LIST_GC),gHID_SLOT_GC);
+    }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 ds3_slot = slotdata.deviceslot;
     u32 ds3_hid = slotdata.hidmask;
     gHID_LIST_DS3 = ds3_hid;
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register DS3-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(gHID_LIST_DS3),ds3_slot); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Register DS3-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(gHID_LIST_DS3),ds3_slot);
+    }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 ds4_slot = slotdata.deviceslot;
     u32 ds4_hid = slotdata.hidmask;
     gHID_LIST_DS4 = ds4_hid;
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register DS4-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(ds4_hid),ds4_slot); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Register DS4-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(ds4_hid),ds4_slot);
+    }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 xinput_slot = slotdata.deviceslot;
     u32 xinput_hid = slotdata.hidmask;
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Register XInput-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(xinput_hid),xinput_slot); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Register XInput-Config. HID-Mask %s Device-Slot: %d\n",StringTools::byte_to_binary(xinput_hid),xinput_slot);
+    }
 
     ControllerPatcherUtils::getNextSlotData(&slotdata);
     u32 switch_pro_slot = slotdata.deviceslot;
@@ -290,7 +308,7 @@ void ControllerPatcher::ResetConfig(){
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[gHID_SLOT_GC][CONTRPS_DOUBLE_USE_BUTTON_4_PRESSED],    CONTROLLER_PATCHER_VALUE_SET,     CONTRPS_VPAD_BUTTON_STICK_L);
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[gHID_SLOT_GC][CONTRPS_DOUBLE_USE_BUTTON_5_PRESSED],    CONTROLLER_PATCHER_VALUE_SET,     CONTRPS_VPAD_BUTTON_STICK_R);
 
-     //Buttons that will be ignored when the CONTRPS_DOUBLE_USE_BUTTON_ACTIVATOR is released
+    //Buttons that will be ignored when the CONTRPS_DOUBLE_USE_BUTTON_ACTIVATOR is released
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[gHID_SLOT_GC][CONTRPS_DOUBLE_USE_BUTTON_1_RELEASED],   CONTROLLER_PATCHER_VALUE_SET,     CONTRPS_VPAD_BUTTON_PLUS);
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[gHID_SLOT_GC][CONTRPS_DOUBLE_USE_BUTTON_2_RELEASED],   CONTROLLER_PATCHER_VALUE_SET,     CONTRPS_VPAD_BUTTON_ZL);
     ControllerPatcherUtils::setConfigValue((u8*)&config_controller[gHID_SLOT_GC][CONTRPS_DOUBLE_USE_BUTTON_3_RELEASED],   CONTROLLER_PATCHER_VALUE_SET,     CONTRPS_VPAD_BUTTON_ZR);
@@ -484,21 +502,28 @@ bool ControllerPatcher::Init(const char * pathToConfig) {
     }
     DEBUG_FUNCTION_LINE("Found the gSamplingCallback at %08X \n",gSamplingCallback);
 
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Init called! \n"); }
-
-    if(gConfig_done == HID_INIT_NOT_DONE){
-        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("First time calling the Init\n"); }
-        gConfig_done = HID_INIT_DONE;
-        ControllerPatcher::ResetConfig();
-    }else{
-        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Config already done!\n"); }
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("Init called! \n");
     }
 
-    if(pathToConfig != NULL && gConfig_done != HID_SDCARD_READ){
+    if(gConfig_done == HID_INIT_NOT_DONE) {
+        if(HID_DEBUG) {
+            DEBUG_FUNCTION_LINE("First time calling the Init\n");
+        }
+        gConfig_done = HID_INIT_DONE;
+        ControllerPatcher::ResetConfig();
+    } else {
+        if(HID_DEBUG) {
+            DEBUG_FUNCTION_LINE("Config already done!\n");
+        }
+    }
+
+    if(pathToConfig != NULL && gConfig_done != HID_SDCARD_READ) {
+        DEBUG_FUNCTION_LINE("Reading config files from SD Card\n");
         DEBUG_FUNCTION_LINE("Reading config files from SD Card\n");
         ConfigReader* reader = ConfigReader::getInstance();
 
-        if(reader->ReadConfigs(pathToConfig)){
+        if(reader->ReadConfigs(pathToConfig)) {
             DEBUG_FUNCTION_LINE("Done with reading config files from SD Card\n");
             gConfig_done = HID_SDCARD_READ;
         }
@@ -508,29 +533,31 @@ bool ControllerPatcher::Init(const char * pathToConfig) {
     DEBUG_FUNCTION_LINE("Initializing the data for button remapping\n");
     InitButtonMapping();
 
-    if(!gHIDAttached){
+    if(!gHIDAttached) {
         HIDAddClient(&gHIDClient, ControllerPatcherHID::myAttachDetachCallback);
     }
 
     return true;
 }
 
-void ControllerPatcher::startNetworkServer(){
+void ControllerPatcher::startNetworkServer() {
     if(!gNetworkControllerActivated) return;
     DEBUG_FUNCTION_LINE("statedNetworkServer! \n");
     UDPServer::getInstance();
     CPTCPServer::getInstance();
 }
 
-void ControllerPatcher::stopNetworkServer(){
+void ControllerPatcher::stopNetworkServer() {
     DEBUG_FUNCTION_LINE("called! \n");
     UDPServer::destroyInstance();
     UDPClient::destroyInstance();
     CPTCPServer::destroyInstance();
 }
 
-void ControllerPatcher::DeInit(){
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("called! \n"); }
+void ControllerPatcher::DeInit() {
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("called! \n");
+    }
 
     if(gHIDAttached) HIDDelClient(&gHIDClient);
 
@@ -577,28 +604,32 @@ void ControllerPatcher::DeInit(){
     destroyConfigHelper();
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::enableControllerMapping(){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::enableControllerMapping() {
     gControllerMapping.gamepad.useAll = 0;
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::disableControllerMapping(){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::disableControllerMapping() {
     gControllerMapping.gamepad.useAll = 1;
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::disableWiiUEnergySetting(){
-    s32 res;
-    if(IMIsDimEnabled(&res) == 0){
-        if(res == 1){
-            if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Dim was orignally enabled!\n"); }
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::disableWiiUEnergySetting() {
+    uint32_t res;
+    if(IMIsDimEnabled(&res) == 0) {
+        if(res == 1) {
+            if(HID_DEBUG) {
+                DEBUG_FUNCTION_LINE("Dim was orignally enabled!\n");
+            }
             gOriginalDimState = 1;
         }
     }
 
-    if(IMIsAPDEnabled(&res) == 0){
-        if(res == 1){
-            if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Auto power down was orignally enabled!\n"); }
+    if(IMIsAPDEnabled(&res) == 0) {
+        if(res == 1) {
+            if(HID_DEBUG) {
+                DEBUG_FUNCTION_LINE("Auto power down was orignally enabled!\n");
+            }
             gOriginalAPDState = 1;
         }
     }
@@ -609,37 +640,39 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::disableWiiUEnergySetting()
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::restoreWiiUEnergySetting(){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::restoreWiiUEnergySetting() {
 
     //Check if we need to enable Auto Power down again on exiting
-    if(gOriginalAPDState == 1){
+    if(gOriginalAPDState == 1) {
         DEBUG_FUNCTION_LINE("Auto shutdown was on before using HID to VPAD. Setting it to on again.\n");
         IMEnableAPD();
     }
-    if(gOriginalDimState == 1){
+    if(gOriginalDimState == 1) {
         DEBUG_FUNCTION_LINE("Burn-in reduction was on before using HID to VPAD. Setting it to on again.\n");
         IMEnableDim();
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::resetControllerMapping(UController_Type type){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::resetControllerMapping(UController_Type type) {
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
 
-    if(cm_map_pad == NULL){return CONTROLLER_PATCHER_ERROR_NULL_POINTER;}
+    if(cm_map_pad == NULL) {
+        return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
+    }
     memset(cm_map_pad,0,sizeof(*cm_map_pad));
 
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::addControllerMapping(UController_Type type,ControllerMappingPADInfo config){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::addControllerMapping(UController_Type type,ControllerMappingPADInfo config) {
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
 
     s32 result = 0;
 
-    for(s32 i=0;i<HID_MAX_DEVICES_PER_SLOT;i++){
+    for(s32 i=0; i<HID_MAX_DEVICES_PER_SLOT; i++) {
         ControllerMappingPADInfo * info = &(cm_map_pad->pad_infos[i]);
-        if(info != NULL && !info->active){
+        if(info != NULL && !info->active) {
             info->active = 1;
             info->pad = config.pad;
             info->type = config.type;
@@ -650,7 +683,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::addControllerMapping(UCont
             break;
         }
     }
-    if(result == 0){
+    if(result == 0) {
         //No free slot.
         return -1;
     }
@@ -658,14 +691,16 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::addControllerMapping(UCont
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-s32 ControllerPatcher::getActiveMappingSlot(UController_Type type){
+s32 ControllerPatcher::getActiveMappingSlot(UController_Type type) {
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
 
-    if(cm_map_pad == NULL){return -1;}
+    if(cm_map_pad == NULL) {
+        return -1;
+    }
 
     s32 connected = -1;
-    for(s32 i =0;i<HID_MAX_DEVICES_PER_SLOT;i++){
-        if(cm_map_pad->pad_infos[i].active || cm_map_pad->pad_infos[i].type == CM_Type_RealController){
+    for(s32 i =0; i<HID_MAX_DEVICES_PER_SLOT; i++) {
+        if(cm_map_pad->pad_infos[i].active || cm_map_pad->pad_infos[i].type == CM_Type_RealController) {
             connected = i;
             break;
         }
@@ -674,12 +709,12 @@ s32 ControllerPatcher::getActiveMappingSlot(UController_Type type){
     return connected;
 }
 
-bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,s32 mapping_slot){
+bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,s32 mapping_slot) {
     ControllerMappingPADInfo * padinfo = getControllerMappingInfo(type,mapping_slot);
-    if(!padinfo){
+    if(!padinfo) {
         return false;
     }
-    if(padinfo->active){
+    if(padinfo->active) {
         DeviceInfo device_info;
 
         memset(&device_info,0,sizeof(device_info));
@@ -687,7 +722,7 @@ bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,s32
         device_info.vidpid = padinfo->vidpid;
 
         s32 res;
-        if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
+        if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0) {
             return false;
         }
 
@@ -697,7 +732,7 @@ bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,s32
         HID_Data * data_cur;
 
         if((res = ControllerPatcherHID::getHIDData(hidmask,pad,&data_cur)) < 0) {
-           return false;
+            return false;
         }
 
         return true;
@@ -705,32 +740,36 @@ bool ControllerPatcher::isControllerConnectedAndActive(UController_Type type,s32
     return false;
 }
 
-ControllerMappingPADInfo * ControllerPatcher::getControllerMappingInfo(UController_Type type,s32 mapping_slot){
+ControllerMappingPADInfo * ControllerPatcher::getControllerMappingInfo(UController_Type type,s32 mapping_slot) {
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
 
-    if(cm_map_pad == NULL){return NULL;}
+    if(cm_map_pad == NULL) {
+        return NULL;
+    }
 
-    if(mapping_slot < 0 || mapping_slot > HID_MAX_DEVICES_PER_SLOT-1){ return NULL;}
+    if(mapping_slot < 0 || mapping_slot > HID_MAX_DEVICES_PER_SLOT-1) {
+        return NULL;
+    }
 
     return &(cm_map_pad->pad_infos[mapping_slot]);
 }
 
-HID_Mouse_Data * ControllerPatcher::getMouseData(){
+HID_Mouse_Data * ControllerPatcher::getMouseData() {
     if(gHID_Mouse_Mode != HID_MOUSE_MODE_TOUCH) return NULL;
     ControllerMappingPAD * CMPAD = ControllerPatcherUtils::getControllerMappingByType(UController_Type_Gamepad);
 
-    if(CMPAD == NULL){
+    if(CMPAD == NULL) {
         return NULL;
     }
 
     HID_Mouse_Data * result = NULL;
 
-    for(s32 i = 0;i<HID_MAX_DEVICES_PER_SLOT;i++){
+    for(s32 i = 0; i<HID_MAX_DEVICES_PER_SLOT; i++) {
         ControllerMappingPADInfo * padinfo = &(CMPAD->pad_infos[i]);
-        if(!padinfo->active){
+        if(!padinfo->active) {
             break;
         }
-        if(padinfo->type == CM_Type_Mouse){
+        if(padinfo->type == CM_Type_Mouse) {
             result = &(gHID_Devices[gMouseSlot].pad_data[padinfo->pad].data_union.mouse.cur_mouse_data);
             DCFlushRange(&result,sizeof(result));
             DCInvalidateRange(&result,sizeof(result));
@@ -740,21 +779,23 @@ HID_Mouse_Data * ControllerPatcher::getMouseData(){
     return result;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumble(UController_Type type,u32 status){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumble(UController_Type type,u32 status) {
     ControllerMappingPAD * cm_map_pad = ControllerPatcherUtils::getControllerMappingByType(type);
-    if(cm_map_pad == NULL){return -1;}
+    if(cm_map_pad == NULL) {
+        return -1;
+    }
     cm_map_pad->rumble = !!status; //to make sure it's only 0 or 1.
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(InputData * output,s32 array_size){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(InputData * output,s32 array_size) {
     s32 hid = gHIDCurrentDevice;
     HID_Data * data_cur;
     VPADStatus pad_buffer;
     VPADStatus * buffer = &pad_buffer;
     s32 result = CONTROLLER_PATCHER_ERROR_NONE;
-    for(s32 i = 0;i< gHIDMaxDevices;i++){
-        if((hid & (1 << i)) != 0){
+    for(s32 i = 0; i< gHIDMaxDevices; i++) {
+        if((hid & (1 << i)) != 0) {
             memset(buffer,0,sizeof(*buffer));
 
             s32 newhid = (1 << i);
@@ -769,9 +810,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
             deviceinfo->slotdata.deviceslot = deviceslot;
             deviceinfo->slotdata.hidmask = newhid;
 
-            if(newhid == gHID_LIST_MOUSE){
+            if(newhid == gHID_LIST_MOUSE) {
                 output[result].type = CM_Type_Mouse;
-            } else if(newhid == gHID_LIST_KEYBOARD){
+            } else if(newhid == gHID_LIST_KEYBOARD) {
                 output[result].type = CM_Type_Keyboard;
             }
 
@@ -787,15 +828,15 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
 
             s32 buttons_hold = 0;
 
-            for(s32 pad = 0;pad<HID_MAX_PADS_COUNT;pad++){
+            for(s32 pad = 0; pad<HID_MAX_PADS_COUNT; pad++) {
                 buttons_hold = 0;
                 buttondata[pad].btn_h = 0;
                 buttondata[pad].btn_d = 0;
                 buttondata[pad].btn_r = 0;
                 s32 res;
 
-                if((res = ControllerPatcherHID::getHIDData(deviceinfo->slotdata.hidmask,pad,&data_cur)) < 0){
-                        continue;
+                if((res = ControllerPatcherHID::getHIDData(deviceinfo->slotdata.hidmask,pad,&data_cur)) < 0) {
+                    continue;
                 }
 
                 res = ControllerPatcherUtils::getButtonPressed(data_cur,&buttons_hold,VPAD_BUTTON_A);
@@ -828,7 +869,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
             }
             result++;
 
-            if(result >= array_size){
+            if(result >= array_size) {
                 break;
             }
         }
@@ -837,7 +878,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::gettingInputAllDevices(Inp
     return result;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHID(void * data,s32 chan, s32 mode){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHID(void * data,s32 chan, s32 mode) {
     if(data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     if(chan < 0 || chan > 3) return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;
     //if(gControllerMapping.proController[chan].enabled == 0) return CONTROLLER_PATCHER_ERROR_MAPPING_DISABLED;
@@ -847,9 +888,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
 
     std::vector<HID_Data *> data_list;
 
-    for(s32 i = 0;i<HID_MAX_DEVICES_PER_SLOT;i++){
+    for(s32 i = 0; i<HID_MAX_DEVICES_PER_SLOT; i++) {
         ControllerMappingPADInfo cm_map_pad_info = gControllerMapping.proController[chan].pad_infos[i];
-        if(!cm_map_pad_info.active){
+        if(!cm_map_pad_info.active) {
             continue;
         }
         DeviceInfo device_info;
@@ -858,7 +899,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
         device_info.vidpid = cm_map_pad_info.vidpid;
 
         s32 res;
-        if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
+        if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0) {
             DEBUG_FUNCTION_LINE("ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) = %d\n",res);
             continue;
         }
@@ -875,7 +916,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
         data_list.push_back(data_cur);
     }
 
-    if(data_list.empty()){
+    if(data_list.empty()) {
         return CONTROLLER_PATCHER_ERROR_FAILED_TO_GET_HIDDATA;
     }
     s32 res = 0;
@@ -884,7 +925,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
     //ControllerPatcher::printVPADButtons(vpad_buffer); //Leads to random crashes on transitions.
 
     //a bit hacky?
-    if(mode == PRO_CONTROLLER_MODE_KPADDATA){
+    if(mode == PRO_CONTROLLER_MODE_KPADDATA) {
         KPADStatus *  pro_buffer = (KPADStatus *) data;
         if((res = ControllerPatcherUtils::translateToPro(vpad_buffer,pro_buffer,&last_button_hold[chan])) < 0 ) return res;
     } else if(mode == PRO_CONTROLLER_MODE_WPADReadData) {
@@ -899,7 +940,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setProControllerDataFromHI
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(VPADStatus * buffer){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(VPADStatus * buffer) {
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     //if(gControllerMapping.gamepad.enabled == 0) return CONTROLLER_PATCHER_ERROR_MAPPING_DISABLED;
 
@@ -911,15 +952,15 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(V
 
     if (cm_map_pad.useAll == 1) {
         data_list = ControllerPatcherHID::getHIDDataAll();
-    }else{
-        for(s32 i = 0;i<HID_MAX_DEVICES_PER_SLOT;i++){
+    } else {
+        for(s32 i = 0; i<HID_MAX_DEVICES_PER_SLOT; i++) {
             ControllerMappingPADInfo cm_map_pad_info = cm_map_pad.pad_infos[i];
-            if(cm_map_pad_info.active){
+            if(cm_map_pad_info.active) {
                 DeviceInfo device_info;
                 memset(&device_info,0,sizeof(device_info));
                 device_info.vidpid = cm_map_pad_info.vidpid;
 
-                if(ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) < 0){
+                if(ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) < 0) {
                     continue;
                     //return CONTROLLER_PATCHER_ERROR_UNKNOWN_VID_PID;
                 }
@@ -930,7 +971,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(V
 
                 pad = cm_map_pad_info.pad;
                 s32 res = ControllerPatcherHID::getHIDData(hidmask,pad,&data);
-                if(res < 0){
+                if(res < 0) {
                     continue;
                     //return CONTROLLER_PATCHER_ERROR_FAILED_TO_GET_HIDDATA;
                 }
@@ -938,24 +979,24 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setControllerDataFromHID(V
             }
         }
     }
-    if(data_list.empty()){
+    if(data_list.empty()) {
         return CONTROLLER_PATCHER_ERROR_FAILED_TO_GET_HIDDATA;
     }
 
     ControllerPatcherHID::setVPADControllerData(buffer,data_list);
 
-    for(u32 i = 0; i < data_list.size();i++){
+    for(u32 i = 0; i < data_list.size(); i++) {
         data_list[i]->rumbleActive = !!gControllerMapping.gamepad.rumble;
     }
 
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::printVPADButtons(VPADStatus * buffer){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::printVPADButtons(VPADStatus * buffer) {
     return CONTROLLER_PATCHER_ERROR_NONE;
     /* BROKEN on transitions.*/
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
-    if(buffer->trigger != 0x00000000){
+    if(buffer->trigger != 0x00000000) {
         char output[250];
 
         output[0] = 0; //null terminate it. just in case.
@@ -987,15 +1028,15 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::printVPADButtons(VPADStatu
         if((buffer->trigger & VPAD_STICK_L_EMULATION_UP)     ==  VPAD_STICK_L_EMULATION_UP)      strcat(output,"LE_Up    ");
         if((buffer->trigger & VPAD_STICK_L_EMULATION_DOWN)   ==  VPAD_STICK_L_EMULATION_DOWN)    strcat(output,"LE_Down  ");
 
-        DEBUG_FUNCTION_LINE("%spressed Sticks: LX %f LY %f RX %f RY %f\n",output,buffer->lstick.x,buffer->lstick.y,buffer->rstick.x,buffer->rstick.y);
+        DEBUG_FUNCTION_LINE("%spressed Sticks: LX %f LY %f RX %f RY %f\n",output,buffer->leftStick.x,buffer->leftStick.y,buffer->rightStick.x,buffer->rightStick.y);
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::buttonRemapping(VPADStatus * buffer,s32 buffer_count){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::buttonRemapping(VPADStatus * buffer,s32 buffer_count) {
     if(!gButtonRemappingConfigDone) return CONTROLLER_PATCHER_ERROR_CONFIG_NOT_DONE;
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
-    for(s32 i = 0;i < buffer_count;i++){
+    for(s32 i = 0; i < buffer_count; i++) {
         VPADStatus new_data;
         memset(&new_data,0,sizeof(new_data));
 
@@ -1047,54 +1088,54 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::buttonRemapping(VPADStatus
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-std::string ControllerPatcher::getIdentifierByVIDPID(u16 vid,u16 pid){
+std::string ControllerPatcher::getIdentifierByVIDPID(u16 vid,u16 pid) {
     return ConfigValues::getStringByVIDPID(vid,pid);
 }
 
-void ControllerPatcher::destroyConfigHelper(){
+void ControllerPatcher::destroyConfigHelper() {
     ConfigReader::destroyInstance();
     ConfigValues::destroyInstance();
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::doSamplingForDeviceSlot(u16 device_slot){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::doSamplingForDeviceSlot(u16 device_slot) {
     return ControllerPatcherUtils::doSampling(device_slot,0,true);
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumbleActivated(bool value){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setRumbleActivated(bool value) {
     gGlobalRumbleActivated = value;
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setNetworkControllerActivated(bool value){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setNetworkControllerActivated(bool value) {
     gNetworkControllerActivated = value;
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-bool ControllerPatcher::isRumbleActivated(){
+bool ControllerPatcher::isRumbleActivated() {
     return gGlobalRumbleActivated;
 }
 
 
-bool ControllerPatcher::isButtonRemappingDone(){
+bool ControllerPatcher::isButtonRemappingDone() {
     return gButtonRemappingConfigDone;
 }
 
-bool ControllerPatcher::isKeyboardConnected(){
+bool ControllerPatcher::isKeyboardConnected() {
     return (gHIDCurrentDevice & gHID_LIST_KEYBOARD) == gHID_LIST_KEYBOARD;
 }
 
-bool ControllerPatcher::areControllersConnected(){
+bool ControllerPatcher::areControllersConnected() {
     return gHIDAttached > 0;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::sampleKeyboardData(){
-    if(ControllerPatcher::isKeyboardConnected()){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::sampleKeyboardData() {
+    if(ControllerPatcher::isKeyboardConnected()) {
         ControllerPatcher::doSamplingForDeviceSlot(gHID_SLOT_KEYBOARD);
     }
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::resetCallbackData(){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::resetCallbackData() {
     memset(gWPADConnectCallback,0,sizeof(gWPADConnectCallback));
     memset(gKPADConnectCallback,0,sizeof(gKPADConnectCallback));
     memset(gExtensionCallback,0,sizeof(gExtensionCallback));
@@ -1104,26 +1145,32 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::resetCallbackData(){
 }
 
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setKPADConnectedCallback(s32 chan, wpad_connect_callback_t callback){
-    if(chan >= 4){ return CONTROLLER_PATCHER_ERROR_INVALID_CHAN; }
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setKPADConnectedCallback(s32 chan, WPADConnectCallback callback) {
+    if(chan >= 4) {
+        return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;
+    }
     gKPADConnectCallback[chan] = callback;
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setKPADExtensionCallback(s32 chan, wpad_connect_callback_t callback){
-    if(chan >= 4){ return CONTROLLER_PATCHER_ERROR_INVALID_CHAN; }
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setKPADExtensionCallback(s32 chan, WPADConnectCallback callback) {
+    if(chan >= 4) {
+        return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;
+    }
     gExtensionCallback[chan] = callback;
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setWPADConnectCallback(s32 chan, wpad_connect_callback_t callback){
-    if(chan >= 4){ return CONTROLLER_PATCHER_ERROR_INVALID_CHAN; }
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setWPADConnectCallback(s32 chan, WPADConnectCallback callback) {
+    if(chan >= 4) {
+        return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;
+    }
     gWPADConnectCallback[chan] = callback;
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::handleCallbackData(bool button_pressed){
-    if(button_pressed && gCallbackCooldown == 0){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::handleCallbackData(bool button_pressed) {
+    if(button_pressed && gCallbackCooldown == 0) {
         gCallbackCooldown = 0xFF;
 
         /*if(HID_DEBUG){ log_printf("my_VPADRead(line %d): Pressed the TV button. Maybe we can call the callbacks.!\n",__LINE__); }
@@ -1131,32 +1178,38 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::handleCallbackData(bool bu
         if(HID_DEBUG){ log_printf("my_VPADRead(line %d): gWPADConnectCallback   =  %08X %08X %08X %08X\n",__LINE__,gWPADConnectCallback[0],gWPADConnectCallback[1],gWPADConnectCallback[2],gWPADConnectCallback[3]); }
         if(HID_DEBUG){ log_printf("my_VPADRead(line %d): gKPADConnectCallback   =  %08X %08X %08X %08X\n",__LINE__,gKPADConnectCallback[0],gKPADConnectCallback[1],gKPADConnectCallback[2],gKPADConnectCallback[3]); }*/
 
-        for(s32 i = 0;i<4;i++){
-            bool doCall = false;
-            if(i == 0){ doCall = ControllerPatcher::isControllerConnectedAndActive(UController_Type_Pro1); }
-            if(i == 1){ doCall = ControllerPatcher::isControllerConnectedAndActive(UController_Type_Pro2); }
-            if(i == 2){ doCall = ControllerPatcher::isControllerConnectedAndActive(UController_Type_Pro3); }
-            if(i == 3){ doCall = ControllerPatcher::isControllerConnectedAndActive(UController_Type_Pro4); }
-            if(doCall){
-                if(gWPADConnectCallback[i] != NULL){
-                    log_printf("my_VPADRead(line %d): Called WPAD connect callback for pro controller in slot %d!\n",__LINE__,(i+1));
-                    gWPADConnectCallback[i](i,0);
-                }
-                if(gKPADConnectCallback[i] != NULL){
-                    log_printf("my_VPADRead(line %d): Called KPAD connect callback for pro controller in slot %d!\n",__LINE__,(i+1));
-                    gKPADConnectCallback[i](i,0);
-                }
-                if(gExtensionCallback[i] != NULL){
-                    log_printf("my_VPADRead(line %d): Called extension callback for pro controller in slot %d!\n",__LINE__,(i+1));
-                    gExtensionCallback[i](i,WPAD_EXT_PRO_CONTROLLER);
-                }
-            }
+        if(ControllerPatcher::isControllerConnectedAndActive(UController_Type_Pro1)) {
+            ControllerPatcher::handleCallbackDataInternal(WPAD_CHAN_0);
+        }
+        if(ControllerPatcher::isControllerConnectedAndActive(UController_Type_Pro2)) {
+            ControllerPatcher::handleCallbackDataInternal(WPAD_CHAN_1);
+        }
+        if(ControllerPatcher::isControllerConnectedAndActive(UController_Type_Pro3)) {
+            ControllerPatcher::handleCallbackDataInternal(WPAD_CHAN_2);
+        }
+        if(ControllerPatcher::isControllerConnectedAndActive(UController_Type_Pro4)) {
+            ControllerPatcher::handleCallbackDataInternal(WPAD_CHAN_3);
         }
     }
-    if(gCallbackCooldown > 0){
+    if(gCallbackCooldown > 0) {
         gCallbackCooldown--;
     }
 
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::handleCallbackDataInternal(WPADChan chan) {
+    if(gWPADConnectCallback[chan] != NULL) {
+        log_printf("Called WPAD connect callback for pro controller in slot %d!\n",chan + 1);
+        gWPADConnectCallback[chan](chan,0);
+    }
+    if(gKPADConnectCallback[chan] != NULL) {
+        log_printf("Called KPAD connect callback for pro controller in slot %d!\n",chan + 1);
+        gKPADConnectCallback[chan](chan,0);
+    }
+    if(gExtensionCallback[chan] != NULL) {
+        log_printf("Called extension callback for pro controller in slot %d!\n",chan + 1);
+        gExtensionCallback[chan](chan,WPAD_EXT_PRO_CONTROLLER);
+    }
+    return CONTROLLER_PATCHER_ERROR_NONE;
+}

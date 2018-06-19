@@ -46,12 +46,12 @@
 
 #define DEFAULT_TCP_PORT    8112
 
-class CPTCPServer: TCPServer{
+class CPTCPServer: TCPServer {
     friend class ControllerPatcher;
 
 private:
-     static CPTCPServer *getInstance() {
-        if(!instance){
+    static CPTCPServer *getInstance() {
+        if(!instance) {
 
             instance = new CPTCPServer(DEFAULT_TCP_PORT);
         }
@@ -59,19 +59,19 @@ private:
     }
 
     static void destroyInstance() {
-        if(instance){
+        if(instance) {
             delete instance;
             instance = NULL;
         }
     }
 
-    static s32 getPriority(){
+    static s32 getPriority() {
         s32 priority = 28;
         if(OSGetTitleID() == 0x00050000101c9300 || //The Legend of Zelda Breath of the Wild JPN
-           OSGetTitleID() == 0x00050000101c9400 || //The Legend of Zelda Breath of the Wild USA
-           OSGetTitleID() == 0x00050000101c9500 || //The Legend of Zelda Breath of the Wild EUR
-           OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
-           OSGetTitleID() == 0x00050000101a3c00){  //The Binding of Isaac: Rebirth USA
+                OSGetTitleID() == 0x00050000101c9400 || //The Legend of Zelda Breath of the Wild USA
+                OSGetTitleID() == 0x00050000101c9500 || //The Legend of Zelda Breath of the Wild EUR
+                OSGetTitleID() == 0x00050000101c9b00 || //The Binding of Isaac: Rebirth EUR
+                OSGetTitleID() == 0x00050000101a3c00) { //The Binding of Isaac: Rebirth USA
             priority = 10;
             DEBUG_FUNCTION_LINE("This game needs higher thread priority. We set it to %d\n",priority);
         }

@@ -21,7 +21,7 @@
 
 #define DEFAULT_UDP_CLIENT_PORT    8114
 
-class UDPClient{
+class UDPClient {
     friend class ControllerPatcher;
     friend class ControllerPatcherHID;
     friend class CPTCPServer;
@@ -29,7 +29,7 @@ public:
 
 private:
     static UDPClient *getInstance() {
-        if(instance == NULL){
+        if(instance == NULL) {
             createInstance();
         }
         return instance;
@@ -37,7 +37,7 @@ private:
 
 
     static UDPClient *createInstance() {
-        if(instance != NULL){
+        if(instance != NULL) {
             destroyInstance();
         }
         instance = new UDPClient(gUDPClientip,DEFAULT_UDP_CLIENT_PORT);
@@ -46,7 +46,7 @@ private:
     }
 
     static void destroyInstance() {
-        if(instance != NULL){
+        if(instance != NULL) {
             delete instance;
             instance = NULL;
         }

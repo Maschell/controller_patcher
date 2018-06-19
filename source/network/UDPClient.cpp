@@ -24,33 +24,34 @@
 
 UDPClient * UDPClient::instance = NULL;
 
-UDPClient::UDPClient(u32 ip, s32 port){
+UDPClient::UDPClient(u32 ip, s32 port) {
     sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (sockfd < 0)
-		return;
+    if (sockfd < 0)
+        return;
 
-	struct sockaddr_in connect_addr;
-	memset(&connect_addr, 0, sizeof(connect_addr));
-	connect_addr.sin_family = AF_INET;
-	connect_addr.sin_port = port;
-	connect_addr.sin_addr.s_addr = ip;
+    struct sockaddr_in connect_addr;
+    memset(&connect_addr, 0, sizeof(connect_addr));
+    connect_addr.sin_family = AF_INET;
+    connect_addr.sin_port = port;
+    connect_addr.sin_addr.s_addr = ip;
 
-	if(connect(sockfd, (struct sockaddr*)&connect_addr, sizeof(connect_addr)) < 0)
-	{
-	    socketclose(sockfd);
-	    sockfd = -1;
-	}
+    if(connect(sockfd, (struct sockaddr*)&connect_addr, sizeof(connect_addr)) < 0) {
+        socketclose(sockfd);
+        sockfd = -1;
+    }
 }
 
-UDPClient::~UDPClient(){
-    if (this->sockfd != -1){
+UDPClient::~UDPClient() {
+    if (this->sockfd != -1) {
         socketclose(sockfd);
     }
-    if(HID_DEBUG){ log_printf("UDPClient::~UDPClient(line %d): Thread has been closed\n",__LINE__); }
+    if(HID_DEBUG) {
+        log_printf("UDPClient::~UDPClient(line %d): Thread has been closed\n",__LINE__);
+    }
 }
 
-bool UDPClient::sendData(char * data,s32 length){
-    if(sockfd < 0 || data == 0 || length < 0 || gUsedProtocolVersion < WIIU_CP_TCP_HANDSHAKE_VERSION_3){
+bool UDPClient::sendData(char * data,s32 length) {
+    if(sockfd < 0 || data == 0 || length < 0 || gUsedProtocolVersion < WIIU_CP_TCP_HANDSHAKE_VERSION_3) {
         return false;
     }
     if(length > 1400) length = 1400;

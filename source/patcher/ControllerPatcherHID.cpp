@@ -26,13 +26,13 @@
  * public implementation for the network controller
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-s32 ControllerPatcherHID::externAttachDetachCallback(HIDDevice *p_device, HIDAttachEvent attach){
+s32 ControllerPatcherHID::externAttachDetachCallback(HIDDevice *p_device, HIDAttachEvent attach) {
     HIDClient client;
     memset(&client,0,sizeof(client));
     return AttachDetachCallback(&client,p_device,attach);
 }
 
-void ControllerPatcherHID::externHIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr){
+void ControllerPatcherHID::externHIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr) {
     HIDReadCallback(handle,buf,bytes_transfered,usr);
 }
 
@@ -40,16 +40,16 @@ void ControllerPatcherHID::externHIDReadCallback(u32 handle, unsigned char *buf,
  * private implementation for the HID Api.
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-s32 ControllerPatcherHID::myAttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, HIDAttachEvent attach){
+s32 ControllerPatcherHID::myAttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, HIDAttachEvent attach) {
     return AttachDetachCallback(p_client,p_device,attach);
 }
 
-void ControllerPatcherHID::myHIDMouseReadCallback(u32 handle, s32 error, unsigned char *buf, u32 bytes_transfered, void *p_user){
-	if(error == 0){
+void ControllerPatcherHID::myHIDMouseReadCallback(u32 handle, s32 error, unsigned char *buf, u32 bytes_transfered, void *p_user) {
+    if(error == 0) {
         my_cb_user *usr = (my_cb_user*)p_user;
 
         u32 slot = 0;
-        if(usr->pad_slot < HID_MAX_PADS_COUNT){
+        if(usr->pad_slot < HID_MAX_PADS_COUNT) {
             slot = usr->pad_slot;
         }
 
@@ -59,7 +59,7 @@ void ControllerPatcherHID::myHIDMouseReadCallback(u32 handle, s32 error, unsigne
         data_ptr->type = DEVICE_TYPE_MOUSE;
         //DEBUG_FUNCTION_LINE("%02X %02X %02X %02X %02X bytes_transfered: %d\n",buf[0],buf[1],buf[2],buf[3],buf[4],bytes_transfered);
 
-        if(buf[0] == 2 && bytes_transfered > 3){ // using the other mouse mode
+        if(buf[0] == 2 && bytes_transfered > 3) { // using the other mouse mode
             buf +=1;
         }
 
@@ -76,7 +76,7 @@ void ControllerPatcherHID::myHIDMouseReadCallback(u32 handle, s32 error, unsigne
         cur_mouse_data->deltaY = y_value;
 
         cur_mouse_data->left_click = buf[0];
-	    cur_mouse_data->right_click = buf[0]>>1;
+        cur_mouse_data->right_click = buf[0]>>1;
 
         if(cur_mouse_data->X < 0) cur_mouse_data->X = 0;
         if(cur_mouse_data->X > 1280) cur_mouse_data->X = 1280;
@@ -89,36 +89,38 @@ void ControllerPatcherHID::myHIDMouseReadCallback(u32 handle, s32 error, unsigne
         //DEBUG_FUNCTION_LINE("%02X %02X %02X %02X %02X %02X %02X %02X %d = X: %d Y: %d \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7],bytes_transfered,x_value,y_value);
 
         HIDRead(handle, usr->buf, bytes_transfered, myHIDMouseReadCallback, usr);
-	}
+    }
 }
 
-void ControllerPatcherHID::myHIDReadCallback(u32 handle, s32 error, unsigned char *buf, u32 bytes_transfered, void *p_user){
-    if(error == 0 && p_user != NULL && gHIDAttached){
-	    my_cb_user *usr = (my_cb_user*)p_user;
+void ControllerPatcherHID::myHIDReadCallback(u32 handle, s32 error, unsigned char *buf, u32 bytes_transfered, void *p_user) {
+    if(error == 0 && p_user != NULL && gHIDAttached) {
+        my_cb_user *usr = (my_cb_user*)p_user;
 
-	    HIDReadCallback(handle,buf,bytes_transfered,usr);
+        HIDReadCallback(handle,buf,bytes_transfered,usr);
 
-        if(usr->slotdata.hidmask == gHID_LIST_DS4){
-	        OSSleepTicks(OSMicrosecondsToTicks(2000)); //DS4 is way tooo fast. sleeping to reduce lag. (need to check the other pads)
-	    }
+        if(usr->slotdata.hidmask == gHID_LIST_DS4) {
+            OSSleepTicks(OSMicrosecondsToTicks(2000)); //DS4 is way tooo fast. sleeping to reduce lag. (need to check the other pads)
+        }
         HIDRead(handle, usr->buf, bytes_transfered, myHIDReadCallback, usr);
-	}
+    }
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  * Intern Callback actions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, HIDAttachEvent attach){
-    if(attach){
+s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p_device, HIDAttachEvent attach) {
+    if(attach) {
         DEBUG_FUNCTION_LINE("vid %04x pid %04x connected\n", SWAP16(p_device->vid),SWAP16(p_device->pid));
-        if(HID_DEBUG){  DEBUG_FUNCTION_LINE("interface index  %02x\n", p_device->interfaceIndex);
-                        DEBUG_FUNCTION_LINE("sub class        %02x\n", p_device->subClass);
-                        DEBUG_FUNCTION_LINE("protocol         %02x\n", p_device->protocol);
-                        DEBUG_FUNCTION_LINE("max packet in    %02x\n", p_device->maxPacketSizeRx);
-                        DEBUG_FUNCTION_LINE("max packet out   %02x\n", p_device->maxPacketSizeRx); }
+        if(HID_DEBUG) {
+            DEBUG_FUNCTION_LINE("interface index  %02x\n", p_device->interfaceIndex);
+            DEBUG_FUNCTION_LINE("sub class        %02x\n", p_device->subClass);
+            DEBUG_FUNCTION_LINE("protocol         %02x\n", p_device->protocol);
+            DEBUG_FUNCTION_LINE("max packet in    %02x\n", p_device->maxPacketSizeRx);
+            DEBUG_FUNCTION_LINE("max packet out   %02x\n", p_device->maxPacketSizeRx);
+        }
     }
-    if(!attach){
+    if(!attach) {
         DEBUG_FUNCTION_LINE("vid %04x pid %04x disconnected\n", SWAP16(p_device->vid),SWAP16(p_device->pid));
     }
     DeviceInfo device_info;
@@ -133,24 +135,24 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
         slotdata->hidmask = gHID_LIST_KEYBOARD;
         slotdata->deviceslot = gHID_SLOT_KEYBOARD;
         //DEBUG_FUNCTION_LINE("Found Keyboard: device: %s slot: %d\n",byte_to_binary(device_info.slotdata.hidmask),device_info.slotdata.deviceslot);
-    }else if ((p_device->subClass == 1) && (p_device->protocol == 2)){ // MOUSE
+    } else if ((p_device->subClass == 1) && (p_device->protocol == 2)) { // MOUSE
         slotdata->hidmask = gHID_LIST_MOUSE;
         slotdata->deviceslot = gMouseSlot;
         //DEBUG_FUNCTION_LINE("Found Mouse: device: %s slot: %d\n",byte_to_binary(device_info.hid),device_info.slot);
-    }else{
+    } else {
         s32 ret;
-        if((ret = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0){
+        if((ret = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) < 0) {
             DEBUG_FUNCTION_LINE("ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) failed %d \n",ret);
             return HID_DEVICE_DETACH;
-        }else{
+        } else {
             //DEBUG_FUNCTION_LINE("ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info) success %d \n",ret);
         }
     }
 
-    if(slotdata->hidmask){
-        if(attach){
+    if(slotdata->hidmask) {
+        if(attach) {
             s32 bufSize = 64;
-            if(slotdata->hidmask != gHID_LIST_MOUSE && config_controller[slotdata->deviceslot][CONTRPS_BUF_SIZE][0] == CONTROLLER_PATCHER_VALUE_SET){
+            if(slotdata->hidmask != gHID_LIST_MOUSE && config_controller[slotdata->deviceslot][CONTRPS_BUF_SIZE][0] == CONTROLLER_PATCHER_VALUE_SET) {
                 bufSize = config_controller[slotdata->deviceslot][CONTRPS_BUF_SIZE][1];
             }
             unsigned char *buf = (unsigned char *) memalign(64,bufSize);
@@ -163,9 +165,9 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             gHIDAttached |= slotdata->hidmask;
             gHIDCurrentDevice |= slotdata->hidmask;
             s32 pads_per_device = 1;
-            if(config_controller[slotdata->deviceslot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE){
+            if(config_controller[slotdata->deviceslot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
                 pads_per_device = config_controller[slotdata->deviceslot][CONTRPS_PAD_COUNT][1];
-                if(pads_per_device > HID_MAX_PADS_COUNT){//maximum of HID_MAX_PADS_COUNT
+                if(pads_per_device > HID_MAX_PADS_COUNT) { //maximum of HID_MAX_PADS_COUNT
                     pads_per_device = HID_MAX_PADS_COUNT;
                 }
             }
@@ -177,8 +179,8 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
 
             s32 failed = 1;
 
-            for(s32 i = 0;i<HID_MAX_PADS_COUNT;i += pads_per_device){
-                if(!(pad_count & (1 << i))){
+            for(s32 i = 0; i<HID_MAX_PADS_COUNT; i += pads_per_device) {
+                if(!(pad_count & (1 << i))) {
                     failed = 0;
                     pad_count |= (1 << i);
                     pad_slot = i;
@@ -186,13 +188,13 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 }
             }
 
-            if(failed){
+            if(failed) {
                 DEBUG_FUNCTION_LINE("error: I can only handle %d devices of the same type. Sorry \n",HID_MAX_PADS_COUNT);
-                if(buf){
+                if(buf) {
                     free(buf);
                     buf = NULL;
                 }
-                if(usr){
+                if(usr) {
                     free(usr);
                     usr = NULL;
                 }
@@ -207,7 +209,7 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
             usr->pads_per_device = pads_per_device;
             usr->pad_slot = pad_slot;
 
-            for(s32 i = 0;i<pads_per_device;i++){
+            for(s32 i = 0; i<pads_per_device; i++) {
                 memset(&gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i],0,sizeof(HID_Data));
 
                 gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i].handle = p_device->handle;
@@ -220,9 +222,11 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 DCInvalidateRange(&gHID_Devices[slotdata->deviceslot].pad_data[pad_slot+i],sizeof(HID_Data));
             }
 
-            if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Device successfully attached\n"); }
+            if(HID_DEBUG) {
+                DEBUG_FUNCTION_LINE("Device successfully attached\n");
+            }
 
-            if(slotdata->hidmask == gHID_LIST_GC){ // GC PAD
+            if(slotdata->hidmask == gHID_LIST_GC) { // GC PAD
                 //The GC Adapter has all ports in one device. Set them all.
                 gHID_Devices[slotdata->deviceslot].pad_data[0].slotdata = device_info.slotdata;
                 gHID_Devices[slotdata->deviceslot].pad_data[1].slotdata = device_info.slotdata;
@@ -232,16 +236,16 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 buf[0] = 0x13;
                 HIDWrite(p_device->handle, usr->buf, 1, NULL,NULL);
                 HIDRead(p_device->handle, usr->buf, usr->transfersize, myHIDReadCallback, usr);
-            }else if (slotdata->hidmask == gHID_LIST_MOUSE){
+            } else if (slotdata->hidmask == gHID_LIST_MOUSE) {
                 HIDSetProtocol(p_device->handle, p_device->interfaceIndex, 0, 0, 0);
                 //HIDGetDescriptor(p_device->handle,0x22,0x00,0,my_buf,512,my_foo_cb,NULL);
                 HIDSetIdle(p_device->handle,p_device->interfaceIndex,1,NULL,NULL);
                 gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
                 HIDRead(p_device->handle, buf, p_device->maxPacketSizeRx, myHIDMouseReadCallback, usr);
-            }else if (slotdata->hidmask == gHID_LIST_SWITCH_PRO){
+            } else if (slotdata->hidmask == gHID_LIST_SWITCH_PRO) {
                 s32 read_result = HIDRead(p_device->handle, usr->buf, usr->transfersize, NULL, NULL);
-                if(read_result == 64){
-                    if(usr->buf[01] == 0x01){ //We need to do the handshake
+                if(read_result == 64) {
+                    if(usr->buf[01] == 0x01) { //We need to do the handshake
                         DEBUG_FUNCTION_LINE("Switch Pro Controller handshake needed\n");
                         /**
                             Thanks to ShinyQuagsire23 for the values (https://github.com/shinyquagsire23/HID-Joy-Con-Whispering)
@@ -261,31 +265,34 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                         buf[1] = 0x04;
                         HIDWrite(p_device->handle, usr->buf, 2, NULL,NULL);
                         HIDRead(p_device->handle, usr->buf, usr->transfersize, NULL, NULL);
-                    }else{
+                    } else {
                         DEBUG_FUNCTION_LINE("Switch Pro Controller handshake already done\n");
                     }
                     HIDRead(p_device->handle, usr->buf, usr->transfersize, myHIDReadCallback, usr);
                 }
-            }else if (slotdata->hidmask == gHID_LIST_KEYBOARD){
+            } else if (slotdata->hidmask == gHID_LIST_KEYBOARD) {
                 HIDSetProtocol(p_device->handle, p_device->interfaceIndex, 1, 0, 0);
                 HIDSetIdle(p_device->handle, p_device->interfaceIndex, 0, 0, 0);
                 HIDRead(p_device->handle, buf, p_device->maxPacketSizeRx, myHIDReadCallback, usr);
-            }else if (slotdata->hidmask == gHID_LIST_DS3){
+            } else if (slotdata->hidmask == gHID_LIST_DS3) {
                 HIDSetProtocol(p_device->handle, p_device->interfaceIndex, 1, 0, 0);
                 HIDDS3Rumble(p_device->handle,usr,0);
-                buf[0] = 0x42; buf[1] = 0x0c; buf[2] = 0x00; buf[3] = 0x00;
+                buf[0] = 0x42;
+                buf[1] = 0x0c;
+                buf[2] = 0x00;
+                buf[3] = 0x00;
                 HIDSetReport(p_device->handle, HID_REPORT_FEATURE, PS3_F4_REPORT_ID, buf, PS3_F4_REPORT_LEN, NULL, NULL);
                 HIDRead(p_device->handle, usr->buf, p_device->maxPacketSizeRx, myHIDReadCallback, usr);
-            }else{
+            } else {
                 HIDRead(p_device->handle, usr->buf, p_device->maxPacketSizeRx, myHIDReadCallback, usr);
             }
             return HID_DEVICE_ATTACH;
 
-        }else{
+        } else {
             my_cb_user * user_data = NULL;
             s32 founddata = 0;
-            for(s32 i = 0;i<HID_MAX_PADS_COUNT;i++){
-                if(gHID_Devices[slotdata->deviceslot].pad_data[i].handle == p_device->handle){
+            for(s32 i = 0; i<HID_MAX_PADS_COUNT; i++) {
+                if(gHID_Devices[slotdata->deviceslot].pad_data[i].handle == p_device->handle) {
                     gHID_Devices[slotdata->deviceslot].pad_data[i].handle = 0;
 
                     DCFlushRange(&gHID_Devices[slotdata->deviceslot].pad_data[i].handle,sizeof(gHID_Devices[slotdata->deviceslot].pad_data[i].handle));
@@ -298,21 +305,23 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 }
             }
 
-            if(user_data){
+            if(user_data) {
                 config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1] &= ~ (1 << user_data->pad_slot);
                 DCFlushRange(&config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1],sizeof(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1]));
                 DCInvalidateRange(&config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1],sizeof(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1]));
-                if(user_data->buf){
+                if(user_data->buf) {
                     free(user_data->buf);
                     user_data->buf = NULL;
                 }
                 free(user_data);
                 user_data = NULL;
-            }else{
-                if(founddata){ DEBUG_FUNCTION_LINE("user_data null. You may have a memory leak.\n"); }
+            } else {
+                if(founddata) {
+                    DEBUG_FUNCTION_LINE("user_data null. You may have a memory leak.\n");
+                }
                 return HID_DEVICE_DETACH;
             }
-            if(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1] == 0){
+            if(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1] == 0) {
                 gHIDAttached &= ~slotdata->hidmask;
                 gHIDCurrentDevice &= ~slotdata->hidmask;
 
@@ -321,29 +330,33 @@ s32 ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevice *p
                 DCFlushRange(&gHIDCurrentDevice,sizeof(gHIDCurrentDevice));
                 DCInvalidateRange(&gHIDCurrentDevice,sizeof(gHIDCurrentDevice));
 
-                if (slotdata->hidmask == gHID_LIST_MOUSE){
+                if (slotdata->hidmask == gHID_LIST_MOUSE) {
                     gHID_Mouse_Mode = HID_MOUSE_MODE_AIM;
                 }
-            }else{
-                if(HID_DEBUG){DEBUG_FUNCTION_LINE("We still have pad for deviceslot %d connected.\n",slotdata->deviceslot); }
+            } else {
+                if(HID_DEBUG) {
+                    DEBUG_FUNCTION_LINE("We still have pad for deviceslot %d connected.\n",slotdata->deviceslot);
+                }
             }
-            if(HID_DEBUG){DEBUG_FUNCTION_LINE("Device successfully detached\n"); }
+            if(HID_DEBUG) {
+                DEBUG_FUNCTION_LINE("Device successfully detached\n");
+            }
         }
-    }else{
+    } else {
         DEBUG_FUNCTION_LINE("HID-Device currently not supported! You can add support through config files\n");
-	}
-	return HID_DEVICE_DETACH;
+    }
+    return HID_DEVICE_DETACH;
 }
 
-void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr){
+void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 bytes_transfered, my_cb_user * usr) {
     ControllerPatcherUtils::doSampling(usr->slotdata.deviceslot,usr->pad_slot,false);
 
     //DEBUG_FUNCTION_LINE("my_read_cbInternal: %d %08X %d\n",bytes_transfered,usr->slotdata.hidmask,usr->slotdata.deviceslot);
-    if(usr->slotdata.hidmask == gHID_LIST_GC){
+    if(usr->slotdata.hidmask == gHID_LIST_GC) {
 
         HID_Data * data_ptr = NULL;
         //Copy the data for all 4 pads
-        for(s32 i = 0;i<4;i++){
+        for(s32 i = 0; i<4; i++) {
             data_ptr = &(gHID_Devices[gHID_SLOT_GC].pad_data[i]);
             memcpy(&(data_ptr->data_union.controller.last_hid_data[0]),&(data_ptr->data_union.controller.cur_hid_data[0]),10); //save last data.
             memcpy(&(data_ptr->data_union.controller.cur_hid_data[0]),&buf[(i*9)+1],9);                  //save new data.
@@ -357,10 +370,10 @@ void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 b
         DEBUG_FUNCTION_LINE("GC3 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
         DEBUG_FUNCTION_LINE("GC4 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X \n",     buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);*/
         HIDGCRumble(handle,usr);
-    }else if(usr->slotdata.hidmask != 0){
+    } else if(usr->slotdata.hidmask != 0) {
         //Depending on how the switch pro controller is connected, it has a different data format. At first we had the Bluetooth version, so we need to convert
         //the USB one into it now. (When it's connected via USB). The network client always sends the BT version, even if connected via USB to the PC.
-        if(usr->slotdata.hidmask == gHID_LIST_SWITCH_PRO && buf != NULL && bytes_transfered >= 0x20){
+        if(usr->slotdata.hidmask == gHID_LIST_SWITCH_PRO && buf != NULL && bytes_transfered >= 0x20) {
             u8 buffer[0x13];
             memcpy(buffer,buf+0x0D,0x013);
 
@@ -379,7 +392,7 @@ void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 b
             //We want to get the next input!
             s32 res = HIDWrite(handle, buf, 9, NULL,NULL);
 
-            if(res == 9){ //Check if it's the USB data format.
+            if(res == 9) { //Check if it's the USB data format.
                 if(buffer[1]  == 0) return;
                 //Converting the buttons
                 u32 buttons = (((u32*)(buffer))[0]) & 0xFFFFFF00;
@@ -407,24 +420,24 @@ void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 b
 
                 //Converting the DPAD
                 if(((dpad & HID_SWITCH_PRO_USB_BUTTON_UP_VALUE)           == HID_SWITCH_PRO_USB_BUTTON_UP_VALUE) &&
-                         ((dpad & HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)  == HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)){
+                        ((dpad & HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)  == HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)) {
                     dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_NE_VALUE;
-                }else if(((dpad & HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE) &&
-                         ((dpad & HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)  == HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)){
+                } else if(((dpad & HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE) &&
+                          ((dpad & HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)  == HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)) {
                     dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_SE_VALUE;
-                }else if(((dpad & HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE) &&
-                         ((dpad & HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)){
+                } else if(((dpad & HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE) &&
+                          ((dpad & HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)) {
                     dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_SW_VALUE;
-                }else if(((dpad & HID_SWITCH_PRO_USB_BUTTON_UP_VALUE)     == HID_SWITCH_PRO_USB_BUTTON_UP_VALUE) &&
-                         ((dpad & HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)){
+                } else if(((dpad & HID_SWITCH_PRO_USB_BUTTON_UP_VALUE)     == HID_SWITCH_PRO_USB_BUTTON_UP_VALUE) &&
+                          ((dpad & HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)) {
                     dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_NW_VALUE;
-                }else if((dpad & HID_SWITCH_PRO_USB_BUTTON_UP_VALUE)      == HID_SWITCH_PRO_USB_BUTTON_UP_VALUE){
+                } else if((dpad & HID_SWITCH_PRO_USB_BUTTON_UP_VALUE)      == HID_SWITCH_PRO_USB_BUTTON_UP_VALUE) {
                     dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_N_VALUE;
-                }else if((dpad &  HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)  == HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE){
+                } else if((dpad &  HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE)  == HID_SWITCH_PRO_USB_BUTTON_RIGHT_VALUE) {
                     dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_E_VALUE;
-                }else if((dpad &  HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE){
+                } else if((dpad &  HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_DOWN_VALUE) {
                     dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_S_VALUE;
-                }else if((dpad &  HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE){
+                } else if((dpad &  HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE)   == HID_SWITCH_PRO_USB_BUTTON_LEFT_VALUE) {
                     dpadResult = HID_SWITCH_PRO_BT_BUTTON_DPAD_W_VALUE;
                 }
 
@@ -448,15 +461,15 @@ void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 b
         s32 skip = 0;
 
         //Input filter
-        if(        config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][0] != CONTROLLER_PATCHER_INVALIDVALUE){
-            if(buf[config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][0]] != config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][1]){
+        if(        config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
+            if(buf[config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][0]] != config_controller[usr->slotdata.deviceslot][CONTRPS_INPUT_FILTER][1]) {
                 skip = 1;
             }
         }
 
-       if(!skip){
+        if(!skip) {
             u32 slot = 0;
-            if(usr->pad_slot < HID_MAX_PADS_COUNT){
+            if(usr->pad_slot < HID_MAX_PADS_COUNT) {
                 slot = usr->pad_slot;
             }
             slot += ControllerPatcherUtils::getPadSlotInAdapter(usr->slotdata.deviceslot,buf); // If the controller has multiple slots, we need to use the right one.
@@ -479,19 +492,19 @@ void ControllerPatcherHID::HIDReadCallback(u32 handle, unsigned char *buf, u32 b
  * Other functions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(VPADStatus * buffer,std::vector<HID_Data *>& data){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(VPADStatus * buffer,std::vector<HID_Data *>& data) {
     if(buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     HID_Data * data_cur;
 
     s32 buttons_hold;
-    for(u32 i = 0;i<data.size();i++){
+    for(u32 i = 0; i<data.size(); i++) {
         data_cur = data[i];
 
-        if(data_cur->slotdata.hidmask & gHID_LIST_MOUSE){  //Reset the input when we have no new inputs
+        if(data_cur->slotdata.hidmask & gHID_LIST_MOUSE) { //Reset the input when we have no new inputs
             HID_Mouse_Data * mouse_data = &data_cur->data_union.mouse.cur_mouse_data;
-            if(mouse_data->valuedChanged == 1){ //Fix for the mouse cursor
+            if(mouse_data->valuedChanged == 1) { //Fix for the mouse cursor
                 mouse_data->valuedChanged = 0;
-            }else{
+            } else {
                 mouse_data->deltaX = 0;
                 mouse_data->deltaY = 0;
             }
@@ -540,7 +553,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
     }
 
     // Caculates a valid stick position
-    if(data.size() > 0){
+    if(data.size() > 0) {
         ControllerPatcherUtils::normalizeStickValues(&buffer->leftStick);
         ControllerPatcherUtils::normalizeStickValues(&buffer->rightStick);
     }
@@ -548,17 +561,17 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::setVPADControllerData(V
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-std::vector<HID_Data *> ControllerPatcherHID::getHIDDataAll(){
+std::vector<HID_Data *> ControllerPatcherHID::getHIDDataAll() {
     u32 hid = gHIDCurrentDevice;
 
     std::vector<HID_Data *> data_list;
-    for(s32 i = 0;i < gHIDMaxDevices;i++){
-        if((hid & (1 << i)) != 0){
+    for(s32 i = 0; i < gHIDMaxDevices; i++) {
+        if((hid & (1 << i)) != 0) {
             u32 cur_hidmask = config_controller_hidmask[i];
-            for(s32 pad = 0; pad < HID_MAX_PADS_COUNT; pad++){
+            for(s32 pad = 0; pad < HID_MAX_PADS_COUNT; pad++) {
                 s32 res;
                 HID_Data * new_data = NULL;
-                if((res = ControllerPatcherHID::getHIDData(cur_hidmask,pad,&new_data)) < 0){ // Checks if the pad is invalid.
+                if((res = ControllerPatcherHID::getHIDData(cur_hidmask,pad,&new_data)) < 0) { // Checks if the pad is invalid.
                     //DEBUG_FUNCTION_LINE("error: Error getting the HID data from HID(%s) CHAN(). Error %d\n",StringTools::byte_to_binary(cur_hidmask),pad,res);
                     continue;
                 }
@@ -572,18 +585,18 @@ std::vector<HID_Data *> ControllerPatcherHID::getHIDDataAll(){
 /*
 The slotdata in the HID_Data pointer is empty. We need to provide the hidmask via the parameter
 */
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(u32 hidmask, s32 pad, HID_Data ** data){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(u32 hidmask, s32 pad, HID_Data ** data) {
     if(data == NULL) return CONTROLLER_PATCHER_ERROR_INVALID_BUFFER;
     if(!(hidmask & gHIDCurrentDevice)) return CONTROLLER_PATCHER_ERROR_HID_NOT_CONNECTED;
     if(pad < 0 && pad > 3) return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;
 
     s32 device_slot = ControllerPatcherUtils::getDeviceSlot(hidmask);
-    if(device_slot < 0){
+    if(device_slot < 0) {
         return CONTROLLER_PATCHER_ERROR_DEVICE_SLOT_NOT_FOUND;
     }
 
     s32 real_pad = pad;
-    if((device_slot !=  gHID_SLOT_GC) && config_controller[device_slot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE){
+    if((device_slot !=  gHID_SLOT_GC) && config_controller[device_slot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
         s32 pad_count = config_controller[device_slot][CONTRPS_PAD_COUNT][1];
         if(pad_count > HID_MAX_PADS_COUNT) pad_count = HID_MAX_PADS_COUNT;
         pad = (pad/(pad_count))*pad_count;
@@ -591,7 +604,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(u32 hidmask,
 
     s32 result = ControllerPatcherUtils::checkActivePad(hidmask,pad);
 
-    if(result < 0){ //Not pad connected to adapter
+    if(result < 0) { //Not pad connected to adapter
         return CONTROLLER_PATCHER_ERROR_NO_PAD_CONNECTED;
     }
 
@@ -601,40 +614,40 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherHID::getHIDData(u32 hidmask,
 }
 
 
-void ControllerPatcherHID::HIDGCRumble(u32 handle,my_cb_user *usr){
+void ControllerPatcherHID::HIDGCRumble(u32 handle,my_cb_user *usr) {
     if(usr == NULL) return;
     if(!ControllerPatcher::isRumbleActivated()) return;
 
     s32 rumblechanged = 0;
 
-    for(s32 i = 0;i<HID_GC_PAD_COUNT;i++){
+    for(s32 i = 0; i<HID_GC_PAD_COUNT; i++) {
         HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[i]);
-        if(data_ptr->rumbleActive != usr->rumblestatus[i]){
+        if(data_ptr->rumbleActive != usr->rumblestatus[i]) {
             rumblechanged = 1;
         }
         usr->rumblestatus[i] = data_ptr->rumbleActive;
         usr->buf[i+1] = usr->rumblestatus[i];
     }
     usr->forceRumbleInTicks[0]--;
-    if(rumblechanged || usr->forceRumbleInTicks[0] <= 0){
+    if(rumblechanged || usr->forceRumbleInTicks[0] <= 0) {
         usr->buf[0] = 0x11;
         HIDWrite(handle, usr->buf, 5, NULL, NULL);
         usr->forceRumbleInTicks[0] = 10;
     }
 }
 
-void ControllerPatcherHID::HIDRumble(u32 handle,my_cb_user *usr,u32 pad){
+void ControllerPatcherHID::HIDRumble(u32 handle,my_cb_user *usr,u32 pad) {
     if(usr == NULL || pad > HID_MAX_PADS_COUNT) return;
     if(!ControllerPatcher::isRumbleActivated()) return;
 
     s32 rumblechanged = 0;
     HID_Data * data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[pad]);
-    if(data_ptr->rumbleActive != usr->rumblestatus[pad]){
+    if(data_ptr->rumbleActive != usr->rumblestatus[pad]) {
         usr->rumblestatus[pad] = data_ptr->rumbleActive;
         rumblechanged = 1;
     }
     usr->forceRumbleInTicks[pad]--;
-    if(rumblechanged || usr->forceRumbleInTicks[pad] <= 0){
+    if(rumblechanged || usr->forceRumbleInTicks[pad] <= 0) {
         //DEBUG_FUNCTION_LINE("Rumble: %d %d\n",usr->rumblestatus[pad],usr->rumbleForce[pad]);
         //Seding to the network client!
         char bytes[6];
@@ -648,22 +661,21 @@ void ControllerPatcherHID::HIDRumble(u32 handle,my_cb_user *usr,u32 pad){
         bytes[i++] = usr->rumblestatus[pad];
 
         UDPClient * instance = UDPClient::getInstance();
-        if(instance != NULL){
+        if(instance != NULL) {
             instance->sendData(bytes,6);
         }
 
 
-        if(usr->slotdata.hidmask == gHID_LIST_DS3){
+        if(usr->slotdata.hidmask == gHID_LIST_DS3) {
             HIDDS3Rumble(handle,usr,usr->rumblestatus[pad]);
-        }else{
+        } else {
             // Not implemented for other devices =(
         }
         usr->forceRumbleInTicks[pad] = 10;
     }
 }
 
-static u8 ds3_rumble_Report[48] =
-{
+static u8 ds3_rumble_Report[48] = {
     0x00, 0xFF, 0x00, 0xFF, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00,
     0xFF, 0x27, 0x10, 0x00, 0x32,
@@ -676,7 +688,7 @@ static u8 ds3_rumble_Report[48] =
     0x00, 0x00, 0x00,
 };
 
-void ControllerPatcherHID::HIDDS3Rumble(u32 handle,my_cb_user *usr,s32 rumble){
+void ControllerPatcherHID::HIDDS3Rumble(u32 handle,my_cb_user *usr,s32 rumble) {
     memcpy(usr->buf, ds3_rumble_Report, 48);
 
     if (rumble) {

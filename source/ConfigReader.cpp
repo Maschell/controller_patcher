@@ -34,55 +34,63 @@
 s32 ConfigReader::numberValidFiles = 0;
 ConfigReader *ConfigReader::instance = NULL;
 
-ConfigReader::ConfigReader(){
+ConfigReader::ConfigReader() {
 }
 
-bool ConfigReader::ReadConfigs(std::string path){
+bool ConfigReader::ReadConfigs(std::string path) {
     std::vector<std::string> fileList = ScanFolder(path);
-    if(fileList.size() == 1 && fileList[0].compare("ERROR") == 0){
+    if(fileList.size() == 1 && fileList[0].compare("ERROR") == 0) {
         return false;
     }
 
-    if(fileList.size() > 0){
-        if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Found %d config files\n",fileList.size()); }
+    if(fileList.size() > 0) {
+        if(HID_DEBUG) {
+            DEBUG_FUNCTION_LINE("Found %d config files\n",fileList.size());
+        }
         processFileList(fileList);
     }
     return true;
 }
 
 
-ConfigReader::~ConfigReader(){
-    if(HID_DEBUG){ DEBUG_FUNCTION_LINE("~ConfigReader\n"); }
+ConfigReader::~ConfigReader() {
+    if(HID_DEBUG) {
+        DEBUG_FUNCTION_LINE("~ConfigReader\n");
+    }
 }
 
-std::vector<std::string> ConfigReader::ScanFolder(std::string path){
+std::vector<std::string> ConfigReader::ScanFolder(std::string path) {
     std::vector<std::string> config_files;
 
     struct dirent *dirent = NULL;
-	DIR *dirHandle = opendir(path.c_str());
-	if (dirHandle == NULL){
+    DIR *dirHandle = opendir(path.c_str());
+    if (dirHandle == NULL) {
         DEBUG_FUNCTION_LINE("Failed to open dir %s\n",path.c_str());
         config_files.push_back("ERROR"); //TODO: Find a proper solution
-		return config_files;
-	}
-	while ((dirent = readdir(dirHandle)) != 0){
-		bool isDir = dirent->d_type & DT_DIR;
-		const char *filename = dirent->d_name;
+        return config_files;
+    }
+    while ((dirent = readdir(dirHandle)) != 0) {
+        bool isDir = dirent->d_type & DT_DIR;
+        const char *filename = dirent->d_name;
 
-		if(strcmp(filename,".") == 0 || strcmp(filename,"..") == 0){ continue; }
+        if(strcmp(filename,".") == 0 || strcmp(filename,"..") == 0) {
+            continue;
+        }
 
         std::string newPath = path + "/" + std::string(filename);
 
-        if(!isDir && StringTools::EndsWith(std::string(filename),".ini")){
+        if(!isDir && StringTools::EndsWith(std::string(filename),".ini")) {
             config_files.push_back(newPath);
-            if(HID_DEBUG){ DEBUG_FUNCTION_LINE("Found ini: %s \n",newPath.c_str()); }
+            if(HID_DEBUG) {
+                DEBUG_FUNCTION_LINE("Found ini: %s \n",newPath.c_str());
+            }
         }
-	}
+    }
 
     return config_files;
 }
 
-void ConfigReader::processFileList(std::vector<std::string> path){
+void ConfigReader::processFileList(std::vector<std::string> path) {
     for(std::vector<std::string>::iterator it = path.begin(); it != path.end(); ++it) {
         DEBUG_FUNCTION_LINE("Reading %s\n",it->c_str());
         std::string result = loadFileToString(*it);
@@ -92,10 +100,10 @@ void ConfigReader::processFileList(std::vector<std::string> path){
     }
 }
 
-std::string ConfigReader::loadFileToString(std::string path){
+std::string ConfigReader::loadFileToString(std::string path) {
     std::string strBuffer = "";
     u8 * buffer = NULL;
-    if(FSUtils::LoadFileToMem(path.c_str(),&buffer,NULL) > 0){
+    if(FSUtils::LoadFileToMem(path.c_str(),&buffer,NULL) > 0) {
         strBuffer = std::string((char *)buffer);
         strBuffer = StringTools::removeCharFromString(strBuffer,'\r');
         strBuffer = StringTools::removeCharFromString(strBuffer,' ');

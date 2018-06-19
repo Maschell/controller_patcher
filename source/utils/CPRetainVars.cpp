@@ -70,6 +70,7 @@ u8 gGlobalRumbleActivated __attribute__((section(".data"))) = 0;
 
 u32 gUDPClientip __attribute__((section(".data"))) = 0;
 ControllerMappingPADInfo* gProPadInfo[4] __attribute__((section(".data"))) = {&gControllerMapping.proController[0].pad_infos[0],
-                                                                               &gControllerMapping.proController[1].pad_infos[0],
-                                                                               &gControllerMapping.proController[2].pad_infos[0],
-                                                                               &gControllerMapping.proController[3].pad_infos[0]} ;
+                                                                              &gControllerMapping.proController[1].pad_infos[0],
+                                                                              &gControllerMapping.proController[2].pad_infos[0],
+                                                                              &gControllerMapping.proController[3].pad_infos[0]
+                                                                             } ;

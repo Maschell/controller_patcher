@@ -23,7 +23,7 @@
 
 #define WIIU_CP_UDP_CONTROLLER_READ_DATA        0x03
 
-class UDPServer{
+class UDPServer {
     friend class ControllerPatcher;
 
 private:
@@ -34,7 +34,7 @@ private:
     }
 
     static void destroyInstance() {
-        if(instance != NULL){
+        if(instance != NULL) {
             delete instance;
             instance = NULL;
         }

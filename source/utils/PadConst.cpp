@@ -58,36 +58,40 @@ const uint8_t HID_GC_BUTTON_R[]      = { 0x08,HID_GC_BUTTON_R_VALUE};
 const uint8_t HID_GC_BUTTON_DPAD_TYPE[]     = { CONTRPDM_Normal,0x00};
 
 const uint8_t HID_GC_STICK_L_X[STICK_CONF_ENUM_MAXVALUE] =  {    STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x03, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x09, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x1A, //STICK_CONF_MIN,
-                                                            0xE4};//STICK_CONF_MAX,
+                                                                 0x03, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x09, //STICK_CONF_DEADZONE,
+                                                                 0x00, //STICK_CONF_INVERT,
+                                                                 0x1A, //STICK_CONF_MIN,
+                                                                 0xE4
+                                                            };//STICK_CONF_MAX,
 
 const uint8_t HID_GC_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE] =  {    STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x04, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x09, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x11, //STICK_CONF_MIN,
-                                                            0xE1};//STICK_CONF_MAX,
+                                                                 0x04, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x09, //STICK_CONF_DEADZONE,
+                                                                 0x00, //STICK_CONF_INVERT,
+                                                                 0x11, //STICK_CONF_MIN,
+                                                                 0xE1
+                                                            };//STICK_CONF_MAX,
 
 const uint8_t HID_GC_STICK_R_X[STICK_CONF_ENUM_MAXVALUE] =  {    STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x05, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x09, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x2B, //STICK_CONF_MIN,
-                                                            0xE2};//STICK_CONF_MAX,
+                                                                 0x05, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x09, //STICK_CONF_DEADZONE,
+                                                                 0x00, //STICK_CONF_INVERT,
+                                                                 0x2B, //STICK_CONF_MIN,
+                                                                 0xE2
+                                                            };//STICK_CONF_MAX,
 
 const uint8_t HID_GC_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {    STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x06, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x09, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x1D, //STICK_CONF_MIN,
-                                                            0xDB};//STICK_CONF_MAX,
+                                                                 0x06, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x09, //STICK_CONF_DEADZONE,
+                                                                 0x00, //STICK_CONF_INVERT,
+                                                                 0x1D, //STICK_CONF_MIN,
+                                                                 0xDB
+                                                            };//STICK_CONF_MAX,
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! DS3
@@ -117,36 +121,40 @@ const uint8_t HID_DS3_BUTTON_GUIDE[]      = { 0x04,HID_DS3_BUTTON_GUIDE_VALUE};
 const uint8_t HID_DS3_BUTTON_DPAD_TYPE[]     = { CONTRPDM_Normal,0x00};
 
 const uint8_t HID_DS3_STICK_L_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x06, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x06, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                 0x06, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x06, //STICK_CONF_DEADZONE,
+                                                                 0x00, //STICK_CONF_INVERT,
+                                                                 0x00, //STICK_CONF_MIN,
+                                                                 0xFF
+                                                             };//STICK_CONF_MAX,
 
 const uint8_t HID_DS3_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x07, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x06, //STICK_CONF_DEADZONE,
-                                                            0x01, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                 0x07, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x06, //STICK_CONF_DEADZONE,
+                                                                 0x01, //STICK_CONF_INVERT,
+                                                                 0x00, //STICK_CONF_MIN,
+                                                                 0xFF
+                                                             };//STICK_CONF_MAX,
 
 const uint8_t HID_DS3_STICK_R_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x08, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x06, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                 0x08, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x06, //STICK_CONF_DEADZONE,
+                                                                 0x00, //STICK_CONF_INVERT,
+                                                                 0x00, //STICK_CONF_MIN,
+                                                                 0xFF
+                                                             };//STICK_CONF_MAX,
 
 const uint8_t HID_DS3_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x09, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x06, //STICK_CONF_DEADZONE,
-                                                            0x01, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                 0x09, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x06, //STICK_CONF_DEADZONE,
+                                                                 0x01, //STICK_CONF_INVERT,
+                                                                 0x00, //STICK_CONF_MIN,
+                                                                 0xFF
+                                                             };//STICK_CONF_MAX,
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! DS4
@@ -184,36 +192,40 @@ const uint8_t HID_DS4_BUTTON_GUIDE[]          = { 0x07,HID_DS4_BUTTON_GUIDE_VALU
 const uint8_t HID_DS4_BUTTON_T_PAD_CLICK[]    = { 0x07,HID_DS4_BUTTON_T_PAD_CLICK_VALUE};
 
 const uint8_t HID_DS4_STICK_L_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x01, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x06, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                 0x01, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x06, //STICK_CONF_DEADZONE,
+                                                                 0x00, //STICK_CONF_INVERT,
+                                                                 0x00, //STICK_CONF_MIN,
+                                                                 0xFF
+                                                             };//STICK_CONF_MAX,
 
 const uint8_t HID_DS4_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x02, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x05, //STICK_CONF_DEADZONE,
-                                                            0x01, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                 0x02, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x05, //STICK_CONF_DEADZONE,
+                                                                 0x01, //STICK_CONF_INVERT,
+                                                                 0x00, //STICK_CONF_MIN,
+                                                                 0xFF
+                                                             };//STICK_CONF_MAX,
 
 const uint8_t HID_DS4_STICK_R_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x03, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x07, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                 0x03, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x07, //STICK_CONF_DEADZONE,
+                                                                 0x00, //STICK_CONF_INVERT,
+                                                                 0x00, //STICK_CONF_MIN,
+                                                                 0xFF
+                                                             };//STICK_CONF_MAX,
 
 const uint8_t HID_DS4_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x04, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x09, //STICK_CONF_DEADZONE,
-                                                            0x01, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                 0x04, //STICK_CONF_BYTE,
+                                                                 0x80, //STICK_CONF_DEFAULT,
+                                                                 0x09, //STICK_CONF_DEADZONE,
+                                                                 0x01, //STICK_CONF_INVERT,
+                                                                 0x00, //STICK_CONF_MIN,
+                                                                 0xFF
+                                                             };//STICK_CONF_MAX,
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! XInput
@@ -243,36 +255,40 @@ const uint8_t HID_XINPUT_BUTTON_DOWN[]       = { 0x07,HID_XINPUT_BUTTON_DOWN_VAL
 const uint8_t HID_XINPUT_BUTTON_UP[]         = { 0x07,HID_XINPUT_BUTTON_UP_VALUE};
 
 const uint8_t HID_XINPUT_STICK_L_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x00, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x10, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                    0x00, //STICK_CONF_BYTE,
+                                                                    0x80, //STICK_CONF_DEFAULT,
+                                                                    0x10, //STICK_CONF_DEADZONE,
+                                                                    0x00, //STICK_CONF_INVERT,
+                                                                    0x00, //STICK_CONF_MIN,
+                                                                    0xFF
+                                                                };//STICK_CONF_MAX,
 
 const uint8_t HID_XINPUT_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x01, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x10, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                    0x01, //STICK_CONF_BYTE,
+                                                                    0x80, //STICK_CONF_DEFAULT,
+                                                                    0x10, //STICK_CONF_DEADZONE,
+                                                                    0x00, //STICK_CONF_INVERT,
+                                                                    0x00, //STICK_CONF_MIN,
+                                                                    0xFF
+                                                                };//STICK_CONF_MAX,
 
 const uint8_t HID_XINPUT_STICK_R_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x02, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x10, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                    0x02, //STICK_CONF_BYTE,
+                                                                    0x80, //STICK_CONF_DEFAULT,
+                                                                    0x10, //STICK_CONF_DEADZONE,
+                                                                    0x00, //STICK_CONF_INVERT,
+                                                                    0x00, //STICK_CONF_MIN,
+                                                                    0xFF
+                                                                };//STICK_CONF_MAX,
 
 const uint8_t HID_XINPUT_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x03, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x10, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x00, //STICK_CONF_MIN,
-                                                            0xFF};//STICK_CONF_MAX,
+                                                                    0x03, //STICK_CONF_BYTE,
+                                                                    0x80, //STICK_CONF_DEFAULT,
+                                                                    0x10, //STICK_CONF_DEADZONE,
+                                                                    0x00, //STICK_CONF_INVERT,
+                                                                    0x00, //STICK_CONF_MIN,
+                                                                    0xFF
+                                                                };//STICK_CONF_MAX,
 
 
 
@@ -310,33 +326,37 @@ const uint8_t HID_SWITCH_PRO_BT_BUTTON_DPAD_NEUTRAL[]  = { 0x02,HID_SWITCH_PRO_B
 
 
 const uint8_t HID_SWITCH_PRO_BT_STICK_L_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x04, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x01, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x28, //STICK_CONF_MIN,
-                                                            0xDF};//STICK_CONF_MAX,
+                                                                           0x04, //STICK_CONF_BYTE,
+                                                                           0x80, //STICK_CONF_DEFAULT,
+                                                                           0x01, //STICK_CONF_DEADZONE,
+                                                                           0x00, //STICK_CONF_INVERT,
+                                                                           0x28, //STICK_CONF_MIN,
+                                                                           0xDF
+                                                                       };//STICK_CONF_MAX,
 
 const uint8_t HID_SWITCH_PRO_BT_STICK_L_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x06, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x06, //STICK_CONF_DEADZONE,
-                                                            0x01, //STICK_CONF_INVERT,
-                                                            0x16, //STICK_CONF_MIN,
-                                                            0xD7};//STICK_CONF_MAX,
+                                                                           0x06, //STICK_CONF_BYTE,
+                                                                           0x80, //STICK_CONF_DEFAULT,
+                                                                           0x06, //STICK_CONF_DEADZONE,
+                                                                           0x01, //STICK_CONF_INVERT,
+                                                                           0x16, //STICK_CONF_MIN,
+                                                                           0xD7
+                                                                       };//STICK_CONF_MAX,
 
 const uint8_t HID_SWITCH_PRO_BT_STICK_R_X[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x08, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x04, //STICK_CONF_DEADZONE,
-                                                            0x00, //STICK_CONF_INVERT,
-                                                            0x29, //STICK_CONF_MIN,
-                                                            0xE2};//STICK_CONF_MAX,
+                                                                           0x08, //STICK_CONF_BYTE,
+                                                                           0x80, //STICK_CONF_DEFAULT,
+                                                                           0x04, //STICK_CONF_DEADZONE,
+                                                                           0x00, //STICK_CONF_INVERT,
+                                                                           0x29, //STICK_CONF_MIN,
+                                                                           0xE2
+                                                                       };//STICK_CONF_MAX,
 
 const uint8_t HID_SWITCH_PRO_BT_STICK_R_Y[STICK_CONF_ENUM_MAXVALUE] =  {   STICK_CONF_MAGIC_VALUE, //STICK_CONF_MAGIC_VERSION
-                                                            0x0A, //STICK_CONF_BYTE,
-                                                            0x80, //STICK_CONF_DEFAULT,
-                                                            0x08, //STICK_CONF_DEADZONE,
-                                                            0x01, //STICK_CONF_INVERT,
-                                                            0x22, //STICK_CONF_MIN,
-                                                            0xE4};//STICK_CONF_MAX,
+                                                                           0x0A, //STICK_CONF_BYTE,
+                                                                           0x80, //STICK_CONF_DEFAULT,
+                                                                           0x08, //STICK_CONF_DEADZONE,
+                                                                           0x01, //STICK_CONF_INVERT,
+                                                                           0x22, //STICK_CONF_MIN,
+                                                                           0xE4
+                                                                       };//STICK_CONF_MAX,
