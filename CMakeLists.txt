@@ -19,6 +19,8 @@ wut_enable_stdcpp(controllerpatcherwut)
 wut_default_malloc(controllerpatcherwut)
 
 target_include_directories(controllerpatcherwut PUBLIC "include")
+target_compile_options(controllerpatcherwut PUBLIC "-D__LOGGING__")
+
 
 install(TARGETS controllerpatcherwut
         ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
