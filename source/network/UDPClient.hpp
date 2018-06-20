@@ -52,11 +52,11 @@ private:
         }
     }
 
-    UDPClient(u32 ip,s32 port);
+    UDPClient(uint32_t ip,int32_t port);
     ~UDPClient();
-    bool sendData(char * data, s32 length);
+    BOOL sendData(char * data, int32_t length);
 
-    volatile s32 sockfd = -1;
+    volatile int32_t sockfd = -1;
     struct sockaddr_in addr;
     static UDPClient *instance;
 };

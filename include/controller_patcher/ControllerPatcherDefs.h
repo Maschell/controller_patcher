@@ -218,35 +218,35 @@ enum Controller_Patcher_DPAD_Settings {
  *  @brief Stores data if the Slot the device is using in gHID_Devices
  */
 typedef struct _HIDSlotData {
-    u16 deviceslot;     /**< deviceslot number */
-    u32 hidmask;        /**< Used HID-Mask */
+    uint16_t deviceslot;     /**< deviceslot number */
+    uint32_t hidmask;        /**< Used HID-Mask */
 } HIDSlotData;
 
 /**
  *  @brief Struct where the data for the callback funtion is stored
  */
 typedef struct _my_cb_user {
-    u8 *buf;  /**< pointer the buffer that is used */
-    u32 transfersize; /**< number of transfered data */
-    u32 handle; /**< HID handle */
+    uint8_t *buf;  /**< pointer the buffer that is used */
+    uint32_t transfersize; /**< number of transfered data */
+    uint32_t handle; /**< HID handle */
     HIDSlotData slotdata; /**< Information about the deviceslot and hidmask */
-    u32 pads_per_device; /**< Number of maximum pads of this device */
-    u8 pad_slot; /**< number of the pad that will be used */
-    u8 rumblestatus[HID_MAX_PADS_COUNT]; /**< Current status of the device rumble */
-    u8 forceRumbleInTicks[HID_MAX_PADS_COUNT];
+    uint32_t pads_per_device; /**< Number of maximum pads of this device */
+    uint8_t pad_slot; /**< number of the pad that will be used */
+    uint8_t rumblestatus[HID_MAX_PADS_COUNT]; /**< Current status of the device rumble */
+    uint8_t forceRumbleInTicks[HID_MAX_PADS_COUNT];
 } my_cb_user;
 
 /**
  *  @brief Stores data for the mouse
  */
 typedef struct _HID_Mouse_Data {
-    u8 left_click; /**< Is 1 when the left mouse button is pressed */
-    u8 right_click; /**< Is 1 when the right mouse button is pressed */
-    s16 X; /**< X position of the cursor */
-    s16 Y; /**< Y position of the cursor */
-    s16 deltaX; /**< difference of the X value since the last call */
-    s16 deltaY; /**< difference of the Y value since the last call */
-    u8 valuedChanged; /**< Is 1 when the value has changed */
+    uint8_t left_click; /**< Is 1 when the left mouse button is pressed */
+    uint8_t right_click; /**< Is 1 when the right mouse button is pressed */
+    int16_t X; /**< X position of the cursor */
+    int16_t Y; /**< Y position of the cursor */
+    int16_t deltaX; /**< difference of the X value since the last call */
+    int16_t deltaY; /**< difference of the Y value since the last call */
+    uint8_t valuedChanged; /**< Is 1 when the value has changed */
 } HID_Mouse_Data;
 
 /**
@@ -261,14 +261,14 @@ enum DEVICE_TYPE {
  *  @brief Stores all data of the HID Device for accessing
  */
 typedef struct _HID_Data {
-    u32 handle;         /**< The HID-handle this device is using */
-    u8 rumbleActive;    /**< 1 when rumble is active */
-    u32 last_buttons;   /**< The last pressed buttons, based on VPAD_BUTTON_XXX data */
+    uint32_t handle;         /**< The HID-handle this device is using */
+    uint8_t rumbleActive;    /**< 1 when rumble is active */
+    uint32_t last_buttons;   /**< The last pressed buttons, based on VPAD_BUTTON_XXX data */
     union {
         struct {
-            u8 cur_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];   /**< Array where the current controller data is stored */
-            u8 last_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];  /**< Array where the last  controller data is stored */
-        } controller; /**< Used when the device in a controller. Using u8 array where the raw data of the controller is placed. */
+            uint8_t cur_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];   /**< Array where the current controller data is stored */
+            uint8_t last_hid_data[HID_MAX_DATA_LENGTH_PER_PAD];  /**< Array where the last  controller data is stored */
+        } controller; /**< Used when the device in a controller. Using uint8_t array where the raw data of the controller is placed. */
         struct {
             HID_Mouse_Data cur_mouse_data;  /**< Struct where the current mouse data is stored */
             HID_Mouse_Data last_mouse_data; /**< Struct where the last mouse data is stored */
@@ -292,8 +292,8 @@ typedef struct _HID_DEVICE_DATA {
  *  @brief Stores a VID and PID
  */
 typedef struct _DeviceVIDPIDInfo {
-    u16 vid; /**< Vendor ID of this device */
-    u16 pid; /**< Product ID of this device */
+    uint16_t vid; /**< Vendor ID of this device */
+    uint16_t pid; /**< Product ID of this device */
 } DeviceVIDPIDInfo;
 
 /**
@@ -302,7 +302,7 @@ typedef struct _DeviceVIDPIDInfo {
 typedef struct _DeviceInfo {
     HIDSlotData slotdata; /**< The slot used by this device */
     DeviceVIDPIDInfo vidpid; /**< The VID/PID of the device */
-    u8  pad_count; /**< Number of maximum pads this device can have*/
+    uint8_t  pad_count; /**< Number of maximum pads this device can have*/
 } DeviceInfo;
 
 /**
@@ -319,10 +319,10 @@ enum ControllerMapping_Type_Defines {
  *  @brief Infos of a mapped controller
  */
 typedef struct _ControllerMappingPADInfo {
-    u8 active; /**< Set to one if mapped */
+    uint8_t active; /**< Set to one if mapped */
     ControllerMapping_Type_Defines type; /**< Type of the controller mapping */
     DeviceVIDPIDInfo vidpid; /**< The VID/PID of the device */
-    u8  pad; /**< Stores which pad it mapped */
+    uint8_t  pad; /**< Stores which pad it mapped */
 } ControllerMappingPADInfo;
 
 /**
@@ -330,8 +330,8 @@ typedef struct _ControllerMappingPADInfo {
  */
 typedef struct _ControllerMappingPAD {
     ControllerMappingPADInfo pad_infos[HID_MAX_DEVICES_PER_SLOT]; //lets limit this to HID_MAX_DEVICES_PER_SLOT.
-    u8 useAll;
-    u8 rumble; /**< Set when the controller should rumble */
+    uint8_t useAll;
+    uint8_t rumble; /**< Set when the controller should rumble */
 } ControllerMappingPAD;
 
 /**
@@ -346,9 +346,9 @@ typedef struct _ControllerMapping {
  *  @brief Pressed/Released/Down Button data.
  */
 typedef struct _InputButtonData {
-    u32 btn_h; /**< Buttons beeing hold */
-    u32 btn_d; /**< Buttons that started pressing */
-    u32 btn_r; /**< Buttons that were button released */
+    uint32_t btn_h; /**< Buttons beeing hold */
+    uint32_t btn_d; /**< Buttons that started pressing */
+    uint32_t btn_r; /**< Buttons that were button released */
 } InputButtonData;
 
 /**

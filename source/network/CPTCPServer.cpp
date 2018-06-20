@@ -23,7 +23,7 @@
 
 CPTCPServer * CPTCPServer::instance = NULL;
 
-CPTCPServer::CPTCPServer(s32 port): TCPServer(port,CPTCPServer::getPriority()) {
+CPTCPServer::CPTCPServer(int32_t port): TCPServer(port,CPTCPServer::getPriority()) {
     CPTCPServer::AttachDetach(HID_DEVICE_DETACH);
 }
 
@@ -40,8 +40,8 @@ void CPTCPServer::AttachDetach(HIDAttachEvent attach) {
         }
     }
 
-    for(s32 i= 0; i< gHIDMaxDevices; i++) {
-        for(s32 j= 0; j< HID_MAX_PADS_COUNT; j++) {
+    for(int32_t i= 0; i< gHIDMaxDevices; i++) {
+        for(int32_t j= 0; j< HID_MAX_PADS_COUNT; j++) {
             if(gNetworkController[i][j][NETWORK_CONTROLLER_ACTIVE] > 0) {
                 DEBUG_FUNCTION_LINE("Found a registered pad in deviceslot %d and padslot %d! Lets detach it.\n",i,j);
                 HIDDevice device;
@@ -72,9 +72,9 @@ void CPTCPServer::DetachAndDelete() {
     memset(&gNetworkController,0,sizeof(gNetworkController));
 }
 
-bool CPTCPServer::whileLoop() {
-    s32 ret;
-    s32 clientfd = getClientFD();
+BOOL CPTCPServer::whileLoop() {
+    int32_t ret;
+    int32_t clientfd = getClientFD();
     while (1) {
         if(shouldExit()) {
             break;
@@ -91,7 +91,7 @@ bool CPTCPServer::whileLoop() {
         switch (ret) {
         case WIIU_CP_TCP_ATTACH: { /*attach */
             if(gUsedProtocolVersion >= WIIU_CP_TCP_HANDSHAKE_VERSION_1) {
-                s32 handle;
+                int32_t handle;
                 ret = recvwait(clientfd, &handle, 4);
                 if(ret < 0) {
                     DEBUG_FUNCTION_LINE("Error in %02X: recvwait handle\n",WIIU_CP_TCP_ATTACH);
@@ -100,8 +100,8 @@ bool CPTCPServer::whileLoop() {
                 if(HID_DEBUG) {
                     DEBUG_FUNCTION_LINE("got handle %d\n",handle);
                 }
-                u16 vid = 0;
-                u16 pid = 0;
+                uint16_t vid = 0;
+                uint16_t pid = 0;
                 ret = recvwait(clientfd, &vid, 2);
                 if(ret < 0) {
                     DEBUG_FUNCTION_LINE("Error in %02X: recvwait vid\n",WIIU_CP_TCP_ATTACH);
@@ -185,7 +185,7 @@ bool CPTCPServer::whileLoop() {
         }
         case WIIU_CP_TCP_DETACH: { /*detach */
             if(gUsedProtocolVersion >= WIIU_CP_TCP_HANDSHAKE_VERSION_1) {
-                s32 handle;
+                int32_t handle;
                 ret = recvwait(clientfd, &handle, 4);
                 if(ret < 0) {
                     DEBUG_FUNCTION_LINE("Error in %02X: recvwait handle\n",WIIU_CP_TCP_DETACH);
@@ -207,13 +207,13 @@ bool CPTCPServer::whileLoop() {
                     return false;
                     break;
                 }
-                s32 deviceslot = user->slotdata.deviceslot;
+                int32_t deviceslot = user->slotdata.deviceslot;
                 if(HID_DEBUG) {
                     DEBUG_FUNCTION_LINE("device slot is: %d , pad slot is: %d\n",deviceslot,user->pad_slot);
                 }
 
                 DeviceVIDPIDInfo vidpid;
-                s32 result;
+                int32_t result;
                 if((result = ControllerPatcherUtils::getVIDPIDbyDeviceSlot(deviceslot,&vidpid)) < 0) {
                     DEBUG_FUNCTION_LINE("Error in %02X: Couldn't find a valid VID/PID for device slot %d. Error: %d\n",WIIU_CP_TCP_DETACH,deviceslot,ret);
                     return false;
@@ -242,7 +242,7 @@ bool CPTCPServer::whileLoop() {
                 if(HID_DEBUG) {
                     DEBUG_FUNCTION_LINE("Got Ping, sending now a Pong\n");
                 }
-                s32 ret = sendbyte(clientfd, WIIU_CP_TCP_PONG);
+                int32_t ret = sendbyte(clientfd, WIIU_CP_TCP_PONG);
                 if(ret < 0) {
                     DEBUG_FUNCTION_LINE("Error in %02X: sendbyte PONG\n");
                     return false;
@@ -260,21 +260,21 @@ bool CPTCPServer::whileLoop() {
     return true;
 }
 
-bool CPTCPServer::acceptConnection() {
-    s32 clientfd = getClientFD();
+BOOL CPTCPServer::acceptConnection() {
+    int32_t clientfd = getClientFD();
     DEBUG_FUNCTION_LINE("TCP Connection accepted! Sending my protocol version: %d (0x%02X)\n", (WIIU_CP_TCP_HANDSHAKE - WIIU_CP_TCP_HANDSHAKE_VERSION_1)+1,WIIU_CP_TCP_HANDSHAKE);
 
     gUDPClientip = getSockAddr().sin_addr.s_addr;
     UDPClient::createInstance();
 
-    s32 ret;
+    int32_t ret;
     ret = sendbyte(clientfd, WIIU_CP_TCP_HANDSHAKE); //Hey I'm a WiiU console!
     if(ret < 0) {
         DEBUG_FUNCTION_LINE("Error sendbyte: %02X\n",WIIU_CP_TCP_HANDSHAKE);
         return false;
     }
 
-    u8 clientProtocolVersion = recvbyte(clientfd);
+    uint8_t clientProtocolVersion = recvbyte(clientfd);
     if(ret < 0) {
         DEBUG_FUNCTION_LINE("Error recvbyte: %02X\n",WIIU_CP_TCP_HANDSHAKE);
         return false;

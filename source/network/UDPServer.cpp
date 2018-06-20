@@ -26,8 +26,8 @@
 CThread * UDPServer::pThread = NULL;
 UDPServer * UDPServer::instance = NULL;
 
-UDPServer::UDPServer(s32 port) {
-    s32 ret;
+UDPServer::UDPServer(int32_t port) {
+    int32_t ret;
     struct sockaddr_in addr;
 
     addr.sin_family = AF_INET;
@@ -36,7 +36,7 @@ UDPServer::UDPServer(s32 port) {
 
     this->sockfd = ret = socket(AF_INET, SOCK_DGRAM, 0);
     if(ret == -1) return;
-    s32 enable = 1;
+    int32_t enable = 1;
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
     ret = bind(sockfd, (sockaddr *)&addr, 16);
     if(ret < 0) return;
@@ -65,7 +65,7 @@ UDPServer::~UDPServer() {
 }
 
 void UDPServer::StartUDPThread(UDPServer * server) {
-    s32 priority = 28;
+    int32_t priority = 28;
     if(OSGetTitleID() == 0x00050000101c9300 || //The Legend of Zelda Breath of the Wild JPN
             OSGetTitleID() == 0x00050000101c9400 || //The Legend of Zelda Breath of the Wild USA
             OSGetTitleID() == 0x00050000101c9500 || //The Legend of Zelda Breath of the Wild EUR
@@ -78,12 +78,12 @@ void UDPServer::StartUDPThread(UDPServer * server) {
     UDPServer::pThread->resumeThread();
 }
 
-bool UDPServer::cpyIncrementBufferOffset(void * target, void * source, s32 * offset, s32 typesize, s32 maximum) {
+BOOL UDPServer::cpyIncrementBufferOffset(void * target, void * source, int32_t * offset, int32_t typesize, int32_t maximum) {
     if(((int)*offset + typesize) > maximum) {
         DEBUG_FUNCTION_LINE("Transfer error. Excepted %04X bytes, but only got %04X\n",(*offset + typesize),maximum);
         return false;
     }
-    memcpy(target,(void*)((u32)source+(*offset)),typesize);
+    memcpy(target,(void*)((uint32_t)source+(*offset)),typesize);
     *offset += typesize;
     return true;
 }
@@ -94,46 +94,46 @@ void UDPServer::DoUDPThread(CThread *thread, void *arg) {
 }
 
 void UDPServer::DoUDPThreadInternal() {
-    u8 buffer[MAX_UDP_SIZE];
-    s32 n;
+    uint8_t buffer[MAX_UDP_SIZE];
+    int32_t n;
 
     my_cb_user  user;
     while(1) {
-        //s32 usingVar = exitThread;
+        //int32_t usingVar = exitThread;
         if(exitThread)break;
         memset(buffer,0,MAX_UDP_SIZE);
         n = recv(sockfd,buffer,MAX_UDP_SIZE,0);
         if (n < 0) {
-            s32 errno_ = socketlasterr();
+            int32_t errno_ = socketlasterr();
             OSSleepTicks(OSMicrosecondsToTicks(2000));
             if(errno_ != 11 && errno_ != 9) {
                 break;
             }
             continue;
         }
-        s32 bufferoffset = 0;
-        u8 type;
+        int32_t bufferoffset = 0;
+        uint8_t type;
         memcpy((void *)&type,buffer,sizeof(type));
         bufferoffset += sizeof(type);
         switch (buffer[0]) {
         case WIIU_CP_UDP_CONTROLLER_READ_DATA: {
             if(gUsedProtocolVersion >= WIIU_CP_TCP_HANDSHAKE_VERSION_1) {
-                u8 count_commands;
+                uint8_t count_commands;
                 memcpy((void *)&count_commands,buffer+bufferoffset,sizeof(count_commands));
                 bufferoffset += sizeof(count_commands);
-                for(s32 i = 0; i<count_commands; i++) {
-                    s32 handle;
-                    u16 deviceSlot;
-                    u32 hid;
-                    u8 padslot;
-                    u8 datasize;
+                for(int32_t i = 0; i<count_commands; i++) {
+                    int32_t handle;
+                    uint16_t deviceSlot;
+                    uint32_t hid;
+                    uint8_t padslot;
+                    uint8_t datasize;
 
                     if(!cpyIncrementBufferOffset((void *)&handle,       (void *)buffer,&bufferoffset,sizeof(handle),    n))continue;
                     if(!cpyIncrementBufferOffset((void *)&deviceSlot,   (void *)buffer,&bufferoffset,sizeof(deviceSlot),n))continue;
                     hid = (1  << deviceSlot);
                     if(!cpyIncrementBufferOffset((void *)&padslot,      (void *)buffer,&bufferoffset,sizeof(padslot),   n))continue;
                     if(!cpyIncrementBufferOffset((void *)&datasize,     (void *)buffer,&bufferoffset,sizeof(datasize),  n))continue;
-                    u8 * databuffer = (u8*) malloc(datasize * sizeof(u8));
+                    uint8_t * databuffer = (uint8_t*) malloc(datasize * sizeof(uint8_t));
                     if(!databuffer) {
                         DEBUG_FUNCTION_LINE("Allocating memory failed\n");
                         continue;

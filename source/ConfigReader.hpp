@@ -40,22 +40,22 @@ class ConfigReader{
             }
         }
 
-        static s32 getNumberOfLoadedFiles(){
+        static int32_t getNumberOfLoadedFiles(){
             return ConfigReader::numberValidFiles;
         }
 
         static void increaseNumberOfLoadedFiles(){
             ConfigReader::numberValidFiles++;
         }
-        bool ReadConfigs(std::string path);
-        static s32 numberValidFiles;
+        BOOL ReadConfigs(std::string path);
+        static int32_t numberValidFiles;
 
         //!Constructor
         ConfigReader();
         //!Destructor
         ~ConfigReader();
 
-        s32 InitSDCard();
+        int32_t InitSDCard();
 
         static ConfigReader *instance;
 

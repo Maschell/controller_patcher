@@ -48,7 +48,7 @@ private:
     /**
         Returns NULL if not a preset!
     **/
-    static const u8 * getValuesStickPreset(std::string possibleValue)
+    static const uint8_t * getValuesStickPreset(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return NULL;
@@ -58,7 +58,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static s32 getKeySlotGamePad(std::string possibleValue)
+    static int32_t getKeySlotGamePad(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -67,7 +67,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static s32 getKeySlotMouse(std::string possibleValue)
+    static int32_t getKeySlotMouse(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -77,7 +77,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static s32 getKeySlotDefaultSingleValue(std::string possibleValue)
+    static int32_t getKeySlotDefaultSingleValue(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -87,7 +87,7 @@ private:
     /**
     Returns -1 if not found
     **/
-    static s32 getKeySlotDefaultPairedValue(std::string possibleValue)
+    static int32_t getKeySlotDefaultPairedValue(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -97,7 +97,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static s32 getPresetValuesKeyboard(std::string possibleValue)
+    static int32_t getPresetValuesKeyboard(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -107,7 +107,7 @@ private:
     /**
         Returns -1 if not found
     **/
-    static s32 getPresetValue(std::string possibleValue)
+    static int32_t getPresetValue(std::string possibleValue)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
@@ -117,14 +117,14 @@ private:
     /**
         Returns -1 if not found
     **/
-    static s32 setIfValueIsAControllerPreset(std::string value,s32 slot,s32 keyslot)
+    static int32_t setIfValueIsAControllerPreset(std::string value,int32_t slot,int32_t keyslot)
     {
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return -1;
         return cur_instance->setIfValueIsAControllerPresetEx(value,slot,keyslot);
     }
 
-    static void addDeviceName(u16 vid,u16 pid,std::string value){
+    static void addDeviceName(uint16_t vid,uint16_t pid,std::string value){
         ConfigValues * cur_instance = getInstance();
         if(cur_instance != NULL){
             cur_instance->addDeviceNameEx(vid,pid,value);
@@ -134,7 +134,7 @@ private:
     /**
         Returns empty String if not found
     **/
-    static std::string getStringByVIDPID(u16 vid,u16 pid){
+    static std::string getStringByVIDPID(uint16_t vid,uint16_t pid){
         ConfigValues * cur_instance = getInstance();
         if(cur_instance ==  NULL) return "";
         return cur_instance->getStringByVIDPIDEx(vid,pid);
@@ -156,18 +156,18 @@ private:
 
     std::map<std::string,std::string> deviceNames;
 
-    std::map<std::string,const u8*> presetGCValues;
-    std::map<std::string,const u8*> presetDS3Values;
-    std::map<std::string,const u8*> presetDS4Values;
-    std::map<std::string,const u8*> presetXInputValues;
-    std::map<std::string,const u8*> presetSwitchProValues;
-    std::map<std::string,const u8*> presetSticks;
+    std::map<std::string,const uint8_t*> presetGCValues;
+    std::map<std::string,const uint8_t*> presetDS3Values;
+    std::map<std::string,const uint8_t*> presetDS4Values;
+    std::map<std::string,const uint8_t*> presetXInputValues;
+    std::map<std::string,const uint8_t*> presetSwitchProValues;
+    std::map<std::string,const uint8_t*> presetSticks;
 
-    s32 getValueFromMap(std::map<std::string,int> values,std::string nameOfString);
+    int32_t getValueFromMap(std::map<std::string,int> values,std::string nameOfString);
 
-    bool checkIfValueIsAControllerPreset(std::string value,s32 slot,s32 keyslot);
+    BOOL checkIfValueIsAControllerPreset(std::string value,int32_t slot,int32_t keyslot);
 
-    s32 getPresetValueEx(std::string possibleString);
+    int32_t getPresetValueEx(std::string possibleString);
 
 	void InitValues(){
         DEBUG_FUNCTION_LINE("Init values for the configuration\n");
@@ -563,12 +563,12 @@ private:
         deviceNames[StringTools::strfmt("%04X%04X",HID_SWITCH_PRO_VID,HID_SWITCH_PRO_PID).c_str()]        = HID_SWITCH_PRO_STRING;
     }
 
-    const u8 * getValuesForPreset(std::map<std::string,const u8*> values,std::string possibleValue);
+    const uint8_t * getValuesForPreset(std::map<std::string,const uint8_t*> values,std::string possibleValue);
 
-    bool setIfValueIsPreset(std::map<std::string,const u8*> values,std::string possibleValue,s32 slot,s32 keyslot);
-    bool setIfValueIsAControllerPresetEx(std::string value,s32 slot,s32 keyslot);
+    BOOL setIfValueIsPreset(std::map<std::string,const uint8_t*> values,std::string possibleValue,int32_t slot,int32_t keyslot);
+    BOOL setIfValueIsAControllerPresetEx(std::string value,int32_t slot,int32_t keyslot);
 
-    void addDeviceNameEx(u16 vid,u16 pid,std::string value);
-    std::string getStringByVIDPIDEx(u16 vid,u16 pid);
+    void addDeviceNameEx(uint16_t vid,uint16_t pid,std::string value);
+    std::string getStringByVIDPIDEx(uint16_t vid,uint16_t pid);
 };
 #endif

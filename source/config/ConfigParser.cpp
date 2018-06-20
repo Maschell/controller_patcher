@@ -30,7 +30,7 @@ ConfigParser::ConfigParser(std::string configData) {
     }
 
     //remove the comments and make everything uppercase
-    for(u32 i = 0; i < contentLines.size(); i++) {
+    for(uint32_t i = 0; i < contentLines.size(); i++) {
         std::vector<std::string> comments = StringTools::stringSplit(contentLines[i], "//");
         if(!comments.empty()) {
             contentLines[i] = comments[0];
@@ -41,7 +41,7 @@ ConfigParser::ConfigParser(std::string configData) {
 
     //remove empty lines
     std::vector<std::string> contentline2;
-    for(u32 i = 0; i < contentLines.size(); i++) {
+    for(uint32_t i = 0; i < contentLines.size(); i++) {
         if(strlen(contentLines[i].c_str()) > 0) {
             contentline2.push_back(contentLines[i]);
         }
@@ -62,21 +62,21 @@ void ConfigParser::setType(PARSE_TYPE newType) {
     this->type_b = newType;
 }
 
-u16 ConfigParser::getSlot() {
+uint16_t ConfigParser::getSlot() {
     return this->slot_b;
 }
 
-void ConfigParser::setSlot(u16 newSlot) {
+void ConfigParser::setSlot(uint16_t newSlot) {
     this->slot_b = newSlot;
 }
 
-bool ConfigParser::Init() {
+BOOL ConfigParser::Init() {
     if(contentLines.size() == 0) {
         DEBUG_FUNCTION_LINE("File seems to be empty. Make sure to have a proper header\n");
         return false;
     }
     const char * line = contentLines[0].c_str();
-    s32 len = strlen(line);
+    int32_t len = strlen(line);
     if(len <= 4) {
         DEBUG_FUNCTION_LINE("Header is too short.\n");
         return false;
@@ -133,7 +133,7 @@ void ConfigParser::parseSingleLine(std::string line) {
         }
         return;
     } else {
-        u16 hid_slot = getSlot();
+        uint16_t hid_slot = getSlot();
 
         if(HID_DEBUG) {
             DEBUG_FUNCTION_LINE("leftpart = \"%s\" \n",cur_values[0].c_str());
@@ -141,7 +141,7 @@ void ConfigParser::parseSingleLine(std::string line) {
         if(HID_DEBUG) {
             DEBUG_FUNCTION_LINE("rightpart = \"%s\" \n",cur_values[1].c_str());
         }
-        s32 keyslot =  -1;
+        int32_t keyslot =  -1;
 
         if(HID_DEBUG) {
             DEBUG_FUNCTION_LINE("Checking single value\n");
@@ -158,9 +158,9 @@ void ConfigParser::parseSingleLine(std::string line) {
                 DEBUG_FUNCTION_LINE("Its a single value\n");
             }
             long rightValue = -1;
-            bool valueSet = false;
+            BOOL valueSet = false;
             if(cur_values[0].compare("DPAD_MODE") == 0) {
-                const u8 * values_ = NULL;
+                const uint8_t * values_ = NULL;
                 if((values_ = ConfigValues::getValuesStickPreset(cur_values[1])) != NULL) {
                     if(values_[STICK_CONF_MAGIC_VERSION] != STICK_CONF_MAGIC_VALUE)
                         if(HID_DEBUG) {
@@ -258,17 +258,17 @@ void ConfigParser::parseSingleLine(std::string line) {
     }
 }
 
-bool ConfigParser::resetConfig() {
-    s32 slot = getSlot();
+BOOL ConfigParser::resetConfig() {
+    int32_t slot = getSlot();
     if((slot == HID_INVALID_SLOT) || (slot >= gHIDMaxDevices)) return false;
-    for(s32 j = (CONTRPS_PID+1); j< CONTRPS_MAX_VALUE; j++) {
+    for(int32_t j = (CONTRPS_PID+1); j< CONTRPS_MAX_VALUE; j++) {
         config_controller[slot][j][0] = CONTROLLER_PATCHER_INVALIDVALUE;
         config_controller[slot][j][1] = CONTROLLER_PATCHER_INVALIDVALUE;
     }
     return true;
 }
 
-s32  ConfigParser::getSlotController(std::string identify) {
+int32_t  ConfigParser::getSlotController(std::string identify) {
     if(HID_DEBUG) {
         DEBUG_FUNCTION_LINE("Getting Controller Slot\n");
     }
@@ -280,11 +280,11 @@ s32  ConfigParser::getSlotController(std::string identify) {
         return HID_INVALID_SLOT;
     }
 
-    s32 vid = getValueFromKeyValue(values[0],"VID","=");
+    int32_t vid = getValueFromKeyValue(values[0],"VID","=");
     if(vid < 0) {
         return HID_INVALID_SLOT;
     }
-    s32 pid = getValueFromKeyValue(values[1],"PID","=");
+    int32_t pid = getValueFromKeyValue(values[1],"PID","=");
     if(pid < 0) {
         return HID_INVALID_SLOT;
     }
@@ -296,9 +296,9 @@ s32  ConfigParser::getSlotController(std::string identify) {
     memset(&deviceinfo,0,sizeof(deviceinfo));
     deviceinfo.vidpid.vid = vid;
     deviceinfo.vidpid.pid = pid;
-    s32 result = ControllerPatcherUtils::getDeviceInfoFromVidPid(&deviceinfo);
-    s32 slot = deviceinfo.slotdata.deviceslot;
-    s32 hid = 0;
+    int32_t result = ControllerPatcherUtils::getDeviceInfoFromVidPid(&deviceinfo);
+    int32_t slot = deviceinfo.slotdata.deviceslot;
+    int32_t hid = 0;
     if(result < 0) {
         if(HID_DEBUG) {
             DEBUG_FUNCTION_LINE("Its a new controller, lets save it\n");
@@ -350,7 +350,7 @@ s32  ConfigParser::getSlotController(std::string identify) {
     return slot;
 }
 
-bool ConfigParser::parseIni() {
+BOOL ConfigParser::parseIni() {
     if(getSlot() == HID_INVALID_SLOT) {
         DEBUG_FUNCTION_LINE("Couldn't parse file. Not a valid slot. Probably broken config. Or you tried to have more than %d devices\n",getType(),gHIDMaxDevices);
         return false;
@@ -361,7 +361,7 @@ bool ConfigParser::parseIni() {
         DEBUG_FUNCTION_LINE("Parsing content, type %d\n",getType());
     }
 
-    s32 start = 1;
+    int32_t start = 1;
     if(contentLines.size() <= 1) {
         DEBUG_FUNCTION_LINE("File only contains a header.\n");
         return false;
@@ -372,7 +372,7 @@ bool ConfigParser::parseIni() {
         start++;
     }
 
-    for(u32 i = start; i < contentLines.size(); i++) {
+    for(uint32_t i = start; i < contentLines.size(); i++) {
         if(HID_DEBUG) {
             DEBUG_FUNCTION_LINE("line %d: \"%s\" \n",(i+1),contentLines[i].c_str());
         }
@@ -385,7 +385,7 @@ bool ConfigParser::parseIni() {
     return true;
 }
 
-s32 ConfigParser::getValueFromKeyValue(std::string value_pair,std::string expectedKey,std::string delimiter) {
+int32_t ConfigParser::getValueFromKeyValue(std::string value_pair,std::string expectedKey,std::string delimiter) {
     std::vector<std::string> string_value = StringTools::stringSplit(value_pair,delimiter);
     if(string_value.size() != 2) {
         if(HID_DEBUG || string_value.size() > 2) {
@@ -398,7 +398,7 @@ s32 ConfigParser::getValueFromKeyValue(std::string value_pair,std::string expect
         return -1;
     }
     char * ptr;
-    s32 value = strtol(string_value[1].c_str(),&ptr,16);
+    int32_t value = strtol(string_value[1].c_str(),&ptr,16);
 
     return value;
 }

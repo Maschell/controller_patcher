@@ -20,11 +20,11 @@
 
 #include <utils/logger.h>
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDataByHandle(s32 handle, my_cb_user ** data) {
-    for(s32 i = 0; i< gHIDMaxDevices; i++) {
-        for(s32 j = 0; j<4; j++) {
-            //log_printf("%d %d %d %d\n",i,j,gHID_Devices[i].pad_data[j].handle,(u32)handle);
-            if(gHID_Devices[i].pad_data[j].handle == (u32)handle) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDataByHandle(int32_t handle, my_cb_user ** data) {
+    for(int32_t i = 0; i< gHIDMaxDevices; i++) {
+        for(int32_t j = 0; j<4; j++) {
+            //log_printf("%d %d %d %d\n",i,j,gHID_Devices[i].pad_data[j].handle,(uint32_t)handle);
+            if(gHID_Devices[i].pad_data[j].handle == (uint32_t)handle) {
                 *data = gHID_Devices[i].pad_data[j].user_data;
                 return CONTROLLER_PATCHER_ERROR_NONE;
             }
@@ -36,12 +36,12 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDataByHandle(s32 h
  * Analyse inputs
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_Data * data, s32 * buttons_hold, s32 VPADButton) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_Data * data, int32_t * buttons_hold, int32_t VPADButton) {
     if(data == NULL || buttons_hold == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    s32 deviceslot = data->slotdata.deviceslot;
+    int32_t deviceslot = data->slotdata.deviceslot;
 
-    s32 result = -1;
+    int32_t result = -1;
 
     do {
         if(data->type == DEVICE_TYPE_MOUSE) {
@@ -75,10 +75,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_
             result = 0;
             break;
         }
-        u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
+        uint8_t * cur_data = &data->data_union.controller.cur_hid_data[0];
         if(cur_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-        s32 cur_config = 0;
+        int32_t cur_config = 0;
 
         if(VPADButton == VPAD_BUTTON_A) {
             cur_config = CONTRPS_VPAD_BUTTON_A;
@@ -111,15 +111,15 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_
         //! Special DPAD treatment.
         if(config_controller[deviceslot][CONTRPS_DPAD_MODE][0] == CONTROLLER_PATCHER_VALUE_SET) {
             if(config_controller[deviceslot][CONTRPS_DPAD_MODE][1] == CONTRPDM_Hat) {
-                u8 mask = 0x0F;
+                uint8_t mask = 0x0F;
                 if(config_controller[deviceslot][CONTRPS_DPAD_MASK][0] == CONTROLLER_PATCHER_VALUE_SET) {
                     mask = config_controller[deviceslot][CONTRPS_DPAD_MASK][1];
                 }
                 if(cur_data[config_controller[deviceslot][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL][0]] != config_controller[deviceslot][CONTRPS_VPAD_BUTTON_DPAD_NEUTRAL][1]) { // Not neutral
-                    u8 dir1_0 = 0,dir1_1 = 0;
-                    u8 dir2_0 = 0,dir2_1 = 0;
-                    u8 dir3_0 = 0,dir3_1 = 0;
-                    u8 direction = 0;
+                    uint8_t dir1_0 = 0,dir1_1 = 0;
+                    uint8_t dir2_0 = 0,dir2_1 = 0;
+                    uint8_t dir3_0 = 0,dir3_1 = 0;
+                    uint8_t direction = 0;
                     if(VPADButton == VPAD_BUTTON_LEFT) {
                         dir1_0 = config_controller[deviceslot][CONTRPS_VPAD_BUTTON_DPAD_W][0];
                         dir2_0 = config_controller[deviceslot][CONTRPS_VPAD_BUTTON_DPAD_NW][0];
@@ -162,7 +162,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_
                 }
 
             } else  if(config_controller[deviceslot][CONTRPS_DPAD_MODE][1] == CONTRPDM_Absolute_2Values) {
-                s32 contrps_value = 0;
+                int32_t contrps_value = 0;
                 if(VPADButton == VPAD_BUTTON_LEFT) {
                     contrps_value = CONTRPS_VPAD_BUTTON_DPAD_ABS_LEFT;
                 } else if(VPADButton == VPAD_BUTTON_RIGHT) {
@@ -174,7 +174,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_
                 }
 
                 if(contrps_value != 0) {
-                    s32 value_byte = CONTROLLER_PATCHER_INVALIDVALUE;
+                    int32_t value_byte = CONTROLLER_PATCHER_INVALIDVALUE;
                     if((value_byte = config_controller[deviceslot][contrps_value][0]) != CONTROLLER_PATCHER_INVALIDVALUE) {
                         if(cur_data[config_controller[deviceslot][contrps_value][0]] == config_controller[deviceslot][contrps_value][1]) {
                             result = 1;
@@ -259,16 +259,16 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getButtonPressed(HID_
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isValueSet(HID_Data * data,s32 cur_config) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isValueSet(HID_Data * data,int32_t cur_config) {
     if(data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
+    uint8_t * cur_data = &data->data_union.controller.cur_hid_data[0];
     if(cur_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    u32 hidmask = data->slotdata.hidmask;
-    s32 deviceslot = data->slotdata.deviceslot;
+    uint32_t hidmask = data->slotdata.hidmask;
+    int32_t deviceslot = data->slotdata.deviceslot;
 
-    s32 result = CONTROLLER_PATCHER_ERROR_NONE;
+    int32_t result = CONTROLLER_PATCHER_ERROR_NONE;
     if(config_controller[deviceslot][cur_config][0] != CONTROLLER_PATCHER_INVALIDVALUE) { //Invalid data
         if(hidmask & gHID_LIST_KEYBOARD) {
             if(isInKeyboardData(cur_data,config_controller[deviceslot][cur_config][1]) > 0) {
@@ -282,9 +282,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isValueSet(HID_Data *
     }
     return result;
 }
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isInKeyboardData(unsigned char * keyboardData,s32 key) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isInKeyboardData(unsigned char * keyboardData,int32_t key) {
     if(keyboardData == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
-    for(s32 i = 0; i<HID_KEYBOARD_DATA_LENGTH; i++) {
+    for(int32_t i = 0; i<HID_KEYBOARD_DATA_LENGTH; i++) {
         if(keyboardData[i] == 0 && i > 1) {
             break;
         } else if (keyboardData[i] == key) {
@@ -298,9 +298,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::isInKeyboardData(unsi
  * Utils for setting the Button data
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonRemappingData(VPADStatus * old_buffer, VPADStatus * new_buffer,u32 VPADButton, s32 CONTRPS_SLOT) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonRemappingData(VPADStatus * old_buffer, VPADStatus * new_buffer,uint32_t VPADButton, int32_t CONTRPS_SLOT) {
     if(old_buffer == NULL || new_buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
-    u32 new_value = VPADButton;
+    uint32_t new_value = VPADButton;
 
     if(config_controller[gGamePadSlot][CONTRPS_SLOT][0] != CONTROLLER_PATCHER_INVALIDVALUE) { //using new value!
         new_value = gGamePadValues[config_controller[gGamePadSlot][CONTRPS_SLOT][1]];
@@ -310,7 +310,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonRemappingDat
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonData(VPADStatus * old_buffer, VPADStatus * new_buffer,u32 oldVPADButton,u32 newVPADButton) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonData(VPADStatus * old_buffer, VPADStatus * new_buffer,uint32_t oldVPADButton,uint32_t newVPADButton) {
     if(old_buffer == NULL || new_buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     if((old_buffer->hold & oldVPADButton) == oldVPADButton) {
         new_buffer->hold |= newVPADButton;
@@ -329,14 +329,14 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setButtonData(VPADSta
  * Pad Status functions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkActivePad(u32 hidmask,s32 pad) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkActivePad(uint32_t hidmask,int32_t pad) {
     if(hidmask & gHID_LIST_GC && pad >= 0 && pad <= 3) {
         if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[pad].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[pad].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 1;
         return CONTROLLER_PATCHER_ERROR_NO_PAD_CONNECTED;
     } else {
-        s32 deviceslot = getDeviceSlot(hidmask);
+        int32_t deviceslot = getDeviceSlot(hidmask);
         if(deviceslot < 0 ) return CONTROLLER_PATCHER_ERROR_DEVICE_SLOT_NOT_FOUND;
-        s32 connected_pads = config_controller[deviceslot][CONTRPS_CONNECTED_PADS][1];
+        int32_t connected_pads = config_controller[deviceslot][CONTRPS_CONNECTED_PADS][1];
 
         if((connected_pads & (1 << pad)) > 0) {
             return 1;
@@ -346,7 +346,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkActivePad(u32 hi
 }
 
 /*
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getActivePad(u32 hidmask){
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getActivePad(uint32_t hidmask){
      if(hidmask & gHID_LIST_GC){
         if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[0].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[0].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 0;
         if (!(((gHID_Devices[gHID_SLOT_GC].pad_data[1].data_union.controller.cur_hid_data[0] & 0x10) == 0) && ((gHID_Devices[gHID_SLOT_GC].pad_data[1].data_union.controller.cur_hid_data[0] & 0x22) != 0x22))) return 1;
@@ -365,8 +365,8 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getActivePad(u32 hidm
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::normalizeStickValues(VPADVec2D * stick) {
     if(stick == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    f32 max_val = 0.0f;
-    f32 mul_val = 0.0f;
+    float max_val = 0.0f;
+    float mul_val = 0.0f;
 
     if((max_val = (fabs(stick->x)) + fabs(stick->y)) > 1.414f) {
         mul_val = 1.414f / max_val;
@@ -390,9 +390,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::normalizeStickValues(
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-f32 ControllerPatcherUtils::convertAnalogValue(u8 value, u8 default_val, u8 min, u8 max, u8 invert,u8 deadzone) {
-    s8 new_value = (s8)(value - default_val);
-    u8 range = 0;
+float ControllerPatcherUtils::convertAnalogValue(uint8_t value, uint8_t default_val, uint8_t min, uint8_t max, uint8_t invert,uint8_t deadzone) {
+    int8_t new_value = (int8_t)(value - default_val);
+    uint8_t range = 0;
     if(value >= max) {
         if(invert == 0x01) return -1.0f;
         return 1.0f;
@@ -416,15 +416,15 @@ f32 ControllerPatcherUtils::convertAnalogValue(u8 value, u8 default_val, u8 min,
     }
 }
 
-VPADVec2D ControllerPatcherUtils::getAnalogValueByButtons(u8 stick_values) {
+VPADVec2D ControllerPatcherUtils::getAnalogValueByButtons(uint8_t stick_values) {
     VPADVec2D stick;
     stick.x = 0.0f;
     stick.y = 0.0f;
 
-    u8 up =     ((stick_values & STICK_VALUE_UP) == STICK_VALUE_UP);
-    u8 down =   ((stick_values & STICK_VALUE_DOWN) == STICK_VALUE_DOWN);
-    u8 left =   ((stick_values & STICK_VALUE_LEFT) == STICK_VALUE_LEFT);
-    u8 right =  ((stick_values & STICK_VALUE_RIGHT) == STICK_VALUE_RIGHT);
+    uint8_t up =     ((stick_values & STICK_VALUE_UP) == STICK_VALUE_UP);
+    uint8_t down =   ((stick_values & STICK_VALUE_DOWN) == STICK_VALUE_DOWN);
+    uint8_t left =   ((stick_values & STICK_VALUE_LEFT) == STICK_VALUE_LEFT);
+    uint8_t right =  ((stick_values & STICK_VALUE_RIGHT) == STICK_VALUE_RIGHT);
 
     if(up) {
         if(!down) {
@@ -462,14 +462,14 @@ VPADVec2D ControllerPatcherUtils::getAnalogValueByButtons(u8 stick_values) {
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(HID_Data * data, VPADStatus * buffer) {
     if(buffer == NULL || data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    s32 deviceslot = data->slotdata.deviceslot;
+    int32_t deviceslot = data->slotdata.deviceslot;
     if (data->type == DEVICE_TYPE_MOUSE) {
         if(gHID_Mouse_Mode == HID_MOUSE_MODE_AIM) { // TODO: tweak values
             HID_Mouse_Data * ms_data = &data->data_union.mouse.cur_mouse_data;
             if(ms_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-            f32 x_value = ms_data->deltaX/10.0f;
-            f32 y_value = -1.0f*(ms_data->deltaY/10.0f);
+            float x_value = ms_data->deltaX/10.0f;
+            float y_value = -1.0f*(ms_data->deltaY/10.0f);
 
             if(config_controller[deviceslot][CONTRPS_MOUSE_STICK][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
                 if(config_controller[deviceslot][CONTRPS_MOUSE_STICK][1] == DEF_L_STICK) {
@@ -483,10 +483,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
             buffer->rightStick.y += y_value;
         }
     } else {
-        u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
+        uint8_t * cur_data = &data->data_union.controller.cur_hid_data[0];
         if(cur_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-        s32 deadzone = 0;
+        int32_t deadzone = 0;
 
         if( config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
             if(config_controller[deviceslot][CONTRPS_VPAD_BUTTON_L_STICK_X_DEADZONE][0] == CONTROLLER_PATCHER_VALUE_SET) {
@@ -542,7 +542,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
                                     deadzone);
         }
 
-        u8 stick_values = 0;
+        uint8_t stick_values = 0;
 
         if(isValueSet(data,CONTRPS_VPAD_BUTTON_L_STICK_UP)) {
             stick_values |= STICK_VALUE_UP;
@@ -585,7 +585,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
 
         if(config_controller[deviceslot][CONTRPS_VPAD_STICK_L_COPY_DPAD][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
             if(config_controller[deviceslot][CONTRPS_VPAD_STICK_L_COPY_DPAD][0] == 1) {
-                u8 stick_values = 0;
+                uint8_t stick_values = 0;
 
                 if(buffer->hold & VPAD_BUTTON_UP) {
                     stick_values |= STICK_VALUE_UP;
@@ -609,7 +609,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
         }
         if(config_controller[deviceslot][CONTRPS_VPAD_STICK_R_COPY_DPAD][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
             if(config_controller[deviceslot][CONTRPS_VPAD_STICK_R_COPY_DPAD][0] == 1) {
-                u8 stick_values = 0;
+                uint8_t stick_values = 0;
 
                 if(buffer->hold & VPAD_BUTTON_UP) {
                     stick_values |= STICK_VALUE_UP;
@@ -641,15 +641,15 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::convertAnalogSticks(H
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setEmulatedSticks(VPADStatus * buffer, u32 * last_emulatedSticks) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setEmulatedSticks(VPADStatus * buffer, uint32_t * last_emulatedSticks) {
     if(buffer == NULL || last_emulatedSticks == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    u32 emulatedSticks = 0;
+    uint32_t emulatedSticks = 0;
 
-    s32 l_x_full = (buffer->leftStick.x > 0.5f || buffer->leftStick.x < -0.5f)? 1:0;
-    s32 l_y_full = (buffer->leftStick.y > 0.5f || buffer->leftStick.y < -0.5f)? 1:0;
-    s32 r_x_full = (buffer->rightStick.x > 0.5f || buffer->rightStick.x < -0.5f)? 1:0;
-    s32 r_y_full = (buffer->rightStick.y > 0.5f || buffer->rightStick.y < -0.5f)? 1:0;
+    int32_t l_x_full = (buffer->leftStick.x > 0.5f || buffer->leftStick.x < -0.5f)? 1:0;
+    int32_t l_y_full = (buffer->leftStick.y > 0.5f || buffer->leftStick.y < -0.5f)? 1:0;
+    int32_t r_x_full = (buffer->rightStick.x > 0.5f || buffer->rightStick.x < -0.5f)? 1:0;
+    int32_t r_y_full = (buffer->rightStick.y > 0.5f || buffer->rightStick.y < -0.5f)? 1:0;
 
     if((buffer->leftStick.x > 0.5f) || (buffer->leftStick.x > 0.1f && !l_y_full)) {
         emulatedSticks |= VPAD_STICK_L_EMULATION_RIGHT;
@@ -694,12 +694,12 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setEmulatedSticks(VPA
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setTouch(HID_Data * data,VPADStatus * buffer) {
     if(buffer == NULL || data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     if(data->type == DEVICE_TYPE_MOUSE && gHID_Mouse_Mode == HID_MOUSE_MODE_TOUCH) {
-        s32 buttons_hold;
+        int32_t buttons_hold;
         if(getButtonPressed(data,&buttons_hold,VPAD_BUTTON_TOUCH)) {
             HID_Mouse_Data *  ms_data = &data->data_union.mouse.cur_mouse_data;
             if(ms_data == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
-            s32 x_mouse = 80 + ((int)(((ms_data->X)*1.0f/1280.0)*3890.0f));
-            s32 y_mouse = 3910 - ((int)(((ms_data->Y)*1.0f/720.0)*3760.0f));
+            int32_t x_mouse = 80 + ((int)(((ms_data->X)*1.0f/1280.0)*3890.0f));
+            int32_t y_mouse = 3910 - ((int)(((ms_data->Y)*1.0f/720.0)*3760.0f));
             buffer->tpNormal.x = x_mouse;
             buffer->tpNormal.y = y_mouse;
             buffer->tpNormal.touched = 1;
@@ -718,11 +718,11 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::setTouch(HID_Data * d
 }
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkAndSetMouseMode(HID_Data * data) {
-    u32 hidmask = data->slotdata.hidmask;
+    uint32_t hidmask = data->slotdata.hidmask;
 
     if(hidmask & gHID_LIST_KEYBOARD) {
-        u8 * cur_data = &data->data_union.controller.cur_hid_data[0];
-        u8 * last_data = &data->data_union.controller.last_hid_data[0];
+        uint8_t * cur_data = &data->data_union.controller.cur_hid_data[0];
+        uint8_t * last_data = &data->data_union.controller.last_hid_data[0];
         if((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) && ((isInKeyboardData(cur_data,HID_KEYBOARD_BUTTON_F1) > 0) != (isInKeyboardData(last_data,HID_KEYBOARD_BUTTON_F1) > 0)) && gMouseModeCoolDown == 0) {
             gMouseModeCoolDown = 60;
             if(gHID_Mouse_Mode == HID_MOUSE_MODE_AIM) {
@@ -744,10 +744,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkAndSetMouseMode(
  * Other functions
  *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToPro(VPADStatus * vpad_buffer,KPADStatus * pro_buffer,u32 * lastButtonsPressesPRO) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToPro(VPADStatus * vpad_buffer,KPADStatus * pro_buffer,uint32_t * lastButtonsPressesPRO) {
     if(vpad_buffer == NULL || pro_buffer == NULL || lastButtonsPressesPRO == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    s32 buttons_hold = 0;
+    int32_t buttons_hold = 0;
 
     if(vpad_buffer->hold & VPAD_BUTTON_A)                 buttons_hold |= WPAD_PRO_BUTTON_A;
     if(vpad_buffer->hold & VPAD_BUTTON_B)                 buttons_hold |= WPAD_PRO_BUTTON_B;
@@ -815,7 +815,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToPro(VPADSt
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRead(VPADStatus * vpad_buffer,WPADStatusProController * pro_buffer) {
     if(vpad_buffer == NULL || pro_buffer == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    s32 buttons_hold = 0;
+    int32_t buttons_hold = 0;
 
     if(vpad_buffer->hold & VPAD_BUTTON_A)                 buttons_hold |= WPAD_PRO_BUTTON_A;
     if(vpad_buffer->hold & VPAD_BUTTON_B)                 buttons_hold |= WPAD_PRO_BUTTON_B;
@@ -850,10 +850,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRea
     if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_UP)     buttons_hold |= WPAD_PRO_STICK_R_EMULATION_UP;
     if(vpad_buffer->hold & VPAD_STICK_R_EMULATION_DOWN)   buttons_hold |= WPAD_PRO_STICK_R_EMULATION_DOWN;
 
-    pro_buffer->leftStick.x = (s16) (vpad_buffer->leftStick.x * 950.0f);
-    pro_buffer->leftStick.y = (s16) (vpad_buffer->leftStick.y * 950.0f);
-    pro_buffer->rightStick.x = (s16) (vpad_buffer->rightStick.x * 950.0f);
-    pro_buffer->rightStick.y = (s16) (vpad_buffer->rightStick.y * 950.0f);
+    pro_buffer->leftStick.x = (int16_t) (vpad_buffer->leftStick.x * 950.0f);
+    pro_buffer->leftStick.y = (int16_t) (vpad_buffer->leftStick.y * 950.0f);
+    pro_buffer->rightStick.x = (int16_t) (vpad_buffer->rightStick.x * 950.0f);
+    pro_buffer->rightStick.y = (int16_t) (vpad_buffer->rightStick.y * 950.0f);
 
     pro_buffer->buttons = buttons_hold;
 
@@ -864,10 +864,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToProWPADRea
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToVPAD(VPADStatus * vpad_buffer,KPADStatus * pro_buffer,u32 * lastButtonsPressesVPAD) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToVPAD(VPADStatus * vpad_buffer,KPADStatus * pro_buffer,uint32_t * lastButtonsPressesVPAD) {
     if(vpad_buffer == NULL || pro_buffer == NULL || lastButtonsPressesVPAD == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
 
-    s32 buttons_hold = 0;
+    int32_t buttons_hold = 0;
 
     if(pro_buffer->pro.hold & WPAD_PRO_BUTTON_A)                 buttons_hold |= VPAD_BUTTON_A;
 
@@ -918,20 +918,20 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::translateToVPAD(VPADS
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkValueinConfigController(s32 deviceslot,s32 CONTRPS_slot,s32 expectedValue) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::checkValueinConfigController(int32_t deviceslot,int32_t CONTRPS_slot,int32_t expectedValue) {
     if(config_controller[deviceslot][CONTRPS_slot][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
         if(expectedValue == config_controller[deviceslot][CONTRPS_slot][1]) return 1;
     }
     return 0;
 }
 
-void ControllerPatcherUtils::setConfigValue(u8 * dest, u8 first, u8 second) {
+void ControllerPatcherUtils::setConfigValue(uint8_t * dest, uint8_t first, uint8_t second) {
     dest[0] = first;
     dest[1] = second;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDeviceSlot(u32 hidmask) {
-    for(s32 i = 0; i < gHIDMaxDevices; i++) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDeviceSlot(uint32_t hidmask) {
+    for(int32_t i = 0; i < gHIDMaxDevices; i++) {
         if(hidmask & config_controller_hidmask[i]) {
             return i;
         }
@@ -941,9 +941,9 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDeviceSlot(u32 hid
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getDeviceInfoFromVidPid(DeviceInfo * info) {
     if(info != NULL) {
-        for(s32 i = 0; i< gHIDMaxDevices; i++) {
-            u16 my_vid = config_controller[i][CONTRPS_VID][0] * 0x100 + config_controller[i][CONTRPS_VID][1];
-            u16 my_pid = config_controller[i][CONTRPS_PID][0] * 0x100 + config_controller[i][CONTRPS_PID][1];
+        for(int32_t i = 0; i< gHIDMaxDevices; i++) {
+            uint16_t my_vid = config_controller[i][CONTRPS_VID][0] * 0x100 + config_controller[i][CONTRPS_VID][1];
+            uint16_t my_pid = config_controller[i][CONTRPS_PID][0] * 0x100 + config_controller[i][CONTRPS_PID][1];
             //log_printf("info->vidpid.vid (%04X) == my_vid (%04X) && info->vidpid.pid (%04X) == my_pid (%04X)\n",info->vidpid.vid,my_vid,info->vidpid.pid,my_pid);
             if(info->vidpid.vid == my_vid && info->vidpid.pid == my_pid) {
                 info->slotdata.hidmask = config_controller_hidmask[i];
@@ -976,7 +976,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getNextSlotData(HIDSl
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getVIDPIDbyDeviceSlot(s32 deviceslot, DeviceVIDPIDInfo * vidpid) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getVIDPIDbyDeviceSlot(int32_t deviceslot, DeviceVIDPIDInfo * vidpid) {
     if(vidpid == NULL) return CONTROLLER_PATCHER_ERROR_NULL_POINTER;
     if(deviceslot >= gHIDMaxDevices || deviceslot < 0) return CONTROLLER_PATCHER_ERROR_DEVICE_SLOT_NOT_FOUND;
     vidpid->vid = config_controller[deviceslot][CONTRPS_VID][0] * 0x100 + config_controller[deviceslot][CONTRPS_VID][1];
@@ -985,14 +985,14 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::getVIDPIDbyDeviceSlot
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-s32 ControllerPatcherUtils::getPadSlotInAdapter(s32 deviceslot, u8 * input_data) {
-    s32 slot_incr = 0;
+int32_t ControllerPatcherUtils::getPadSlotInAdapter(int32_t deviceslot, uint8_t * input_data) {
+    int32_t slot_incr = 0;
     if(config_controller[deviceslot][CONTRPS_PAD_COUNT][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
-        s32 pad_count = config_controller[deviceslot][CONTRPS_PAD_COUNT][1];
+        int32_t pad_count = config_controller[deviceslot][CONTRPS_PAD_COUNT][1];
         if(pad_count > HID_MAX_PADS_COUNT) {
             pad_count = HID_MAX_PADS_COUNT;
         }
-        for(s32 i= 0; i<pad_count; i++) {
+        for(int32_t i= 0; i<pad_count; i++) {
             if(        config_controller[deviceslot][CONTRPS_PAD1_FILTER + i][0] != CONTROLLER_PATCHER_INVALIDVALUE) {
                 if(input_data[config_controller[deviceslot][CONTRPS_PAD1_FILTER + i][0]] == config_controller[deviceslot][CONTRPS_PAD1_FILTER + i][1]) {
                     slot_incr = i;
@@ -1021,7 +1021,7 @@ ControllerMappingPAD * ControllerPatcherUtils::getControllerMappingByType(UContr
     return cm_map_pad;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::doSampling(u16 deviceslot,u8 padslot = 0,bool ignorePadSlot = false) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::doSampling(uint16_t deviceslot,uint8_t padslot = 0,BOOL ignorePadSlot = false) {
     if(gSamplingCallback != NULL) {
         doSamplingSingle(WPAD_CHAN_0, deviceslot, padslot, ignorePadSlot);
         doSamplingSingle(WPAD_CHAN_1, deviceslot, padslot, ignorePadSlot);
@@ -1031,7 +1031,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::doSampling(u16 device
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::doSamplingSingle(WPADChan chan, u16 deviceslot,u8 padslot = 0,bool ignorePadSlot = false) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::doSamplingSingle(WPADChan chan, uint16_t deviceslot,uint8_t padslot = 0,BOOL ignorePadSlot = false) {
     ControllerMappingPADInfo * padinfo = gProPadInfo[chan];
     if(padinfo->active) {
         DeviceInfo device_info;
@@ -1039,10 +1039,10 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcherUtils::doSamplingSingle(WPAD
         memset(&device_info,0,sizeof(device_info));
         device_info.vidpid = padinfo->vidpid;
 
-        s32 res = -1;
+        int32_t res = -1;
         if((res = ControllerPatcherUtils::getDeviceInfoFromVidPid(&device_info)) >= 0) {
             if(!ignorePadSlot) {
-                s32 real_pad = (padinfo->pad/(device_info.pad_count))*device_info.pad_count;
+                int32_t real_pad = (padinfo->pad/(device_info.pad_count))*device_info.pad_count;
                 if(real_pad == padslot && device_info.slotdata.deviceslot == deviceslot) {
                     if(ControllerPatcherUtils::checkActivePad(device_info.slotdata.hidmask,padinfo->pad)) {
                         gSamplingCallback(chan);

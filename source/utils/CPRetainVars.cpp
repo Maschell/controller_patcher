@@ -19,56 +19,56 @@
 
 ControllerMapping gControllerMapping __attribute__((section(".data")));
 
-u8 gConfig_done __attribute__((section(".data"))) = 0;
-u8 gButtonRemappingConfigDone __attribute__((section(".data"))) = 0;
+uint8_t gConfig_done __attribute__((section(".data"))) = 0;
+uint8_t gButtonRemappingConfigDone __attribute__((section(".data"))) = 0;
 
-u32 gHIDAttached __attribute__((section(".data"))) = 0;
-u32 gHIDCurrentDevice __attribute__((section(".data"))) = 0;
+uint32_t gHIDAttached __attribute__((section(".data"))) = 0;
+uint32_t gHIDCurrentDevice __attribute__((section(".data"))) = 0;
 
-u16 gHIDRegisteredDevices __attribute__((section(".data"))) = 0;
+uint16_t gHIDRegisteredDevices __attribute__((section(".data"))) = 0;
 
 HIDClient gHIDClient __attribute__((section(".data")));
 
 HID_DEVICE_DATA gHID_Devices[gHIDMaxDevices] __attribute__((section(".data")));
 
-u8 gHID_Mouse_Mode __attribute__((section(".data"))) = HID_MOUSE_MODE_TOUCH;
+uint8_t gHID_Mouse_Mode __attribute__((section(".data"))) = HID_MOUSE_MODE_TOUCH;
 
-u8 gMouseModeCoolDown __attribute__((section(".data"))) = 0;
+uint8_t gMouseModeCoolDown __attribute__((section(".data"))) = 0;
 
-u32 gGamePadValues[CONTRPS_MAX_VALUE] __attribute__((section(".data")));
+uint32_t gGamePadValues[CONTRPS_MAX_VALUE] __attribute__((section(".data")));
 
-u8  config_controller[gHIDMaxDevices][CONTRPS_MAX_VALUE][2] __attribute__((section(".data")));
-u32 config_controller_hidmask[gHIDMaxDevices] __attribute__((section(".data")));
+uint8_t  config_controller[gHIDMaxDevices][CONTRPS_MAX_VALUE][2] __attribute__((section(".data")));
+uint32_t config_controller_hidmask[gHIDMaxDevices] __attribute__((section(".data")));
 
-u32 gHID_LIST_GC __attribute__((section(".data"))) = 0;
-u32 gHID_LIST_DS3 __attribute__((section(".data"))) = 0;
-u32 gHID_LIST_DS4 __attribute__((section(".data"))) = 0;
-u32 gHID_LIST_KEYBOARD __attribute__((section(".data"))) = 0;
-u32 gHID_LIST_SWITCH_PRO __attribute__((section(".data"))) = 0;
-u32 gHID_LIST_MOUSE __attribute__((section(".data"))) = 0;
+uint32_t gHID_LIST_GC __attribute__((section(".data"))) = 0;
+uint32_t gHID_LIST_DS3 __attribute__((section(".data"))) = 0;
+uint32_t gHID_LIST_DS4 __attribute__((section(".data"))) = 0;
+uint32_t gHID_LIST_KEYBOARD __attribute__((section(".data"))) = 0;
+uint32_t gHID_LIST_SWITCH_PRO __attribute__((section(".data"))) = 0;
+uint32_t gHID_LIST_MOUSE __attribute__((section(".data"))) = 0;
 
-u16 gGamePadSlot __attribute__((section(".data"))) = 0;
-u16 gHID_SLOT_GC __attribute__((section(".data"))) = 0;
-u16 gHID_SLOT_KEYBOARD __attribute__((section(".data"))) = 0;
-u16 gMouseSlot __attribute__((section(".data"))) = 0;
+uint16_t gGamePadSlot __attribute__((section(".data"))) = 0;
+uint16_t gHID_SLOT_GC __attribute__((section(".data"))) = 0;
+uint16_t gHID_SLOT_KEYBOARD __attribute__((section(".data"))) = 0;
+uint16_t gMouseSlot __attribute__((section(".data"))) = 0;
 
-u8 gOriginalDimState __attribute__((section(".data"))) = 0;
-u8 gOriginalAPDState __attribute__((section(".data"))) = 0;
+uint8_t gOriginalDimState __attribute__((section(".data"))) = 0;
+uint8_t gOriginalAPDState __attribute__((section(".data"))) = 0;
 
-u16 gNetworkController[gHIDMaxDevices][HID_MAX_PADS_COUNT][4] __attribute__((section(".data")));
-s32 gHIDNetworkClientID __attribute__((section(".data"))) = 0;
-u8 gUsedProtocolVersion  __attribute__((section(".data"))) = WIIU_CP_TCP_HANDSHAKE;
+uint16_t gNetworkController[gHIDMaxDevices][HID_MAX_PADS_COUNT][4] __attribute__((section(".data")));
+int32_t gHIDNetworkClientID __attribute__((section(".data"))) = 0;
+uint8_t gUsedProtocolVersion  __attribute__((section(".data"))) = WIIU_CP_TCP_HANDSHAKE;
 
 WPADConnectCallback gWPADConnectCallback[4] __attribute__((section(".data")));
 WPADConnectCallback gKPADConnectCallback[4] __attribute__((section(".data")));
 WPADExtensionCallback gExtensionCallback[4] __attribute__((section(".data")));
 WPADSamplingCallback gSamplingCallback __attribute__((section(".data"))) = 0;
-u8 gCallbackCooldown __attribute__((section(".data"))) = 0;
-u8 gNetworkControllerActivated __attribute__((section(".data"))) = 1;
+uint8_t gCallbackCooldown __attribute__((section(".data"))) = 0;
+uint8_t gNetworkControllerActivated __attribute__((section(".data"))) = 1;
 
-u8 gGlobalRumbleActivated __attribute__((section(".data"))) = 0;
+uint8_t gGlobalRumbleActivated __attribute__((section(".data"))) = 0;
 
-u32 gUDPClientip __attribute__((section(".data"))) = 0;
+uint32_t gUDPClientip __attribute__((section(".data"))) = 0;
 ControllerMappingPADInfo* gProPadInfo[4] __attribute__((section(".data"))) = {&gControllerMapping.proController[0].pad_infos[0],
                                                                               &gControllerMapping.proController[1].pad_infos[0],
                                                                               &gControllerMapping.proController[2].pad_infos[0],

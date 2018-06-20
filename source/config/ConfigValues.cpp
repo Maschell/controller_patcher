@@ -33,8 +33,8 @@ ConfigValues::~ConfigValues() {
     }
 }
 
-const u8 * ConfigValues::getValuesForPreset(std::map<std::string,const u8*> values,std::string possibleValue) {
-    std::map<std::string,const u8*>::iterator it;
+const uint8_t * ConfigValues::getValuesForPreset(std::map<std::string,const uint8_t*> values,std::string possibleValue) {
+    std::map<std::string,const uint8_t*>::iterator it;
     it = values.find(possibleValue);
     if (it != values.end()) {
         return it->second;
@@ -42,7 +42,7 @@ const u8 * ConfigValues::getValuesForPreset(std::map<std::string,const u8*> valu
     return NULL;
 }
 
-bool ConfigValues::setIfValueIsAControllerPresetEx(std::string value,s32 slot,s32 keyslot) {
+BOOL ConfigValues::setIfValueIsAControllerPresetEx(std::string value,int32_t slot,int32_t keyslot) {
     if(setIfValueIsPreset(presetGCValues,value,slot,keyslot)) return true;
     if(setIfValueIsPreset(presetDS3Values,value,slot,keyslot)) return true;
     if(setIfValueIsPreset(presetDS4Values,value,slot,keyslot)) return true;
@@ -52,11 +52,11 @@ bool ConfigValues::setIfValueIsAControllerPresetEx(std::string value,s32 slot,s3
 }
 
 //We need this function here so we can use preset sticks.
-bool ConfigValues::setIfValueIsPreset(std::map<std::string,const u8*> values,std::string possibleValue,s32 slot,s32 keyslot) {
+BOOL ConfigValues::setIfValueIsPreset(std::map<std::string,const uint8_t*> values,std::string possibleValue,int32_t slot,int32_t keyslot) {
     if(slot > gHIDMaxDevices || slot < 0 || keyslot < 0 || keyslot >= CONTRPS_MAX_VALUE) {
         return false;
     }
-    const u8 * values_ = NULL;
+    const uint8_t * values_ = NULL;
     if( keyslot == CONTRPS_VPAD_BUTTON_L_STICK_X ||
             keyslot == CONTRPS_VPAD_BUTTON_L_STICK_Y ||
             keyslot == CONTRPS_VPAD_BUTTON_R_STICK_X ||
@@ -90,7 +90,7 @@ bool ConfigValues::setIfValueIsPreset(std::map<std::string,const u8*> values,std
 }
 
 
-s32 ConfigValues::getValueFromMap(std::map<std::string,int> values,std::string nameOfString) {
+int32_t ConfigValues::getValueFromMap(std::map<std::string,int> values,std::string nameOfString) {
     std::map<std::string,int>::iterator it;
     it = values.find(nameOfString);
     if (it != values.end()) {
@@ -101,8 +101,8 @@ s32 ConfigValues::getValueFromMap(std::map<std::string,int> values,std::string n
     return -1;
 }
 
-s32 ConfigValues::getPresetValueEx(std::string possibleString) {
-    s32 rightValue = -1;
+int32_t ConfigValues::getPresetValueEx(std::string possibleString) {
+    int32_t rightValue = -1;
     if((rightValue = getValueFromMap(gGamePadValuesToCONTRPSString,possibleString))!= -1) {
         if(HID_DEBUG) {
             DEBUG_FUNCTION_LINE("Used pre-defined VPAD_VALUE! \"%s\" is %d\n",possibleString.c_str(),rightValue);
@@ -115,11 +115,11 @@ s32 ConfigValues::getPresetValueEx(std::string possibleString) {
     return rightValue;
 }
 
-void ConfigValues::addDeviceNameEx(u16 vid,u16 pid,std::string value) {
+void ConfigValues::addDeviceNameEx(uint16_t vid,uint16_t pid,std::string value) {
     deviceNames[StringTools::strfmt("%04X%04X",vid,pid).c_str()] = value;
 }
 
-std::string ConfigValues::getStringByVIDPIDEx(u16 vid,u16 pid) {
+std::string ConfigValues::getStringByVIDPIDEx(uint16_t vid,uint16_t pid) {
     std::string result = "";
     std::map<std::string,std::string>::iterator it;
 

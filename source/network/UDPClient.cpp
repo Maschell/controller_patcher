@@ -24,7 +24,7 @@
 
 UDPClient * UDPClient::instance = NULL;
 
-UDPClient::UDPClient(u32 ip, s32 port) {
+UDPClient::UDPClient(uint32_t ip, int32_t port) {
     sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd < 0)
         return;
@@ -50,12 +50,12 @@ UDPClient::~UDPClient() {
     }
 }
 
-bool UDPClient::sendData(char * data,s32 length) {
+BOOL UDPClient::sendData(char * data,int32_t length) {
     if(sockfd < 0 || data == 0 || length < 0 || gUsedProtocolVersion < WIIU_CP_TCP_HANDSHAKE_VERSION_3) {
         return false;
     }
     if(length > 1400) length = 1400;
 
-    s32 ret = send(sockfd, data, length, 0);
+    int32_t ret = send(sockfd, data, length, 0);
     return (ret >= 0);
 }

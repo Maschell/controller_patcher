@@ -65,8 +65,8 @@ private:
         }
     }
 
-    static s32 getPriority() {
-        s32 priority = 28;
+    static int32_t getPriority() {
+        int32_t priority = 28;
         if(OSGetTitleID() == 0x00050000101c9300 || //The Legend of Zelda Breath of the Wild JPN
                 OSGetTitleID() == 0x00050000101c9400 || //The Legend of Zelda Breath of the Wild USA
                 OSGetTitleID() == 0x00050000101c9500 || //The Legend of Zelda Breath of the Wild EUR
@@ -78,7 +78,7 @@ private:
         return priority;
     }
 
-    CPTCPServer(s32 port);
+    CPTCPServer(int32_t port);
 
     virtual ~CPTCPServer();
 
@@ -88,9 +88,9 @@ private:
 
     virtual void DetachAndDelete();
 
-    virtual bool whileLoop();
+    virtual BOOL whileLoop();
 
-    virtual bool acceptConnection();
+    virtual BOOL acceptConnection();
 
     virtual void onConnectionClosed();
 

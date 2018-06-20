@@ -46,29 +46,29 @@ private:
     PARSE_TYPE getType();
     void setType(PARSE_TYPE newType);
 
-    u16 getSlot();
-    void setSlot(u16 newSlot);
+    uint16_t getSlot();
+    void setSlot(uint16_t newSlot);
 
-    bool parseIni();
+    BOOL parseIni();
 
-    bool Init();
+    BOOL Init();
 
-    bool parseConfigString(std::string content);
+    BOOL parseConfigString(std::string content);
 
-    s32 getSlotController(std::string identify);
+    int32_t getSlotController(std::string identify);
 
-    s32 checkExistingController(s32 vid, s32 pid);
+    int32_t checkExistingController(int32_t vid, int32_t pid);
 
-    s32 getValueFromKeyValue(std::string value_pair,std::string expectedKey,std::string delimiter);
+    int32_t getValueFromKeyValue(std::string value_pair,std::string expectedKey,std::string delimiter);
 
-    bool resetConfig();
+    BOOL resetConfig();
 
     void parseSingleLine(std::string line);
-    u16 slot_b;
+    uint16_t slot_b;
     PARSE_TYPE type_b;
 
-    u16 vid;
-    u16 pid;
+    uint16_t vid;
+    uint16_t pid;
 
     std::string content;
     std::vector<std::string> contentLines;

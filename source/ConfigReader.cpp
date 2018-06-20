@@ -31,13 +31,13 @@
 
 #include <utils/logger.h>
 
-s32 ConfigReader::numberValidFiles = 0;
+int32_t ConfigReader::numberValidFiles = 0;
 ConfigReader *ConfigReader::instance = NULL;
 
 ConfigReader::ConfigReader() {
 }
 
-bool ConfigReader::ReadConfigs(std::string path) {
+BOOL ConfigReader::ReadConfigs(std::string path) {
     std::vector<std::string> fileList = ScanFolder(path);
     if(fileList.size() == 1 && fileList[0].compare("ERROR") == 0) {
         return false;
@@ -70,7 +70,7 @@ std::vector<std::string> ConfigReader::ScanFolder(std::string path) {
         return config_files;
     }
     while ((dirent = readdir(dirHandle)) != 0) {
-        bool isDir = dirent->d_type & DT_DIR;
+        BOOL isDir = dirent->d_type & DT_DIR;
         const char *filename = dirent->d_name;
 
         if(strcmp(filename,".") == 0 || strcmp(filename,"..") == 0) {
@@ -102,7 +102,7 @@ void ConfigReader::processFileList(std::vector<std::string> path) {
 
 std::string ConfigReader::loadFileToString(std::string path) {
     std::string strBuffer = "";
-    u8 * buffer = NULL;
+    uint8_t * buffer = NULL;
     if(FSUtils::LoadFileToMem(path.c_str(),&buffer,NULL) > 0) {
         strBuffer = std::string((char *)buffer);
         strBuffer = StringTools::removeCharFromString(strBuffer,'\r');

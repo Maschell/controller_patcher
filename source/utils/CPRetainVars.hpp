@@ -22,55 +22,55 @@
 
 extern ControllerMapping gControllerMapping;
 
-extern u8 gConfig_done;
-extern u8 gButtonRemappingConfigDone;
+extern uint8_t gConfig_done;
+extern uint8_t gButtonRemappingConfigDone;
 
-extern u32 gHIDAttached;
-extern u32 gHIDCurrentDevice;
+extern uint32_t gHIDAttached;
+extern uint32_t gHIDCurrentDevice;
 extern HIDClient gHIDClient;
 
-extern u16 gHIDRegisteredDevices;
+extern uint16_t gHIDRegisteredDevices;
 
 extern HID_DEVICE_DATA gHID_Devices[gHIDMaxDevices];
 
-extern u8 gHID_Mouse_Mode;
+extern uint8_t gHID_Mouse_Mode;
 
-extern u8 gMouseModeCoolDown;
+extern uint8_t gMouseModeCoolDown;
 
-extern u32 gGamePadValues[CONTRPS_MAX_VALUE];
+extern uint32_t gGamePadValues[CONTRPS_MAX_VALUE];
 
-extern u8 config_controller[gHIDMaxDevices][CONTRPS_MAX_VALUE][2];
-extern u32 config_controller_hidmask[gHIDMaxDevices];
+extern uint8_t config_controller[gHIDMaxDevices][CONTRPS_MAX_VALUE][2];
+extern uint32_t config_controller_hidmask[gHIDMaxDevices];
 
-extern u32 gHID_LIST_GC;
-extern u32 gHID_LIST_DS3;
-extern u32 gHID_LIST_DS4;
-extern u32 gHID_LIST_KEYBOARD;
-extern u32 gHID_LIST_SWITCH_PRO;
-extern u32 gHID_LIST_MOUSE;
-extern u16 gGamePadSlot;
+extern uint32_t gHID_LIST_GC;
+extern uint32_t gHID_LIST_DS3;
+extern uint32_t gHID_LIST_DS4;
+extern uint32_t gHID_LIST_KEYBOARD;
+extern uint32_t gHID_LIST_SWITCH_PRO;
+extern uint32_t gHID_LIST_MOUSE;
+extern uint16_t gGamePadSlot;
 
-extern u16 gHID_SLOT_GC;
-extern u16 gHID_SLOT_KEYBOARD;
-extern u16 gMouseSlot;
+extern uint16_t gHID_SLOT_GC;
+extern uint16_t gHID_SLOT_KEYBOARD;
+extern uint16_t gMouseSlot;
 
-extern u8 gOriginalDimState;
-extern u8 gOriginalAPDState;
+extern uint8_t gOriginalDimState;
+extern uint8_t gOriginalAPDState;
 
-extern u16 gNetworkController[gHIDMaxDevices][HID_MAX_PADS_COUNT][4];
-extern s32 gHIDNetworkClientID;
+extern uint16_t gNetworkController[gHIDMaxDevices][HID_MAX_PADS_COUNT][4];
+extern int32_t gHIDNetworkClientID;
 
-extern u8 gUsedProtocolVersion;
+extern uint8_t gUsedProtocolVersion;
 
 extern WPADConnectCallback gWPADConnectCallback[4];
 extern WPADConnectCallback gKPADConnectCallback[4];
 extern WPADExtensionCallback gExtensionCallback[4];
 extern WPADSamplingCallback gSamplingCallback;
-extern u8 gCallbackCooldown;
-extern u8 gGlobalRumbleActivated;
-extern u8 gNetworkControllerActivated;
+extern uint8_t gCallbackCooldown;
+extern uint8_t gGlobalRumbleActivated;
+extern uint8_t gNetworkControllerActivated;
 
-extern u32 gUDPClientip;
+extern uint32_t gUDPClientip;
 extern ControllerMappingPADInfo* gProPadInfo[4];
 
 #endif // CP_RETAINS_VARS_H_
