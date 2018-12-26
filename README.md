@@ -13,7 +13,15 @@ Configfiles for all controllers are collection in [this repository](https://gith
 To able to use the logging change the "DO_LOGGING" parameter in the Makefile.
 
 # Compiling
-You need to install all dependencies first!
+You either need to install all dependencies first! Or use the provided docker configuration.
+
+Start the docker container by running:
+``` docker-compose up ```
+When this container is running you'll be able to run the rest of the command below inside this container.
+This container will have all dependencies required to be able to make and make install the app: 
+- devkitpro/devkitppc
+- libutils
+- dynamic_libs
 
 Install this static library into your portlibs folder via: 
 
