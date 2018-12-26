@@ -1,4 +1,4 @@
-FROM devkitpro/devkitppc:latest
+FROM devkitpro/devkitppc:20180703
 
 ## Create & set workdir
 RUN mkdir /opt/project &&\
