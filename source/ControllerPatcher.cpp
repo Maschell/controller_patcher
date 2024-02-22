@@ -476,6 +476,7 @@ bool ControllerPatcher::Init(const char * pathToConfig){
     InitSysHIDFunctionPointers();
     InitVPadFunctionPointers();
     InitPadScoreFunctionPointers();
+    // log_init_();
 
     gSamplingCallback = (wpad_sampling_callback_t)((u32)KPADRead + 0x1F0);
     if(*(u32*)gSamplingCallback != FIRST_INSTRUCTION_IN_SAMPLING_CALLBACK){

@@ -166,6 +166,17 @@ class ControllerPatcherUtils{
     /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * Stick functions
      *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+        /**
+            \brief Sign-extend negative numbers of lower bit lengths into s16 type
+
+            \param input       Input value (from HID data)
+            \param bit_length  Bit length of this input number
+
+            \return The number in s16 type
+        **/
+        static s16 signExtendValue(u16 input, u8 bit_length);
+
         /**
             \brief Normalizes the stick to valid values.
 
@@ -187,7 +198,7 @@ class ControllerPatcherUtils{
 
             \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
         **/
-        static f32 convertAnalogValue(u8 value, u8 default_val, u8 min, u8 max, u8 invert,u8 deadzone);
+        static f32 convertAnalogValue(s32 value, s32 default_val, s32 min, s32 max, u8 invert,u8 deadzone);
 
         /**
             \brief Calculates a the stick data (Vec2D) from given digital direction.

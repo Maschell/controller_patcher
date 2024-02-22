@@ -109,7 +109,7 @@ class ControllerPatcher{
         static CONTROLLER_PATCHER_RESULT_OR_ERROR enableControllerMapping();
 
         /**
-            Disbale the Controller mapping. Afterwards all connected controllers will be used for the gamepad.
+            Disable the Controller mapping. Afterwards all connected controllers will be used for the gamepad.
             @return When the functions failed result < 0 is returned. If the result is == 0 the function was successful.
         **/
         static CONTROLLER_PATCHER_RESULT_OR_ERROR disableControllerMapping();
@@ -171,7 +171,7 @@ class ControllerPatcher{
         static bool isControllerConnectedAndActive(UController_Type type,s32 mapping_slot = 0);
 
         /**
-            Search for a connected mouse and returns a pointer to it's data.
+            Search for a connected mouse and returns a pointer to its data.
             @return A pointer to the first connected mouse that is found. NULL if no mouse is connected.
         **/
         static HID_Mouse_Data * getMouseData();
