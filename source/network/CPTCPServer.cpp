@@ -132,7 +132,7 @@ BOOL CPTCPServer::whileLoop() {
                     my_cb_user *user = NULL;
                     ControllerPatcherHID::externAttachDetachCallback(&device, HID_DEVICE_ATTACH);
                     if ((ret = ControllerPatcherUtils::getDataByHandle(handle, &user)) < 0) {
-                        DEBUG_FUNCTION_LINE("Error in %02X: getDataByHandle(%d,%08X).", WIIU_CP_TCP_ATTACH, handle, &user);
+                        DEBUG_FUNCTION_LINE("Error in %02X: getDataByHandle(%d,%p).", WIIU_CP_TCP_ATTACH, handle, (void *) &user);
                         DEBUG_FUNCTION_LINE("Error in %02X: Config for the controller is missing.", WIIU_CP_TCP_ATTACH);
                         if ((ret = sendbyte(clientfd, WIIU_CP_TCP_ATTACH_CONFIG_NOT_FOUND) < 0)) {
                             DEBUG_FUNCTION_LINE("Error in %02X: Sending the WIIU_CP_TCP_ATTACH_CONFIG_NOT_FOUND byte failed. Error: %d.", WIIU_CP_TCP_ATTACH, ret);
@@ -200,7 +200,7 @@ BOOL CPTCPServer::whileLoop() {
                     }
                     my_cb_user *user = NULL;
                     if (ControllerPatcherUtils::getDataByHandle(handle, &user) < 0) {
-                        DEBUG_FUNCTION_LINE("Error in %02X: getDataByHandle(%d,%08X).", WIIU_CP_TCP_DETACH, handle, &user);
+                        DEBUG_FUNCTION_LINE("Error in %02X: getDataByHandle(%d,%p).", WIIU_CP_TCP_DETACH, handle, (void *) &user);
                         return false;
                         break;
                     }
@@ -246,7 +246,7 @@ BOOL CPTCPServer::whileLoop() {
                     }
                     int32_t ret = sendbyte(clientfd, WIIU_CP_TCP_PONG);
                     if (ret < 0) {
-                        DEBUG_FUNCTION_LINE("Error in %02X: sendbyte PONG");
+                        DEBUG_FUNCTION_LINE("Error in sendbyte PONG");
                         return false;
                     }
 

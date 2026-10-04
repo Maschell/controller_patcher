@@ -85,6 +85,8 @@ void ControllerPatcher::ResetConfig() {
     memset(config_controller_hidmask, 0, sizeof(config_controller_hidmask));               // Init / Invalid everything
     memset(gNetworkController, 0, sizeof(gNetworkController));                             // Init / Invalid everything
     memset(gHID_Devices, 0, sizeof(gHID_Devices));                                         // Init / Invalid everything
+    memset(gHIDPadsWithData, 0, sizeof(gHIDPadsWithData));                                 // Init / Invalid everything
+    memset(gHIDLastReportTime, 0, sizeof(gHIDLastReportTime));                             // Init / Invalid everything
 
     memset(gWPADConnectCallback, 0, sizeof(gWPADConnectCallback));
     memset(gKPADConnectCallback, 0, sizeof(gKPADConnectCallback));
@@ -483,6 +485,8 @@ void ControllerPatcher::ResetConfig() {
     ControllerPatcherUtils::setConfigValue((uint8_t *) &config_controller[xinput_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y_DEADZONE], CONTROLLER_PATCHER_VALUE_SET, HID_XINPUT_STICK_R_Y[STICK_CONF_DEADZONE]);
     ControllerPatcherUtils::setConfigValue((uint8_t *) &config_controller[xinput_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y_MINMAX], HID_XINPUT_STICK_R_Y[STICK_CONF_MIN], HID_XINPUT_STICK_R_Y[STICK_CONF_MAX]);
     ControllerPatcherUtils::setConfigValue((uint8_t *) &config_controller[xinput_slot][CONTRPS_VPAD_BUTTON_R_STICK_Y_INVERT], CONTROLLER_PATCHER_VALUE_SET, HID_XINPUT_STICK_R_Y[STICK_CONF_INVERT]);
+
+    ControllerPatcherUtils::normalizeStickAxisConfig();
 }
 
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::UpdateSamplingFunctionAddress() {
@@ -512,7 +516,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::UpdateSamplingFunctionAddr
 BOOL ControllerPatcher::Init(const char *pathToConfig) {
     gSamplingCallback = nullptr;
     if (gSamplingCallback != nullptr) {
-        DEBUG_FUNCTION_LINE("Found the gSamplingCallback at %08X ", gSamplingCallback);
+        DEBUG_FUNCTION_LINE("Found the gSamplingCallback at %08X ", (uint32_t) (void *) gSamplingCallback);
     }
 
     if (HID_DEBUG) {
@@ -539,6 +543,7 @@ BOOL ControllerPatcher::Init(const char *pathToConfig) {
             DEBUG_FUNCTION_LINE("Done with reading config files from SD Card");
             gConfig_done = HID_SDCARD_READ;
         }
+        ControllerPatcherUtils::normalizeStickAxisConfig();
     }
 
     DEBUG_FUNCTION_LINE("Initializing the data for button remapping");
@@ -1166,7 +1171,7 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setKPADConnectedCallback(i
     return CONTROLLER_PATCHER_ERROR_NONE;
 }
 
-CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setKPADExtensionCallback(int32_t chan, WPADConnectCallback callback) {
+CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::setKPADExtensionCallback(int32_t chan, WPADExtensionCallback callback) {
     if (chan >= 4) {
         return CONTROLLER_PATCHER_ERROR_INVALID_CHAN;
     }
@@ -1214,11 +1219,11 @@ CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::handleCallbackData(BOOL bu
 CONTROLLER_PATCHER_RESULT_OR_ERROR ControllerPatcher::handleCallbackDataInternal(WPADChan chan) {
     if (gWPADConnectCallback[chan] != NULL) {
         DEBUG_FUNCTION_LINE("Called WPAD connect callback for pro controller in slot %d!", chan + 1);
-        gWPADConnectCallback[chan](chan, 0);
+        gWPADConnectCallback[chan](chan, (WPADError) 0);
     }
     if (gKPADConnectCallback[chan] != NULL) {
         DEBUG_FUNCTION_LINE("Called KPAD connect callback for pro controller in slot %d!", chan + 1);
-        gKPADConnectCallback[chan](chan, 0);
+        gKPADConnectCallback[chan](chan, (WPADError) 0);
     }
     if (gExtensionCallback[chan] != NULL) {
         DEBUG_FUNCTION_LINE("Called extension callback for pro controller in slot %d!", chan + 1);

@@ -168,6 +168,47 @@ private:
      * Stick functions
      *---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
     /**
+        \brief Process HID report data for a stick axis.
+
+        \param buffer_axis           Reference to axis buffer
+        \param cur_data              Pointer to the device HID data
+        \param deviceslot            Device slot
+        \param axis_code             CONTRPS_VPAD_BUTTON_*_STICK_*             start byte in HID data of axis report, default value 
+        \param axis_deadzone_code    CONTRPS_VPAD_BUTTON_*_STICK_*_DEADZONE    axis deadzone
+        \param axis_minmax_code      CONTRPS_VPAD_BUTTON_*_STICK_*_MINMAX      least significant bytes for axis min, axis max
+        \param axis_bit_length_code  CONTRPS_VPAD_BUTTON_*_STICK_*_BIT_LENGTH  8 to 16 bits supported
+        \param axis_bit_offset_code  CONTRPS_VPAD_BUTTON_*_STICK_*_BIT_OFFSET  not all HID data is byte-aligned (Adaptoid uses 2 x 12bit axes)
+        \param axis_minmax_msb_code  CONTRPS_VPAD_BUTTON_*_STICK_*_MINMAX_MSB  most significant bytes for axis min, axis max
+        \param axis_default_msb_code CONTRPS_VPAD_BUTTON_*_STICK_*_DEFAULT_MSB most significant byte for axis default value
+        \param axis_signed_code      CONTRPS_VPAD_BUTTON_*_STICK_*_SIGNED      is axis report a signed value?
+        \param axis_invert_code      CONTRPS_VPAD_BUTTON_*_STICK_*_INVERT      invert axis?
+
+        \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
+    **/
+    static CONTROLLER_PATCHER_RESULT_OR_ERROR processStickAxis(float &buffer_axis, const uint8_t *cur_data, int32_t deviceslot,
+                                                               uint8_t axis_code, uint8_t axis_deadzone_code, uint8_t axis_minmax_code,
+                                                               uint8_t axis_bit_length_code, uint8_t axis_bit_offset_code,
+                                                               uint8_t axis_minmax_msb_code, uint8_t axis_default_msb_code,
+                                                               uint8_t axis_signed_code, uint8_t axis_invert_code);
+
+    /**
+        \brief Sign-extend negative numbers of lower bit lengths into int16_t type
+
+        \param input       Input value (from HID data)
+        \param bit_length  Bit length of this input number
+
+        \return The number in int16_t type
+    **/
+    static int16_t signExtendValue(uint16_t input, uint8_t bit_length);
+
+    /**
+        \brief Fills in defaults for the optional multi-byte stick axis settings of every device slot, so processStickAxis
+               can use them without checks: *_BIT_LENGTH becomes 8 when unset or outside 8 to 16, *_SIGNED becomes false
+               when unset. Must be called whenever the config has been (re)loaded.
+    **/
+    static void normalizeStickAxisConfig();
+
+    /**
         \brief Normalizes the stick to valid values.
 
         \param stick  Pointer to the stick that will be normalized
@@ -188,8 +229,7 @@ private:
 
         \return When the functions failed result < 0 is returned. If the result is >= 0 the function was successful.
     **/
-    static float convertAnalogValue(uint8_t value, uint8_t default_val, uint8_t min, uint8_t max, uint8_t invert, uint8_t deadzone);
-
+    static float convertAnalogValue(int32_t value, int32_t default_val, int32_t min, int32_t max, uint8_t invert, uint8_t deadzone);
     /**
         \brief Calculates a the stick data (VPADVec2D) from given digital direction.
 

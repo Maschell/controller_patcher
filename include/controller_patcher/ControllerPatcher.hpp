@@ -111,7 +111,7 @@ public:
     static CONTROLLER_PATCHER_RESULT_OR_ERROR UpdateSamplingFunctionAddress();
 
     /**
-        Disbale the Controller mapping. Afterwards all connected controllers will be used for the gamepad.
+        Disable the Controller mapping. Afterwards all connected controllers will be used for the gamepad.
         @return When the functions failed result < 0 is returned. If the result is == 0 the function was successful.
     **/
     static CONTROLLER_PATCHER_RESULT_OR_ERROR disableControllerMapping();
@@ -173,7 +173,7 @@ public:
     static BOOL isControllerConnectedAndActive(UController_Type type, int32_t mapping_slot = 0);
 
     /**
-        Search for a connected mouse and returns a pointer to it's data.
+        Search for a connected mouse and returns a pointer to its data.
         @return A pointer to the first connected mouse that is found. NULL if no mouse is connected.
     **/
     static HID_Mouse_Data *getMouseData();
@@ -241,7 +241,7 @@ public:
 
     static CONTROLLER_PATCHER_RESULT_OR_ERROR setKPADConnectedCallback(int32_t chan, WPADConnectCallback callback);
 
-    static CONTROLLER_PATCHER_RESULT_OR_ERROR setKPADExtensionCallback(int32_t chan, WPADConnectCallback callback);
+    static CONTROLLER_PATCHER_RESULT_OR_ERROR setKPADExtensionCallback(int32_t chan, WPADExtensionCallback callback);
 
     static CONTROLLER_PATCHER_RESULT_OR_ERROR setWPADConnectCallback(int32_t chan, WPADConnectCallback callback);
 

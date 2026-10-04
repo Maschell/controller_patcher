@@ -39,6 +39,8 @@ uint32_t gGamePadValues[CONTRPS_MAX_VALUE] __attribute__((section(".data")));
 
 uint8_t config_controller[gHIDMaxDevices][CONTRPS_MAX_VALUE][2] __attribute__((section(".data")));
 uint32_t config_controller_hidmask[gHIDMaxDevices] __attribute__((section(".data")));
+uint8_t gHIDPadsWithData[gHIDMaxDevices] __attribute__((section(".data")));
+OSTime gHIDLastReportTime[gHIDMaxDevices][HID_MAX_PADS_COUNT] __attribute__((section(".data")));
 
 uint32_t gHID_LIST_GC __attribute__((section(".data")))         = 0;
 uint32_t gHID_LIST_DS3 __attribute__((section(".data")))        = 0;

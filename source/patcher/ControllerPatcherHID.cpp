@@ -86,6 +86,10 @@ void ControllerPatcherHID::myHIDMouseReadCallback(uint32_t handle, int32_t error
 
         cur_mouse_data->valuedChanged = 1;
 
+        gHIDLastReportTime[usr->slotdata.deviceslot][slot] = OSGetTime();
+        gHIDPadsWithData[usr->slotdata.deviceslot] |= (1 << slot);
+        DCFlushRange(&gHIDPadsWithData[usr->slotdata.deviceslot], sizeof(gHIDPadsWithData[usr->slotdata.deviceslot]));
+
         //DEBUG_FUNCTION_LINE("%02X %02X %02X %02X %02X %02X %02X %02X %d = X: %d Y: %d \n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7],bytes_transfered,x_value,y_value);
 
         HIDRead(handle, usr->buf, bytes_transfered, myHIDMouseReadCallback, usr);
@@ -209,6 +213,10 @@ int32_t ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevic
             usr->pads_per_device = pads_per_device;
             usr->pad_slot        = pad_slot;
 
+            // Until its first report arrives, the pad's data is just zeroed memory, so don't treat it as input
+            gHIDPadsWithData[slotdata->deviceslot] &= ~(1 << pad_slot);
+            DCFlushRange(&gHIDPadsWithData[slotdata->deviceslot], sizeof(gHIDPadsWithData[slotdata->deviceslot]));
+
             for (int32_t i = 0; i < pads_per_device; i++) {
                 memset(&gHID_Devices[slotdata->deviceslot].pad_data[pad_slot + i], 0, sizeof(HID_Data));
 
@@ -307,6 +315,8 @@ int32_t ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevic
 
             if (user_data) {
                 config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1] &= ~(1 << user_data->pad_slot);
+                gHIDPadsWithData[slotdata->deviceslot] &= ~(1 << user_data->pad_slot);
+                DCFlushRange(&gHIDPadsWithData[slotdata->deviceslot], sizeof(gHIDPadsWithData[slotdata->deviceslot]));
                 DCFlushRange(&config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1], sizeof(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1]));
                 DCInvalidateRange(&config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1], sizeof(config_controller[slotdata->deviceslot][CONTRPS_CONNECTED_PADS][1]));
                 if (user_data->buf) {
@@ -349,8 +359,6 @@ int32_t ControllerPatcherHID::AttachDetachCallback(HIDClient *p_client, HIDDevic
 }
 
 void ControllerPatcherHID::HIDReadCallback(uint32_t handle, unsigned char *buf, uint32_t bytes_transfered, my_cb_user *usr) {
-    ControllerPatcherUtils::doSampling(usr->slotdata.deviceslot, usr->pad_slot, false);
-
     //DEBUG_FUNCTION_LINE("my_read_cbInternal: %d %08X %d",bytes_transfered,usr->slotdata.hidmask,usr->slotdata.deviceslot);
     if (usr->slotdata.hidmask == gHID_LIST_GC) {
 
@@ -369,6 +377,7 @@ void ControllerPatcherHID::HIDReadCallback(uint32_t handle, unsigned char *buf, 
         DEBUG_FUNCTION_LINE("GC3 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X ",       buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);i++;
         DEBUG_FUNCTION_LINE("GC4 %08X: %02X %02X %02X %02X %02X %02X %02X %02X %02X \n",     buf[i*9+0],buf[i*9+1],buf[i*9+2],buf[i*9+3],buf[i*9+4],buf[i*9+5],buf[i*9+6],buf[i*9+7],buf[i*9+8]);*/
         HIDGCRumble(handle, usr);
+        ControllerPatcherUtils::doSampling(usr->slotdata.deviceslot, usr->pad_slot, false);
     } else if (usr->slotdata.hidmask != 0) {
         //Depending on how the switch pro controller is connected, it has a different data format. At first we had the Bluetooth version, so we need to convert
         //the USB one into it now. (When it's connected via USB). The network client always sends the BT version, even if connected via USB to the PC.
@@ -480,8 +489,14 @@ void ControllerPatcherHID::HIDReadCallback(uint32_t handle, unsigned char *buf, 
 
             DCFlushRange(&gHID_Devices[usr->slotdata.deviceslot].pad_data[slot], sizeof(HID_Data));
 
-            data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[slot]);
+            if (usr->pad_slot < HID_MAX_PADS_COUNT) {
+                gHIDLastReportTime[usr->slotdata.deviceslot][usr->pad_slot] = OSGetTime();
+                gHIDPadsWithData[usr->slotdata.deviceslot] |= (1 << usr->pad_slot);
+                DCFlushRange(&gHIDPadsWithData[usr->slotdata.deviceslot], sizeof(gHIDPadsWithData[usr->slotdata.deviceslot]));
+            }
 
+            data_ptr = &(gHID_Devices[usr->slotdata.deviceslot].pad_data[slot]);
+            ControllerPatcherUtils::doSampling(usr->slotdata.deviceslot, usr->pad_slot, false);
             HIDRumble(handle, usr, slot);
         }
     }

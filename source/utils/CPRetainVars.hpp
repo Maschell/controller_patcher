@@ -18,6 +18,7 @@
 #define CP_RETAINS_VARS_H_
 
 #include <controller_patcher/ControllerPatcherDefs.h>
+#include <coreinit/time.h>
 #include <nsyshid/hid.h>
 
 extern ControllerMapping gControllerMapping;
@@ -41,6 +42,8 @@ extern uint32_t gGamePadValues[CONTRPS_MAX_VALUE];
 
 extern uint8_t config_controller[gHIDMaxDevices][CONTRPS_MAX_VALUE][2];
 extern uint32_t config_controller_hidmask[gHIDMaxDevices];
+extern uint8_t gHIDPadsWithData[gHIDMaxDevices];                      // Per device slot, a bit per pad slot that has delivered at least one report
+extern OSTime gHIDLastReportTime[gHIDMaxDevices][HID_MAX_PADS_COUNT]; // Per device slot and pad slot, when the last report arrived
 
 extern uint32_t gHID_LIST_GC;
 extern uint32_t gHID_LIST_DS3;

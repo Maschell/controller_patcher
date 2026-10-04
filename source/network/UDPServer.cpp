@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "UDPServer.hpp"
+#include <coreinit/cache.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
-#include <coreinit/cache.h>
 #include <utils/logger.h>
 
 #define MAX_UDP_SIZE 0x578
@@ -60,8 +60,7 @@ UDPServer::~UDPServer() {
         }
     }
 
-        DEBUG_FUNCTION_LINE("Thread has been closed");
-
+    DEBUG_FUNCTION_LINE("Thread has been closed");
 }
 
 void UDPServer::StartUDPThread(UDPServer *server) {

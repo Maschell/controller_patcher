@@ -179,7 +179,7 @@ void ConfigParser::parseSingleLine(std::string line) {
                 if (getType() == PARSE_KEYBOARD) {
                     if ((rightValue = ConfigValues::getPresetValuesKeyboard(cur_values[1])) != -1) {
                         if (HID_DEBUG) {
-                            DEBUG_FUNCTION_LINE("Used pre-defined Keyboard! \"%s\" is %d", cur_values[1].c_str(), rightValue);
+                            DEBUG_FUNCTION_LINE("Used pre-defined Keyboard! \"%s\" is %ld", cur_values[1].c_str(), rightValue);
                         }
                     } else {
                         if (HID_DEBUG) {
@@ -209,7 +209,7 @@ void ConfigParser::parseSingleLine(std::string line) {
                     }
                 }
                 if (HID_DEBUG) {
-                    DEBUG_FUNCTION_LINE("Setting value to %d", rightValue);
+                    DEBUG_FUNCTION_LINE("Setting value to %ld", rightValue);
                 }
 
                 config_controller[hid_slot][keyslot][0] = CONTROLLER_PATCHER_VALUE_SET;
@@ -243,7 +243,7 @@ void ConfigParser::parseSingleLine(std::string line) {
                     config_controller[hid_slot][keyslot][1] = secondValue;
 
                     if (HID_DEBUG) {
-                        DEBUG_FUNCTION_LINE("Set %02X,%02X", firstValue, secondValue);
+                        DEBUG_FUNCTION_LINE("Set %02lX,%02lX", firstValue, secondValue);
                     }
                 } else {
                     if (HID_DEBUG) {
@@ -351,7 +351,7 @@ int32_t ConfigParser::getSlotController(std::string identify) {
 
 BOOL ConfigParser::parseIni() {
     if (getSlot() == HID_INVALID_SLOT) {
-        DEBUG_FUNCTION_LINE("Couldn't parse file. Not a valid slot. Probably broken config. Or you tried to have more than %d devices", getType(), gHIDMaxDevices);
+        DEBUG_FUNCTION_LINE("Couldn't parse file. Not a valid slot. Probably broken config. Or you tried to have more than %d devices", gHIDMaxDevices);
         return false;
     }
 

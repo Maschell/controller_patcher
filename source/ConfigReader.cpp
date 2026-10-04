@@ -102,7 +102,7 @@ void ConfigReader::processFileList(std::vector<std::string> path) {
 std::string ConfigReader::loadFileToString(std::string path) {
     std::string strBuffer = "";
     uint8_t *buffer       = NULL;
-    uint32_t outLen = 0;
+    uint32_t outLen       = 0;
     if (FSUtils::LoadFileToMem(path.c_str(), &buffer, &outLen) > 0) {
         strBuffer = std::string((char *) buffer, outLen);
         free(buffer);
